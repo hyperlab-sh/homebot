@@ -194,7 +194,10 @@ func TestZshForRunsCleanUnderCompinit(t *testing.T) {
 			if err := os.WriteFile(file, []byte(script), 0o600); err != nil {
 				t.Fatal(err)
 			}
-			init := "autoload -Uz compinit; compinit -D\n"
+			// -u: accept insecure fpath dirs without prompting. Hosted CI runners
+			// have group/world-writable dirs there, and compaudit would abort;
+			// this test checks homebot's output, not the host's permissions.
+			init := "autoload -Uz compinit; compinit -u -D\n"
 			if tc.registered {
 				init += "_comps[homebot]=_files\n"
 			}
