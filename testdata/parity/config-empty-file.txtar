@@ -1,0 +1,22 @@
+[!linux] skip 'recorded on linux'
+
+# An empty homebot.yml is valid: every default applies.
+# exit: 0
+exec homebot
+cmpwork stdout config-empty-file.stdout
+cmpwork stderr config-empty-file.stderr
+-- home/.home/homebot.yml --
+-- config-empty-file.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • No profile chosen for testhost
+       Set profiles.default or profiles.hosts in homebot.yml
+       → $EDITOR ~/.home/homebot.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- config-empty-file.stderr --

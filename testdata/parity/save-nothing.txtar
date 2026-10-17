@@ -1,0 +1,55 @@
+[!linux] skip 'recorded on linux'
+
+# Nothing to commit, with a remote that has everything already; then an untracked file, which is left for triage.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot save
+cmpwork stdout save-nothing.stdout
+cmpwork stderr save-nothing.stderr
+exec sh -c 'echo new > home/.home/untracked.txt'
+# exit: 0
+exec homebot save
+cmpwork stdout save-untracked.stdout
+exec git -C home/.home status --porcelain
+cmpwork stdout status.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- save-nothing.stdout --
+Nothing new to commit.
+-- save-nothing.stderr --
+-- save-untracked.stdout --
+Nothing new to commit.
+-- status.stdout --
+?? untracked.txt

@@ -1,0 +1,49 @@
+[!linux] skip 'recorded on linux'
+
+# The remote is gone: the commit is made, nothing is pushed, and the message says how to find out why.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+exec git -C home/.home remote set-url origin $WORK/missing.git
+exec sh -c 'echo more >> home/.home/autolink/common/zshrc'
+# exit: 0
+exec homebot save
+cmpwork stdout save-unreachable.stdout
+cmpwork stderr save-unreachable.stderr
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- save-unreachable.stdout --
+committed 1 file
+Couldn't reach the remote, so nothing was pushed. To see why:
+  homebot remote
+-- save-unreachable.stderr --

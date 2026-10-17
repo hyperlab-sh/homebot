@@ -1,0 +1,227 @@
+compare/index.html: homebot
+compare/index.html: homebot triage
+index.html: homebot
+index.html: homebot next
+index.html: homebot remote
+index.html: homebot cleanup
+index.html: homebot cleanup
+index.html: homebot triage
+index.html: homebot
+index.html: homebot
+index.html: homebot next
+index.html: homebot pack ~/.config/thing
+index.html: homebot pack ~/.config/thing --layer linux
+index.html: homebot pack ~/.netrc --private
+index.html: homebot triage
+index.html: homebot save
+index.html: homebot link
+index.html: homebot unpack
+install/index.html: homebot remote
+install/index.html: homebot cleanup
+install/index.html: homebot completion bash
+install/index.html: homebot completion zsh
+install/index.html: homebot completion fish
+install/index.html: homebot version --check
+install/index.html: homebot tidy --notify
+install/index.html: homebot
+layout/index.html: homebot unpack
+layout/index.html: homebot export
+layout/index.html: homebot triage
+linking/index.html: homebot link
+linking/index.html: homebot link
+linking/index.html: homebot link --dry-run    # show what would happen
+linking/index.html: homebot link --backup     # rename blockers to *.homebot-backup-<time>, then link
+linking/index.html: homebot cleanup           # later: compare each backup with the link, then decide
+linking/index.html: homebot pack
+linking/index.html: homebot link
+linking/index.html: homebot cleanup
+linking/index.html: homebot save
+linking/index.html: homebot save
+linking/index.html: homebot link
+linking/index.html: homebot unlink
+linking/index.html: homebot link
+linking/index.html: homebot tidy
+linking/index.html: homebot pack
+linking/index.html: homebot pack ~/.config/zed                  # autolink/common/config/zed
+linking/index.html: homebot pack ~/.config/zed --layer linux    # autolink/linux/config/zed
+linking/index.html: homebot pack ~/.netrc --private             # private/common/netrc (local) + netrc.age (committed)
+naming/index.html: homebot name         # show the configured name and what works here
+naming/index.html: homebot name rosie   # rename this home; other machines follow once it is saved and synced
+naming/index.html: homebot name --off   # remove the name and its link; keep homebot
+naming/index.html: homebot name homebot
+naming/index.html: homebot name
+naming/index.html: homebot shell zsh
+personas/index.html: homebot persona list
+personas/index.html: homebot persona show <id>
+personas/index.html: homebot persona use neatpik
+personas/index.html: homebot persona use none
+personas/index.html: homebot save
+personas/index.html: homebot --plain <command>
+personas/index.html: homebot name
+personas/index.html: homebot persona new tester
+personas/index.html: homebot persona validate tester
+personas/index.html: homebot persona preview tester
+personas/index.html: homebot persona preview tester --event inbox.nudge --all-variants
+personas/index.html: homebot persona ids
+personas/index.html: homebot pack
+personas/index.html: homebot persona validate tester
+profiles/index.html: homebot unpack
+profiles/index.html: homebot unpack --dry-run      # print the steps, run nothing
+profiles/index.html: homebot unpack --from 4       # resume after a failure (the error tells you N)
+profiles/index.html: homebot actions               # list every action available
+profiles/index.html: homebot link
+profiles/index.html: homebot actions
+profiles/index.html: homebot action <name> [args]
+profiles/index.html: homebot export
+profiles/index.html: homebot export
+reference/commands/index.html: homebot --help
+reference/commands/index.html: homebot help <command>
+reference/commands/index.html: homebot persona
+reference/commands/index.html: homebot persona use --help
+reference/commands/index.html: homebot help persona use
+reference/commands/index.html: homebot unpack
+reference/commands/index.html: homebot unpack --dry-run
+reference/commands/index.html: homebot persona
+reference/commands/index.html: homebot name [word]
+reference/commands/index.html: homebot name --off
+reference/commands/index.html: homebot --plain save
+reference/commands/index.html: homebot save --plain
+reference/commands/index.html: homebot help
+reference/commands/index.html: homebot help --plain link
+reference/commands/index.html: homebot --help
+reference/commands/index.html: homebot
+reference/commands/index.html: homebot next
+reference/commands/index.html: homebot unpack [profile]
+reference/commands/index.html: homebot pack <path>
+reference/commands/index.html: homebot link
+reference/commands/index.html: homebot unlink
+reference/commands/index.html: homebot link
+reference/commands/index.html: homebot cleanup
+reference/commands/index.html: homebot keys init
+reference/commands/index.html: homebot unlock
+reference/commands/index.html: homebot lock
+reference/commands/index.html: homebot triage
+reference/commands/index.html: homebot inventory
+reference/commands/index.html: homebot remote [url]
+reference/commands/index.html: homebot save
+reference/commands/index.html: homebot export [name...]
+reference/commands/index.html: homebot tidy
+reference/commands/index.html: homebot name
+reference/commands/index.html: homebot persona use
+reference/commands/index.html: homebot version
+reference/commands/index.html: homebot actions
+reference/commands/index.html: homebot action <name>
+reference/commands/index.html: homebot action <name> [args]
+reference/commands/index.html: homebot action apt-repos linux/apt-repos
+reference/commands/index.html: homebot shell zsh
+reference/commands/index.html: homebot completion zsh
+reference/commands/index.html: homebot name [word]
+reference/commands/index.html: homebot shell zsh
+reference/commands/index.html: homebot persona [list]
+reference/commands/index.html: homebot persona show <id>
+reference/commands/index.html: homebot persona use <id|none>
+reference/commands/index.html: homebot persona new <id>
+reference/commands/index.html: homebot persona validate [id|file]
+reference/commands/index.html: homebot persona preview <id>
+reference/commands/index.html: homebot persona ids
+reference/commands/index.html: homebot triage
+reference/commands/index.html: homebot remote
+reference/commands/index.html: homebot remote
+reference/commands/index.html: homebot remote <url>
+reference/commands/index.html: homebot inbox
+reference/commands/index.html: homebot next
+reference/commands/index.html: homebot unpack [profile]
+reference/commands/index.html: homebot unpack --dry-run
+reference/commands/index.html: homebot unpack server --from 4
+reference/commands/index.html: homebot pack &lt;path&gt;...
+reference/commands/index.html: homebot pack ~/.config/zed
+reference/commands/index.html: homebot pack --layer linux ~/.config/foo
+reference/commands/index.html: homebot pack --private ~/.ssh/id_ed25519
+reference/commands/index.html: homebot link
+reference/commands/index.html: homebot unlink
+reference/commands/index.html: homebot cleanup
+reference/commands/index.html: homebot keys init
+reference/commands/index.html: homebot unlock
+reference/commands/index.html: homebot lock
+reference/commands/index.html: homebot triage
+reference/commands/index.html: homebot inventory
+reference/commands/index.html: homebot remote [url]
+reference/commands/index.html: homebot remote
+reference/commands/index.html: homebot remote git@github.com:you/home.git
+reference/commands/index.html: homebot save
+reference/commands/index.html: homebot export [name...]
+reference/commands/index.html: homebot export apt apt-repos
+reference/commands/index.html: homebot tidy
+reference/commands/index.html: homebot actions
+reference/commands/index.html: homebot action &lt;name&gt; [args...]
+reference/commands/index.html: homebot action &lt;name&gt; --help
+reference/commands/index.html: homebot action --help
+reference/commands/index.html: homebot action apt-repos linux/apt-repos
+reference/commands/index.html: homebot shell zsh
+reference/commands/index.html: homebot name [word]
+reference/commands/index.html: homebot persona [command]
+reference/commands/index.html: homebot version
+reference/commands/index.html: homebot --version
+reference/commands/index.html: homebot -v
+reference/config/index.html: name: homebot                 # optional; homebot means no other command name
+reference/config/index.html: homebot export <name>
+reference/config/index.html: homebot export apt
+reference/config/index.html: homebot
+reference/config/index.html: homebot tidy --quiet
+reference/config/index.html: homebot version --check
+reference/config/index.html: homebot persona use
+reference/config/index.html: homebot
+reference/config/index.html: homebot
+reference/config/index.html: homebot name
+reference/config/index.html: homebot --plain <command>
+reference/config/index.html: homebot triage
+reference/develop/index.html: homebot hook pre-commit
+reference/develop/index.html: homebot
+reference/develop/index.html: homebot name
+reference/develop/index.html: homebot
+reference/develop/index.html: homebot
+reference/develop/index.html: homebot link
+reference/inbox/index.html: $ homebot
+reference/inbox/index.html: homebot
+reference/inbox/index.html: homebot persona use
+reference/inbox/index.html: homebot refresh
+reference/inbox/index.html: homebot
+reference/inbox/index.html: homebot persona use
+reference/inbox/index.html: homebot
+reference/inbox/index.html: homebot refresh
+reference/inbox/index.html: homebot unlock
+reference/inbox/index.html: homebot cleanup
+reference/inbox/index.html: homebot link --backup
+reference/inbox/index.html: homebot cleanup
+reference/inbox/index.html: homebot persona validate <id>
+reference/inbox/index.html: homebot tidy --notify --quiet --helper
+reference/inbox/index.html: homebot tidy
+reference/inbox/index.html: homebot version --check
+reference/inbox/index.html: homebot version --check
+reference/inbox/index.html: homebot triage
+reference/inbox/index.html: homebot completion zsh|bash|fish
+reference/inbox/index.html: homebot name
+reference/inbox/index.html: homebot shell zsh
+reference/inbox/index.html: homebot
+reference/personas/index.html: homebot persona ids
+reference/personas/index.html: homebot persona validate <id>
+reference/personas/index.html: homebot persona use <id>
+reference/personas/index.html: homebot persona list
+reference/personas/index.html: homebot persona ids
+reference/personas/index.html: homebot persona preview <id>
+reference/personas/index.html: homebot link
+secrets/index.html: homebot keys init                    # once, ever: make the key pair, pick a passphrase
+secrets/index.html: homebot pack ~/.netrc --private      # move a secret in, link it back, seal it
+secrets/index.html: homebot unlock                       # decrypt everything (passphrase asked once)
+secrets/index.html: homebot lock                         # seal what changed; --wipe also deletes plaintext
+secrets/index.html: homebot keys init
+secrets/index.html: homebot pack --private
+secrets/index.html: homebot save
+secrets/index.html: homebot save
+secrets/index.html: homebot unlock
+secrets/index.html: homebot unlock
+secrets/index.html: homebot unlock --theirs
+secrets/index.html: homebot lock --ours
+secrets/index.html: homebot hook pre-commit
+secrets/index.html: homebot save
+secrets/index.html: homebot

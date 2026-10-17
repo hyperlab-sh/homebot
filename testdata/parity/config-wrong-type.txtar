@@ -1,0 +1,14 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: wrong type
+# exit: 1
+! exec homebot
+cmpwork stdout config-wrong-type.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-wrong-type.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: [workstation]
+-- config-wrong-type.stdout --
+-- config-wrong-type.stderr --
+homebot: $WORK/home/.home/homebot.yml:2:12: profiles.default must be a profile name

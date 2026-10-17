@@ -1,0 +1,98 @@
+[!linux] skip 'recorded on linux'
+
+# A real file in the way of a link, in an otherwise healthy repo.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot unpack
+# exit: 0
+exec homebot
+cmpwork stdout inbox-before.stdout
+# exit: 0
+exec homebot setup
+# exit: 0
+exec homebot link
+cmpwork stdout link.stdout
+# exit: 0
+exec homebot
+cmpwork stdout inbox-link-conflict.stdout
+cmpwork stderr inbox-link-conflict.stderr
+# exit: 0
+exec homebot next
+cmpwork stdout next-link-conflict.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.zshrc --
+export MINE=1
+-- inbox-before.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! The commit guard is not installed
+       → homebot setup
+  2  • 1 file is in the way of links
+       ~/.zshrc
+       → homebot link
+  3  • 1 new thing to sort: track, ignore or snooze
+       ~/.zshrc
+       → homebot triage
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+
+  Do the first one now: homebot next
+-- link.stdout --
+  blocked ~/.zshrc  already exists with different content
+0 changes, 0 already linked, 1 blocked
+To move what is in the way aside (renamed *.homebot-backup-<time>, nothing is deleted):
+  homebot link --backup
+-- inbox-link-conflict.stdout --
+homebot · testhost · 2 things need you
+
+  1  • 1 file is in the way of links
+       ~/.zshrc
+       → homebot link
+  2  • 1 new thing to sort: track, ignore or snooze
+       ~/.zshrc
+       → homebot triage
+
+  Do the first one now: homebot next
+-- inbox-link-conflict.stderr --
+-- next-link-conflict.stdout --
+1 file is in the way of links
+~/.zshrc
+→ homebot link
+  blocked ~/.zshrc  already exists with different content
+0 changes, 0 already linked, 1 blocked
+To move what is in the way aside (renamed *.homebot-backup-<time>, nothing is deleted):
+  homebot link --backup

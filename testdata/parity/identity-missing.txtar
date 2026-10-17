@@ -1,0 +1,100 @@
+[!linux] skip 'recorded on linux'
+
+# git knows no name or email: the inbox says so, and setup (no terminal) only explains.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+env GIT_CONFIG_GLOBAL=$WORK/empty-gitconfig
+# exit: 0
+exec homebot
+cmpwork stdout inbox-no-identity.stdout
+# exit: 0
+exec homebot setup
+# deliberate: final review home I2: setup says the helper keeps the XDG_* folders it was set up with, after the helper line; the TypeScript's helper carried no XDG_* and said nothing
+# deliberate: the Go build loads the integration with eval "$(homebot shell zsh)", so the hint prints that line instead of the TypeScript's `source ~/.home/homebot/shell/homebot.zsh`
+# deliberate: guided setup: setup ends on the inbox, terminal or not, so what is left is listed with its commands; the TypeScript's setup printed only the zshrc hint
+cmpwork stdout setup-no-identity.stdout
+cmpwork stderr setup-no-identity.stderr
+# exit: 0
+exec homebot next
+cmpwork stdout next-no-identity.stdout
+-- empty-gitconfig --
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- inbox-no-identity.stdout --
+homebot · testhost · 5 things need you (2 urgent)
+
+  1  ! Git doesn't know who you are
+       Commits by homebot save and the hourly autosave fail without a name and
+       email.
+       → mkdir -p ~/.config/git && git config --file ~/.config/git/config user.name "Your Name" && git config --file ~/.config/git/config user.email you@example.com
+  2  ! The commit guard is not installed
+       → homebot setup
+  3  • 1 link to make or fix
+       → homebot link
+  4  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- setup-no-identity.stdout --
+installed commit guard (core.hooksPath)
+Git doesn't know who you are yet, and homebot commits as you.
+Set it once:
+  mkdir -p ~/.config/git && git config --file ~/.config/git/config user.name "Your Name" && git config --file ~/.config/git/config user.email you@example.com
+installed hourly systemd timer homebot-tidy.timer
+The helper keeps the XDG_* folders it was set up with. After changing XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_STATE_HOME or XDG_CACHE_HOME, run homebot setup again.
+
+Add this to your .zshrc so new terminals tell you when something needs you:
+  eval "$(homebot shell zsh)"
+
+homebot · testhost · 3 things need you (1 urgent)
+
+  1  ! Git doesn't know who you are
+       Commits by homebot save and the hourly autosave fail without a name and
+       email.
+       → mkdir -p ~/.config/git && git config --file ~/.config/git/config user.name "Your Name" && git config --file ~/.config/git/config user.email you@example.com
+  2  • 1 link to make or fix
+       → homebot link
+  3  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+-- setup-no-identity.stderr --
+-- next-no-identity.stdout --
+Git doesn't know who you are
+Commits by homebot save and the hourly autosave fail without a name and email.
+Run this yourself:
+  mkdir -p ~/.config/git && git config --file ~/.config/git/config user.name "Your Name" && git config --file ~/.config/git/config user.email you@example.com

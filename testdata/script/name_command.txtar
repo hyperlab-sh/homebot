@@ -1,0 +1,48 @@
+[!linux] skip 'the named link and PATH are exercised in the Linux sandbox'
+
+exec homebot name
+stdout 'Configured name: homebot'
+stdout 'Effective name here: homebot'
+
+exec homebot name zork
+stdout 'Name set to zork.'
+stdout 'Add ~/.local/bin to your PATH to type zork'
+grep '^name: zork$' home/.home/homebot.yml
+exists $HOME/.local/bin/zork
+! exists $HOME/.config/systemd/user/homebot-tidy.service
+exec homebot name
+stdout 'Configured name: zork'
+
+# Repeating the name leaves config text alone and repairs a missing owned link.
+exec sh -c 'cp "$WORK/home/.home/homebot.yml" "$WORK/unchanged.yml"'
+exec sh -c 'rm "$HOME/.local/bin/zork"'
+exec homebot name zork
+exists $HOME/.local/bin/zork
+cmp home/.home/homebot.yml unchanged.yml
+
+exec homebot name zara
+stdout 'The old name zork stops working'
+exists $HOME/.local/bin/zara
+! exists $HOME/.local/bin/zork
+grep '^name: zara$' home/.home/homebot.yml
+
+exec homebot name homebot
+stdout 'Name turned off'
+! exists $HOME/.local/bin/zara
+! grep '^name:' home/.home/homebot.yml
+
+exec homebot name zork
+exec homebot name --off
+stdout 'Name turned off'
+! exists $HOME/.local/bin/zork
+! grep '^name:' home/.home/homebot.yml
+
+# Reserved names fail before writing a config key or link.
+! exec homebot name save
+stderr 'Cannot use save: homebot uses it as a command'
+! grep '^name:' home/.home/homebot.yml
+! exists $HOME/.local/bin/save
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation

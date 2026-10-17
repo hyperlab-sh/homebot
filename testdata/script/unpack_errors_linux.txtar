@@ -1,0 +1,48 @@
+[!linux] skip 'recorded on linux'
+
+# The stdout of the two failing steps in unpack_errors.txtar names the OS
+# ("testhost (linux)"), so it is recorded here and checked on Linux only.
+# Everything else about these failures is checked everywhere.
+
+# A step with no action: no resume hint, nothing recorded.
+exec cp unknown.yml home/.home/manifests/profiles/workstation.yml
+! exec homebot unpack
+cmp stdout unknown.stdout
+cmp stderr unknown.stderr
+
+# A script action that exits non-zero names the step and how to resume.
+exec cp script.yml home/.home/manifests/profiles/workstation.yml
+! exec homebot unpack
+cmp stdout script.stdout
+cmp stderr script.stderr
+
+! exists xdg/state/homebot/state.json
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+steps:
+  - run: echo a
+-- unknown.yml --
+steps:
+  - teleport: x
+-- script.yml --
+steps:
+  - flaky: [a, b]
+-- home/.home/manifests/actions/flaky.sh --
+echo flaky "$@"
+exit 3
+-- unknown.stdout --
+Unpacking workstation on testhost (linux): 1 steps
+[1/1] teleport x
+-- unknown.stderr --
+homebot: Step 1: no action named "teleport". See: homebot actions
+-- script.stdout --
+Unpacking workstation on testhost (linux): 1 steps
+[1/1] flaky a, b
+flaky a b
+-- script.stderr --
+homebot: Step 1 (flaky a, b) exited with 3.
+Fix it, then resume:
+  homebot unpack workstation --from 1

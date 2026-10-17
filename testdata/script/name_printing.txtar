@@ -1,0 +1,85 @@
+[!linux] skip 'the named link and PATH are exercised in the Linux sandbox'
+
+# A valid machine record and a working link make zork the printed command.
+# A second homebot link in $WORK/bin keeps the executable available when the
+# later PATH check deliberately removes ~/.local/bin.
+exec sh name-setup.sh
+env PATH=$HOME/.local/bin:$WORK/bin:/usr/bin:/bin
+
+exec homebot --help
+stdout '^zork:'
+stdout 'zork next'
+! stdout 'homebot next'
+exec homebot pack --help
+stdout 'zork pack'
+stdout 'zork pack ~/.config/zed'
+! stdout 'homebot pack'
+exec homebot
+stdout '^zork · testhost'
+stdout '→ zork setup'
+
+# Plain changes voice and styling, not the machine's effective name.
+env HOMEBOT_PLAIN=1
+exec homebot next --help
+stdout 'zork next'
+exec homebot
+stdout '^zork · testhost'
+stdout '→ zork setup'
+
+# Errors still use the neutral stored-text rendering (R16).
+! exec homebot pack ~/.missing
+stderr '^homebot: ~/.missing does not exist\.'
+! stderr '^zork:'
+
+# A record and link alone are insufficient: the name must be on PATH.
+env PATH=$WORK/bin:/usr/bin:/bin
+exec homebot --help
+stdout '^homebot:'
+stdout 'homebot next'
+! stdout 'zork next'
+exec homebot
+stdout '^homebot · testhost'
+stdout '→ homebot setup'
+
+# Stored triage text remains the neutral command even when the effective
+# printed command is zork.
+env PATH=$HOME/.local/bin:$WORK/bin:/usr/bin:/bin
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m initial
+stdin ignore
+exec homebot triage
+grep '^# Written by `homebot triage`' home/.home/decisions.yml
+! grep 'zork' home/.home/decisions.yml
+
+# A styled command printed after pack uses zork. The saved commit and journal
+# remain portable across machines and never persist that machine's name.
+exec sh -c 'echo x > "$HOME/.zshrc"'
+exec homebot pack ~/.zshrc
+stdout 'zork save'
+chmod 755 bin/gitleaks
+exec homebot save
+exec git -C home/.home log -1 --format=%B
+! stdout 'zork'
+exec homebot tidy
+exec sh -c 'cat "$XDG_STATE_HOME/homebot/journal.jsonl"'
+! stdout 'zork'
+
+-- name-setup.sh --
+set -eu
+mkdir -p "$HOME/.local/bin" "$XDG_STATE_HOME/homebot"
+stable=$(command -v homebot)
+ln -s "$stable" "$WORK/bin/homebot"
+ln -s "$stable" "$HOME/.local/bin/zork"
+printf 'name=zork\ntarget=%s\nmade=true\n' "$stable" > "$XDG_STATE_HOME/homebot/name"
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+
+-- ignore --
+i
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0

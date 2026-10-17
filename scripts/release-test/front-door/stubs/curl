@@ -1,0 +1,118 @@
+#!/bin/bash
+# Stub curl. Logs its argv. Serves two things:
+#
+# - Homebrew's installer (the fake one) on stdout for Homebrew's URL;
+#   STUB_CURL_FAIL refuses it.
+# - The release's install.sh and checksums.txt, for the "latest" or a pinned
+#   tag URL, to the file named by -o, printing the HTTP status when -w asks
+#   for it. STUB_RELEASE picks what GitHub says:
+#     (unset)    a release: install.sh is the fake release installer and
+#                checksums.txt lists its real sha256
+#     none       404 for everything (no release, or no such tag)
+#     mismatch   checksums.txt lists another sha256 for install.sh
+#     tampered   install.sh is not what checksums.txt was made from
+#     nosum      checksums.txt has no line for install.sh
+#     twosum     checksums.txt has two lines for install.sh
+#     error      500 for everything
+#     offline    no answer at all (curl exit 6, status 000, curl's message)
+#     mixedver   the archive lines name two versions
+#     noarchive  checksums.txt has no archive lines
+#   STUB_TAG is the release's tag (default v0.1.0); any other tag is a 404.
+#   STUB_LATEST_FLIP: "latest" moves on to v9.0.0 after its first answer, as
+#   when a release is published while the script runs; pinned tags stay put.
+#   Everything else is refused.
+echo "curl $*" >>"${STUB_LOG:?}"
+url=${*: -1}
+out=""
+want_code=0
+args=("$@")
+for ((i = 0; i < ${#args[@]}; i++)); do
+  case ${args[i]} in
+    -o) out=${args[i + 1]} ;;
+    -w) want_code=1 ;;
+  esac
+done
+
+if [ "$url" = "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh" ] && [ -z "${STUB_CURL_FAIL:-}" ]; then
+  cat "${STUB_FIXTURES:?}/brew-installer.sh"
+  exit 0
+fi
+
+reply() { # reply CODE: the status the stub's "GitHub" gives
+  if [ "$want_code" = 1 ]; then printf '%s' "$1"; fi
+  [ "$1" = 200 ]
+}
+
+case $url in
+  https://github.com/hyperlab-sh/homebot/releases/latest/download/* | \
+    https://github.com/hyperlab-sh/homebot/releases/download/v*/*)
+    file=${url##*/}
+    case ${STUB_RELEASE:-} in
+      none) reply 404; exit 0 ;;
+      error) reply 500; exit 0 ;;
+      offline) echo 'curl: (6) Could not resolve host: github.com' >&2; reply 000; exit 6 ;;
+    esac
+    case $url in
+      */releases/latest/download/*)
+        n=$(cat "${STUB_STATE:?}/latest-count" 2>/dev/null || echo 0)
+        echo $((n + 1)) >"$STUB_STATE/latest-count"
+        if [ -n "${STUB_LATEST_FLIP:-}" ] && [ "$n" -gt 0 ]; then
+          # the new release: another version, another script
+          echo "curl: latest moved on" >>"$STUB_LOG"
+          out_ver=9.0.0
+        fi
+        ;;
+    esac
+    ver=${out_ver:-${STUB_TAG:-v0.1.0}}
+    ver=${ver#v}
+    # a pinned tag other than the one the stub has is no release
+    case $url in
+      */releases/download/v*/*)
+        tag=${url#*/releases/download/}
+        tag=${tag%%/*}
+        if [ "$tag" != "${STUB_TAG:-v0.1.0}" ]; then reply 404; exit 0; fi
+        ;;
+    esac
+    inst=${STUB_FIXTURES:?}/stubs/release-install.sh
+    sum=$(sha256sum "$inst" | awk '{print $1}')
+    case $file in
+      install.sh)
+        if [ "${STUB_RELEASE:-}" = tampered ]; then
+          { cat "$inst"; echo "echo tampered >>\"\${STUB_LOG:?}\""; } >"$out"
+        else
+          cp "$inst" "$out"
+        fi
+        reply 200
+        exit 0
+        ;;
+      checksums.txt)
+        case ${STUB_RELEASE:-} in
+          mismatch) sum=0000000000000000000000000000000000000000000000000000000000000000 ;;
+        esac
+        {
+          a=$(printf '%064d' 0 | tr 0 a)
+          b=$(printf '%064d' 0 | tr 0 b)
+          case ${STUB_RELEASE:-} in
+            noarchive) ;;
+            mixedver) printf '%s  homebot_%s_linux_amd64.tar.gz\n%s  homebot_9.9.9_linux_arm64.tar.gz\n' "$a" "$ver" "$b" ;;
+            *)
+              printf '%s  homebot_%s_darwin_arm64.tar.gz\n' "$a" "$ver"
+              printf '%s  homebot_%s_linux_amd64.tar.gz\n' "$b" "$ver"
+              printf '%s  homebot_%s_linux_arm64.tar.gz\n' "$a" "$ver"
+              printf '%s  homebot_%s_linux_amd64.deb\n' "$b" "$ver"
+              ;;
+          esac
+          case ${STUB_RELEASE:-} in
+            nosum) ;;
+            twosum) printf '%s  install.sh\n%s  install.sh\n' "$sum" "$sum" ;;
+            *) printf '%s  install.sh\n' "$sum" ;;
+          esac
+        } >"$out"
+        reply 200
+        exit 0
+        ;;
+    esac
+    ;;
+esac
+echo "curl: the stub refuses $url" >&2
+exit 22

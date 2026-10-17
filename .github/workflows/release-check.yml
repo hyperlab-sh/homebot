@@ -1,0 +1,105 @@
+name: release-check
+
+on:
+  workflow_dispatch:
+  # Manual only: run it to check a goreleaser snapshot build on demand.
+
+permissions: {contents: read}
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with: {go-version: '1.27.2'}
+      - uses: anchore/sbom-action/download-syft@fffec3d851af758d56fee099cf3fbf8aa8779843 # v0.24.3
+        with: {syft-version: v1.54.1}
+      - name: Install pinned goreleaser
+        run: |
+          go install github.com/goreleaser/goreleaser/v2@v2.18.3
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      - name: Build two unsigned local snapshots
+        run: scripts/release-test/make-snapshots.sh dist-snapshots
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-snapshots
+          path: dist-snapshots/
+          retention-days: 1
+          if-no-files-found: error
+
+  cask:
+    needs: snapshot
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      HOMEBREW_NO_ANALYTICS: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with: {persist-credentials: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: {name: release-snapshots, path: dist-snapshots/}
+      - name: Check downloaded snapshots
+        id: snapshots
+        shell: bash
+        run: |
+          if [[ ! -s dist-snapshots/v0.0.1/metadata.json || ! -s dist-snapshots/v0.0.1/checksums.txt ||
+                ! -s dist-snapshots/v0.0.2/metadata.json || ! -s dist-snapshots/v0.0.2/checksums.txt ]]; then
+            echo '::warning::Snapshot artifact download returned before its files were available; retrying once'
+            echo 'retry=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: steps.snapshots.outputs.retry == 'true'
+        with: {name: release-snapshots, path: dist-snapshots/}
+      - name: Require complete snapshots
+        shell: bash
+        run: |
+          for version in 0.0.1 0.0.2; do
+            for name in metadata.json checksums.txt; do
+              [[ -s dist-snapshots/v$version/$name ]] || { echo "::error::dist-snapshots/v$version/$name is missing or empty after retry"; exit 1; }
+            done
+          done
+      - name: Install, inspect and upgrade local cask
+        shell: bash
+        run: bash scripts/release-test/macos/cask.sh dist-snapshots
+
+  install-sh:
+    needs: snapshot
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with: {persist-credentials: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: {name: release-snapshots, path: dist-snapshots/}
+      - name: Check downloaded snapshots
+        id: snapshots
+        shell: bash
+        run: |
+          if [[ ! -s dist-snapshots/v0.0.1/metadata.json || ! -s dist-snapshots/v0.0.1/checksums.txt ||
+                ! -s dist-snapshots/v0.0.2/metadata.json || ! -s dist-snapshots/v0.0.2/checksums.txt ]]; then
+            echo '::warning::Snapshot artifact download returned before its files were available; retrying once'
+            echo 'retry=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: steps.snapshots.outputs.retry == 'true'
+        with: {name: release-snapshots, path: dist-snapshots/}
+      - name: Require complete snapshots
+        shell: bash
+        run: |
+          for version in 0.0.1 0.0.2; do
+            for name in metadata.json checksums.txt; do
+              [[ -s dist-snapshots/v$version/$name ]] || { echo "::error::dist-snapshots/v$version/$name is missing or empty after retry"; exit 1; }
+            done
+          done
+      - name: Check macOS installer and architecture selection
+        shell: bash
+        run: bash scripts/release-test/macos/install-sh.sh dist-snapshots

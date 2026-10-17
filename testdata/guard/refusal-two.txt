@@ -1,0 +1,4 @@
+homebot refused this commit:
+  - private/a is plaintext. Only *.age files may be committed from private/. Unstage it:
+    git rm --cached private/a
+  - big.bin is 60 MB (limit 50 MB). Unstage it and add it to .gitignore.

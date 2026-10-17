@@ -1,0 +1,19 @@
+[!linux] skip 'recorded on linux'
+
+# A dotted name inside (), and an empty pair, one per layer.
+# exit: 1
+! exec homebot link
+cmpwork stdout layout-invalid-names-link.stdout
+cmpwork stderr layout-invalid-names-link.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/(.dotted)/a --
+a
+-- home/.home/autolink/linux/()/a --
+a
+-- layout-invalid-names-link.stdout --
+  invalid autolink/common/(.dotted)  "(.dotted)": top-level names get their dot from homebot; rename it to "(dotted)"
+  invalid autolink/linux/()  "()" has no name inside
+0 changes, 0 already linked, 2 layout errors in the repo
+-- layout-invalid-names-link.stderr --

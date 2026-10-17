@@ -1,0 +1,125 @@
+[!linux] skip 'recorded on linux'
+
+# pack moves things from $HOME into the repo and links them back.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot pack ~/.config/zed
+cmpwork stdout pack-folder.stdout
+cmpwork stderr pack-folder.stderr
+exists home/.home/autolink/common/config/zed/settings.json
+# exit: 0
+exec homebot pack --layer linux ~/.tmux.conf
+cmpwork stdout pack-layer.stdout
+# exit: 0
+exec homebot pack ~/.vimrc ~/.inputrc
+cmpwork stdout pack-two.stdout
+# exit: 0
+exec homebot
+# deliberate: D5 pack stages what it moved into autolink/, so triage no longer lists the packed repo paths and the inbox shows them as uncommitted changes (recorded from bun src/cli.ts with git add after the move)
+cmpwork stdout inbox-after-pack.stdout
+# exit: 0
+exec homebot save
+# deliberate: D5 pack staged the moved paths, so save commits them instead of finding nothing new (recorded from bun src/cli.ts with git add after the move)
+cmpwork stdout save-after-pack.stdout
+# exit: 1
+! exec homebot pack
+cmpwork stderr pack-noargs.stderr
+# exit: 1
+! exec homebot pack ~/.missing
+cmpwork stderr pack-missing.stderr
+# exit: 1
+! exec homebot pack --layer windows ~/.bashrc
+cmpwork stderr pack-bad-layer.stderr
+# exit: 1
+! exec homebot pack ~/.vimrc
+cmpwork stderr pack-already.stderr
+# exit: 1
+! exec homebot pack --private ~/.bashrc
+cmpwork stderr pack-private-nokeys.stderr
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.config/zed/settings.json --
+{}
+-- home/.tmux.conf --
+set -g mouse on
+-- home/.vimrc --
+set nu
+-- home/.inputrc --
+set bell-style none
+-- home/.bashrc --
+alias ll='ls -l'
+-- pack-folder.stdout --
+packed ~/.config/zed → autolink/common/config/zed
+Commit it with:
+  homebot save
+-- pack-folder.stderr --
+-- pack-layer.stdout --
+packed ~/.tmux.conf → autolink/linux/tmux.conf
+Commit it with:
+  homebot save
+-- pack-two.stdout --
+packed ~/.vimrc → autolink/common/vimrc
+packed ~/.inputrc → autolink/common/inputrc
+Commit it with:
+  homebot save
+-- inbox-after-pack.stdout --
+homebot · testhost · 6 things need you (1 urgent)
+
+  1  ! The commit guard is not installed
+       → homebot setup
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 1 new thing to sort: track, ignore or snooze
+       ~/.bashrc
+       → homebot triage
+  4  • 4 uncommitted changes
+       → homebot save
+  5  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  ...and 1 more: homebot --all
+
+  Do the first one now: homebot next
+-- save-after-pack.stdout --
+committed 4 files
+pushed 1 commit
+-- pack-noargs.stderr --
+homebot: What should be packed? e.g. homebot pack ~/.config/nvim
+-- pack-missing.stderr --
+homebot: ~/.missing does not exist.
+-- pack-bad-layer.stderr --
+homebot: Unknown layer "windows" (use common, linux, macos).
+-- pack-already.stderr --
+homebot: ~/.vimrc is already managed.
+-- pack-private-nokeys.stderr --
+homebot: Create keys before packing secrets:
+  homebot keys init

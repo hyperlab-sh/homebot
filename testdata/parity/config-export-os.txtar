@@ -1,0 +1,17 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: export on an unknown OS
+# exit: 1
+! exec homebot
+cmpwork stdout config-export-os.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-export-os.stderr
+-- home/.home/homebot.yml --
+exports:
+  - name: brewfile
+    on: [windows]
+    out: manifests/Brewfile
+    run: brew bundle dump --file -
+-- config-export-os.stdout --
+-- config-export-os.stderr --
+homebot: $WORK/home/.home/homebot.yml:3:10: exports[0].on: unknown OS "windows" (use linux or macos)

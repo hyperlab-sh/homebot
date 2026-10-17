@@ -1,0 +1,4 @@
+#!/bin/bash
+# A stand-in for age and gitleaks.
+echo "$(basename "$0") $*" >>"${STUB_LOG:?}"
+echo "$(basename "$0") stub"

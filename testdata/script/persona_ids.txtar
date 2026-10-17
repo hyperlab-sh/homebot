@@ -1,0 +1,9 @@
+exec homebot persona ids
+stdout 'save.success.committed \[success\]'
+stdout '\{n\}: int'
+! stdout '^guard.plaintext'
+# No line ends in a dangling ", " (a slot with no fixed value) or in spaces (an
+# entry with no slots), which git diff --check would flag in the golden.
+! stdout ', $'
+! stdout ' $'
+! stderr .

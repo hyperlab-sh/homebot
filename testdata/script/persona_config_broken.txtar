@@ -1,0 +1,86 @@
+# A homebot.yml whose persona: does not load is reported by persona list and
+# by a bare persona validate, as persona use reports it. Neither claims that
+# neatpik is the persona in use or valid: the repo's choice is not known.
+
+# The sandbox sets HOMEBOT_PERSONA; clear it, so that the config decides.
+env HOMEBOT_PERSONA=
+
+# persona use is the reference: it stops with the config's error.
+! exec homebot persona use neatpik
+stderr 'homebot.yml:3:10: persona "Bad" must be none or a lowercase id'
+
+# list still lists, since the personas do not depend on the config, but it
+# fails with the same error and marks nothing as the one in use.
+! exec homebot persona list
+stderr 'homebot.yml:3:10: persona "Bad" must be none or a lowercase id'
+stdout '^  neatpik  Neatpik  \[built-in\]'
+stdout '^  tester  Tester  \[user\]'
+! stdout '^\*'
+
+# The bare command is the same as list.
+! exec homebot persona
+stderr 'persona "Bad" must be'
+! stdout '^\*'
+
+# A bare validate has nothing it can validate: the file does not say which
+# persona the repo selects. It reports the error and does not call neatpik
+# valid.
+! exec homebot persona validate
+stderr 'homebot.yml:3:10: persona "Bad" must be none or a lowercase id'
+! stdout 'is valid'
+! stdout .
+
+# HOMEBOT_PERSONA still decides which persona is in use, so it is marked and
+# validated; the config's error is reported all the same, and the exit code
+# says the setup is not healthy.
+env HOMEBOT_PERSONA=tester
+! exec homebot persona list
+stderr 'persona "Bad" must be'
+stdout '^\* tester  Tester  \[user\]'
+! stdout '^\*  *neatpik'
+! exec homebot persona validate
+stdout 'Persona tester is valid'
+stderr 'persona "Bad" must be'
+env HOMEBOT_PERSONA=none
+! exec homebot persona validate
+stdout 'Neutral voice selected'
+stderr 'persona "Bad" must be'
+env HOMEBOT_PERSONA=
+
+# A validate that names its persona does not depend on the config, and neither
+# does show: the problem is the config's, not the persona's.
+exec homebot persona validate tester
+stdout 'Persona tester is valid'
+! stderr .
+
+# With the config fixed, list marks the persona it selects and exits 0.
+cp home/.home/good.yml home/.home/homebot.yml
+exec homebot persona list
+stdout '^\* tester  Tester  \[user\]'
+! stderr .
+exec homebot persona validate
+stdout 'Persona tester is valid'
+
+# Outside a home repo, listing and validating work and use the default.
+rm home/.home
+exec homebot persona list
+stdout '^\* neatpik  Neatpik  \[built-in\]'
+! stderr .
+exec homebot persona validate
+stdout 'Persona neatpik is valid'
+! stderr .
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+persona: Bad
+-- home/.home/good.yml --
+profiles:
+  default: workstation
+persona: tester
+-- xdg/config/homebot/personas/tester.toml --
+schema = 1
+id = "tester"
+name = "Tester"
+emoji = "🧪"
+extends = "neatpik"

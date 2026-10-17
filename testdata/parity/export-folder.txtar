@@ -1,0 +1,23 @@
+[!linux] skip 'recorded on linux'
+
+# {out} may be a folder; it is replaced as a whole only when something changed.
+# exit: 0
+exec homebot export
+cmpwork stdout export-folder-first.stdout
+# exit: 0
+exec homebot export
+cmpwork stdout export-folder-second.stdout
+exec ls home/.home/manifests/repos
+cmpwork stdout files.stdout
+-- home/.home/homebot.yml --
+exports:
+  - name: repos
+    out: manifests/repos
+    run: mkdir {out} && echo a > {out}/a.list && echo b > {out}/b.list
+-- export-folder-first.stdout --
+updated   manifests/repos
+-- export-folder-second.stdout --
+unchanged manifests/repos
+-- files.stdout --
+a.list
+b.list

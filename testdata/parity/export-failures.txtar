@@ -1,0 +1,57 @@
+[!linux] skip 'recorded on linux'
+
+# A failing command, a missing tool, an empty result over a good file, and a bad name.
+# exit: 0
+exec homebot export
+cmpwork stdout export-first.stdout
+exec sh -c 'echo good > home/.home/manifests/keep.txt'
+# exit: 0
+exec homebot export
+cmpwork stdout export-second.stdout
+cmpwork stderr export-second.stderr
+exec cat home/.home/manifests/keep.txt
+cmpwork stdout keep.txt
+# exit: 1
+! exec homebot export nope
+cmpwork stdout export-unknown.stdout
+cmpwork stderr export-unknown.stderr
+# exit: 1
+! exec homebot export nope also-nope
+cmpwork stderr export-unknown-two.stderr
+-- home/.home/homebot.yml --
+exports:
+  - name: broken
+    out: manifests/broken.txt
+    run: echo first line >&2; echo second line >&2; exit 4
+  - name: notool
+    out: manifests/notool.txt
+    run: definitely-not-a-tool --dump
+  - name: empty
+    out: manifests/keep.txt
+    run: printf ''
+  - name: linux-only
+    on: linux
+    out: manifests/{os}/{host}.txt
+    run: echo hello
+  - name: mac-only
+    on: macos
+    out: manifests/mac.txt
+    run: echo hello
+-- export-first.stdout --
+failed    broken: exited with 4: first line second line
+skipped   notool: definitely-not-a-tool is not installed
+updated   manifests/keep.txt
+updated   manifests/linux/testhost.txt
+-- export-second.stdout --
+failed    broken: exited with 4: first line second line
+skipped   notool: definitely-not-a-tool is not installed
+failed    empty: produced an empty file; kept the previous manifests/keep.txt
+unchanged manifests/linux/testhost.txt
+-- export-second.stderr --
+-- keep.txt --
+good
+-- export-unknown.stdout --
+-- export-unknown.stderr --
+homebot: No export named nope for this OS. Exports here: broken, notool, empty, linux-only.
+-- export-unknown-two.stderr --
+homebot: No export named nope, also-nope for this OS. Exports here: broken, notool, empty, linux-only.

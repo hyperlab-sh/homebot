@@ -1,0 +1,25 @@
+[!linux] skip 'recorded on linux'
+
+# exit: 1
+! exec homebot keys
+cmpwork stderr keys-usage.stderr
+# exit: 1
+! exec homebot keys frobnicate
+cmpwork stderr keys-usage-bad.stderr
+# exit: 1
+! exec homebot hook
+cmpwork stderr hook-usage.stderr
+# exit: 1
+! exec homebot hook post-commit
+cmpwork stderr hook-usage-bad.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- keys-usage.stderr --
+homebot: Usage: homebot keys init
+-- keys-usage-bad.stderr --
+homebot: Usage: homebot keys init
+-- hook-usage.stderr --
+homebot: Usage: homebot hook pre-commit
+-- hook-usage-bad.stderr --
+homebot: Usage: homebot hook pre-commit

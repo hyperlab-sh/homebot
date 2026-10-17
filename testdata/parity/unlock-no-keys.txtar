@@ -1,0 +1,21 @@
+[!linux] skip 'recorded on linux'
+
+# No keys in the repo at all.
+# exit: 1
+! exec homebot unlock
+cmpwork stdout unlock-nokeys.stdout
+cmpwork stderr unlock-nokeys.stderr
+# exit: 0
+exec homebot lock
+cmpwork stdout lock-nokeys.stdout
+cmpwork stderr lock-nokeys.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- unlock-nokeys.stdout --
+-- unlock-nokeys.stderr --
+homebot: No private/identity.age yet. Create keys first:
+  homebot keys init
+-- lock-nokeys.stdout --
+Nothing to seal.
+-- lock-nokeys.stderr --

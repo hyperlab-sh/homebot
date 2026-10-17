@@ -1,0 +1,178 @@
+version: 2
+project_name: homebot
+
+builds:
+  - id: homebot
+    main: ./cmd/homebot
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -X main.commit={{ .FullCommit }} -X main.date={{ .CommitDate }} -X main.channel=release
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: homebot
+    ids: [homebot]
+    formats: [tar.gz]
+    name_template: "homebot_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - src: LICENSE
+        info: {mtime: "{{ .CommitDate }}"}
+      - src: README.md
+        info: {mtime: "{{ .CommitDate }}"}
+      - src: dist-extra/THIRD_PARTY_NOTICES
+        dst: .
+        strip_parent: true
+        info: {mtime: "{{ .CommitDate }}"}
+      - src: dist-extra/completions/homebot.bash
+        dst: completions
+        strip_parent: true
+        info: {mtime: "{{ .CommitDate }}"}
+      - src: dist-extra/completions/_homebot
+        dst: completions
+        strip_parent: true
+        info: {mtime: "{{ .CommitDate }}"}
+      - src: dist-extra/completions/homebot.fish
+        dst: completions
+        strip_parent: true
+        info: {mtime: "{{ .CommitDate }}"}
+      - src: dist-extra/man/homebot.1
+        dst: man
+        strip_parent: true
+        info: {mtime: "{{ .CommitDate }}"}
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+  extra_files:
+    - glob: ./install.sh
+
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    signature: "${artifact}.sigstore.json"
+    args: ["sign-blob", "--bundle=${signature}", "${artifact}", "--yes"]
+
+sboms:
+  - artifacts: archive
+
+nfpms:
+  - id: packages
+    file_name_template: "{{ .ConventionalFileName }}"
+    ids: [homebot]
+    vendor: homebot contributors
+    maintainer: Saulo Vallory <me@saulo.engineer>
+    homepage: https://homebot.sh
+    description: Attention-Deficit Home Discipline.
+    license: MIT
+    formats: [deb, rpm]
+    bindir: /usr/bin
+    recommends: [gitleaks]
+    suggests: [fzf, lazygit]
+    overrides:
+      deb:
+        dependencies: ["git (>= 1:2.40)"]
+      rpm:
+        dependencies: ["git >= 2.40"]
+    contents:
+      - src: dist-extra/man/homebot.1.gz
+        dst: /usr/share/man/man1/homebot.1.gz
+      - src: dist-extra/completions/homebot.bash
+        dst: /usr/share/bash-completion/completions/homebot
+      - src: dist-extra/completions/_homebot
+        dst: /usr/share/zsh/vendor-completions/_homebot
+        packager: deb
+      - src: dist-extra/completions/_homebot
+        dst: /usr/share/zsh/site-functions/_homebot
+        packager: rpm
+      - src: dist-extra/completions/homebot.fish
+        dst: /usr/share/fish/vendor_completions.d/homebot.fish
+      - src: LICENSE
+        dst: /usr/share/doc/homebot/copyright
+        packager: deb
+      - src: LICENSE
+        dst: /usr/share/licenses/homebot/LICENSE
+        type: license
+        packager: rpm
+
+homebrew_casks:
+  - name: homebot
+    ids: [homebot]
+    binaries: [homebot]
+    manpages: [man/homebot.1]
+    completions:
+      bash: completions/homebot.bash
+      zsh: completions/_homebot
+      fish: completions/homebot.fish
+    homepage: https://homebot.sh
+    description: A dotfiles manager for people who won't remember to run it.
+    directory: Casks
+    # setup refuses without gitleaks (the commit guard needs it) and without
+    # git 2.40 or newer, and Xcode 16's command-line tools ship 2.39.5, so the
+    # cask pulls both in; brew install --cask homebot then works end to end.
+    dependencies:
+      - formula: git
+      - formula: gitleaks
+    skip_upload: auto
+    commit_author:
+      name: Saulo Vallory
+      email: me@saulo.engineer
+    repository:
+      owner: hyperlab-sh
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/homebot"]
+          end
+
+release:
+  github: {owner: hyperlab-sh, name: homebot}
+  prerelease: auto
+  extra_files:
+    - glob: ./install.sh
+  footer: |
+    Verify downloads against checksums.txt, then verify its Sigstore bundle with cosign 2.4.3 or newer.
+
+    cosign 3.x:
+
+    ```sh
+    cosign verify-blob \
+      --certificate-identity https://github.com/hyperlab-sh/homebot/.github/workflows/release.yml@refs/tags/{{ .Tag }} \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      --bundle checksums.txt.sigstore.json checksums.txt
+    ```
+
+    cosign 2.4.3 to 2.x needs `--new-bundle-format` as well:
+
+    ```sh
+    cosign verify-blob --new-bundle-format \
+      --certificate-identity https://github.com/hyperlab-sh/homebot/.github/workflows/release.yml@refs/tags/{{ .Tag }} \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      --bundle checksums.txt.sigstore.json checksums.txt
+    ```
+
+changelog:
+  use: git
+  groups:
+    - title: Features
+      regexp: '^feat'
+      order: 0
+    - title: Fixes
+      regexp: '^fix'
+      order: 1
+    - title: Other
+      order: 999
+  filters:
+    exclude:
+      - '^docs\(agent\)'
+      - '^test'
+      - '^chore\(deps\)'
+
+snapshot:
+  version_template: "{{ .Version }}"

@@ -1,0 +1,36 @@
+# Whole phrases, case-insensitive on word boundaries. Keep common words out.
+# A space or a hyphen inside a phrase also matches the other or nothing, so
+# one spelling denies them all.
+# A phrase that starts with = is matched in the case it is written in instead.
+# It is for a title that is also ordinary English, where the lowercase form is
+# not the work. Its gap is still interchangeable, as above.
+#
+# These phrases are kept out of Go code, testdata and the catalog
+# (TestNamesStayInBuiltin, TestDenylistSparesCatalog). Persona lines may name
+# them: a built-in's lines and tagline only may not spell its own name
+# (TestBuiltinDenylist), which reaches them through {bot}.
+Rosie
+WALL-E
+Marvin
+R2-D2
+Johnny 5
+HAL 9000
+Miss Minute
+The Jetsons
+The Hitchhiker's Guide to the Galaxy
+=Short Circuit
+Star Wars
+2001: A Space Odyssey
+Loki
+Disney
+Pixar
+Marvel
+George Jetson
+Jane Jetson
+Judy Jetson
+Elroy Jetson
+Astro
+EVE
+C-3PO
+Darth Vader
+Mickey Mouse

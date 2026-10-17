@@ -1,0 +1,18 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: unknown top-level key
+# exit: 1
+! exec homebot
+cmpwork stdout config-unknown-key.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+# deliberate: naming adds name: to the keys the message lists
+# deliberate: phase 3 adds persona: to the keys the message lists
+# deliberate: release Task 12 activates update: in the schema key list
+cmpwork stderr config-unknown-key.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+colour: blue
+-- config-unknown-key.stdout --
+-- config-unknown-key.stderr --
+homebot: $WORK/home/.home/homebot.yml:3:1: unknown key "colour" (expected profiles, triage, autosave, exports, limits, name, persona, update)

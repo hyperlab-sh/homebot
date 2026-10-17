@@ -1,0 +1,77 @@
+[!linux] skip 'recorded on linux'
+
+# A stub script action: the arguments, the working folder and the HOMEBOT_* variables it gets.
+# exit: 0
+exec homebot action show a 'b c'
+cmpwork stdout action-show.stdout
+cmpwork stderr action-show.stderr
+# exit: 3
+! exec homebot action fails
+cmpwork stdout action-fails.stdout
+cmpwork stderr action-fails.stderr
+# exit: 0
+exec homebot action brew
+cmpwork stdout action-override.stdout
+# exit: 1
+! exec homebot action nope
+cmpwork stdout action-nope.stdout
+cmpwork stderr action-nope.stderr
+# exit: 1
+! exec homebot action
+cmpwork stderr action-noname.stderr
+# exit: 0
+exec homebot action unlock
+cmpwork stdout action-unlock.stdout
+# exit: 1
+! exec homebot action link bogus
+cmpwork stderr action-link-bogus.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/actions/show.sh --
+#!/bin/bash
+# Show what an action sees.
+echo "args: $#"
+for a in "$@"; do echo "  [$a]"; done
+echo "cwd: $(pwd)"
+echo "root: $HOMEBOT_ROOT"
+echo "os: $HOMEBOT_OS host: $HOMEBOT_HOST"
+echo "manifests: $HOMEBOT_MANIFESTS"
+echo "furniture: $HOMEBOT_FURNITURE"
+echo "autolink: $HOMEBOT_AUTOLINK"
+echo "private: $HOMEBOT_PRIVATE"
+echo "to stderr" >&2
+-- home/.home/manifests/actions/fails.sh --
+#!/bin/bash
+echo "about to fail"
+exit 3
+-- home/.home/manifests/actions/brew.sh --
+#!/bin/bash
+echo "custom brew wins"
+-- action-show.stdout --
+args: 2
+  [a]
+  [b c]
+cwd: $WORK/home/.home/manifests
+root: $WORK/home/.home
+os: linux host: testhost
+manifests: $WORK/home/.home/manifests
+furniture: $WORK/home/.home/furniture
+autolink: $WORK/home/.home/autolink
+private: $WORK/home/.home/private
+-- action-show.stderr --
+to stderr
+-- action-fails.stdout --
+about to fail
+-- action-fails.stderr --
+-- action-override.stdout --
+custom brew wins
+-- action-nope.stdout --
+-- action-nope.stderr --
+homebot: No action named "nope". See: homebot actions
+-- action-noname.stderr --
+homebot: Usage: homebot action <name> [args...]. See: homebot actions
+-- action-unlock.stdout --
+unlock: nothing to decrypt
+-- action-link-bogus.stderr --
+homebot: link: unknown tree "bogus" (use autolink or private)

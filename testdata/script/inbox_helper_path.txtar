@@ -1,0 +1,18 @@
+[!linux] skip 'uses a systemd user service fixture'
+
+# A timer recorded as installed with a stale binary path gives one todo.
+exec homebot inbox --all
+stdout 'An installed helper or guard points at a broken homebot path'
+stdout '/missing/homebot'
+stdout 'homebot setup'
+! stderr .
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.config/systemd/user/homebot-tidy.service --
+[Service]
+ExecStart="/missing/homebot" "tidy" "--notify" "--quiet"
+-- home/.config/systemd/user/homebot-tidy.timer --
+[Timer]
+OnBootSec=5min

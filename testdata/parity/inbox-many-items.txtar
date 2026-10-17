@@ -1,0 +1,93 @@
+[!linux] skip 'recorded on linux'
+
+# More than five things: --all shows every one, the plain inbox cuts at five.
+# exit: 0
+exec homebot
+cmpwork stdout inbox-cut.stdout
+# exit: 0
+exec homebot --all
+cmpwork stdout inbox-all.stdout
+# exit: 0
+exec homebot inbox --all
+cmpwork stdout inbox-word-all.stdout
+# exit: 0
+exec homebot next
+cmpwork stdout next-shell-fix.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1
+-- home/.home/autolink/common/gitconfig --
+x
+-- home/.home/autolink/common/vimrc --
+x
+-- home/.zshrc --
+mine
+-- home/.gitconfig --
+mine
+-- home/.vimrc --
+mine
+-- home/.bashrc --
+mine
+-- home/.config/foo/conf --
+mine
+-- inbox-cut.stdout --
+homebot · testhost · 6 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 3 files are in the way of links
+       ~/.gitconfig, ~/.vimrc, ~/.zshrc
+       → homebot link
+  4  • 5 new things to sort: track, ignore or snooze
+       ~/.config/foo, ~/.bashrc, ~/.gitconfig, ...
+       → homebot triage
+  5  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  ...and 1 more: homebot --all
+-- inbox-all.stdout --
+homebot · testhost · 6 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 3 files are in the way of links
+       ~/.gitconfig, ~/.vimrc, ~/.zshrc
+       → homebot link
+  4  • 5 new things to sort: track, ignore or snooze
+       ~/.config/foo, ~/.bashrc, ~/.gitconfig, ...
+       → homebot triage
+  5  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  6  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- inbox-word-all.stdout --
+homebot · testhost · 6 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 3 files are in the way of links
+       ~/.gitconfig, ~/.vimrc, ~/.zshrc
+       → homebot link
+  4  • 5 new things to sort: track, ignore or snooze
+       ~/.config/foo, ~/.bashrc, ~/.gitconfig, ...
+       → homebot triage
+  5  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  6  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- next-shell-fix.stdout --
+~/.home is not a git repository
+Run this yourself:
+  git -C ~/.home init

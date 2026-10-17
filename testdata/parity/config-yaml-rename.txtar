@@ -1,0 +1,13 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yaml instead of homebot.yml: the error says to rename it.
+# exit: 1
+! exec homebot
+cmpwork stdout config-yaml-rename.stdout
+cmpwork stderr config-yaml-rename.stderr
+-- home/.home/homebot.yaml --
+profiles:
+  default: workstation
+-- config-yaml-rename.stdout --
+-- config-yaml-rename.stderr --
+homebot: homebot reads homebot.yml now: rename $WORK/home/.home/homebot.yaml to homebot.yml

@@ -1,0 +1,166 @@
+{
+  "title": "homebot",
+  "url": "https://homebot.sh/docs/",
+  "base": "/docs/",
+  "favicon": "assets/favicon.ico",
+  "src": "pages",
+  "out": "site",
+  "engine": "js",
+  "layout": {
+    "spa": true,
+    "header": {
+      "enabled": true
+    },
+    "sidebar": {
+      "collapsible": true,
+      "defaultCollapsed": false
+    },
+    "optionsMenu": {
+      "position": "sidebar-top",
+      "components": {
+        "search": true,
+        "themeSwitch": true
+      }
+    },
+    "footer": {
+      "style": "minimal",
+      "content": "homebot docs. Source: docs/pages.",
+      "branding": false
+    },
+    "menubar": {
+      "left": [
+        {
+          "type": "title",
+          "text": "homebot.sh",
+          "url": "/../"
+        }
+      ],
+      "right": [
+        {
+          "text": "Meet the family",
+          "url": "/../#family"
+        }
+      ]
+    }
+  },
+  "theme": {
+    "name": "default",
+    "appearance": "system",
+    "codeHighlight": true,
+    "customCss": [
+      "assets/css/homebot.css"
+    ],
+    "customJs": [
+      "assets/js/font.js",
+      "assets/js/a11y.js",
+      "assets/js/docs-choice.js"
+    ]
+  },
+  "markdown": {
+    "breaks": false
+  },
+  "minify": true,
+  "autoTitleFromH1": true,
+  "copyCode": true,
+  "pageNavigation": true,
+  "navigation": [
+    {
+      "title": "Start here",
+      "path": "/",
+      "icon": "house"
+    },
+    {
+      "title": "Install and update",
+      "path": "/install/",
+      "icon": "download"
+    },
+    {
+      "title": "How it compares",
+      "path": "/compare/",
+      "icon": "scale"
+    },
+    {
+      "title": "Your home repo",
+      "icon": "folder-tree",
+      "children": [
+        {
+          "title": "Layout",
+          "path": "/layout/",
+          "icon": "folders"
+        },
+        {
+          "title": "Linking rules",
+          "path": "/linking/",
+          "icon": "link"
+        },
+        {
+          "title": "Secrets",
+          "path": "/secrets/",
+          "icon": "lock"
+        },
+        {
+          "title": "Personas",
+          "path": "/personas/",
+          "icon": "palette"
+        },
+        {
+          "title": "Naming your homebot",
+          "path": "/naming/",
+          "icon": "tag"
+        },
+        {
+          "title": "Profiles & packages",
+          "path": "/profiles/",
+          "icon": "package"
+        }
+      ]
+    },
+    {
+      "title": "Reference",
+      "icon": "bot",
+      "children": [
+        {
+          "title": "Commands",
+          "path": "/reference/commands/",
+          "icon": "terminal"
+        },
+        {
+          "title": "Persona files",
+          "path": "/reference/personas/",
+          "icon": "file-text"
+        },
+        {
+          "title": "Message catalog",
+          "path": "/reference/messages/",
+          "icon": "list"
+        },
+        {
+          "title": "Inbox & helper",
+          "path": "/reference/inbox/",
+          "icon": "inbox"
+        },
+        {
+          "title": "homebot.yml",
+          "path": "/reference/config/",
+          "icon": "settings"
+        },
+        {
+          "title": "Hacking on it",
+          "path": "/reference/develop/",
+          "icon": "wrench"
+        }
+      ]
+    }
+  ],
+  "plugins": {
+    "git": {
+      "commitHistory": true,
+      "maxCommits": 5
+    },
+    "seo": {
+      "defaultDescription": "How homebot and a home repo work."
+    },
+    "ai": false,
+    "okf": false
+  }
+}

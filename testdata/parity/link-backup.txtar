@@ -1,0 +1,67 @@
+[!linux] skip 'recorded on linux'
+
+# --backup moves what is in the way aside (renamed with the clock), then links.
+# exit: 0
+exec homebot link --backup
+cmpwork stdout link-backup.stdout
+cmpwork stderr link-backup.stderr
+# exit: 0
+exec homebot link --dry-run
+cmpwork stdout link-backup-dry.stdout
+# exit: 0
+exec homebot cleanup --list
+cmpwork stdout cleanup-list.stdout
+# exit: 0
+exec homebot cleanup
+cmpwork stdout cleanup-notty.stdout
+# exit: 0
+exec homebot
+cmpwork stdout link-backup-inbox.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1
+-- home/.home/autolink/common/gitconfig --
+[user]
+-- home/.zshrc --
+export MINE=1
+-- home/.gitconfig --
+[user]
+	name = Mine
+-- link-backup.stdout --
+moved aside ~/.gitconfig.homebot-backup-20260101-000000
+moved aside ~/.zshrc.homebot-backup-20260101-000000
+Compare and delete them when you have a minute:
+  homebot cleanup
+  link    ~/.gitconfig
+  link    ~/.zshrc
+2 changes, 0 already linked
+-- link-backup.stderr --
+-- link-backup-dry.stdout --
+2 already linked
+-- cleanup-list.stdout --
+  ~/.gitconfig.homebot-backup-20260101-000000
+  ~/.zshrc.homebot-backup-20260101-000000
+-- cleanup-notty.stdout --
+  ~/.gitconfig.homebot-backup-20260101-000000
+  ~/.zshrc.homebot-backup-20260101-000000
+Review them in a terminal:
+  homebot cleanup
+-- link-backup-inbox.stdout --
+homebot · testhost · 5 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 2 backups that homebot link moved aside: compare, then delete or keep
+       ~/.gitconfig.homebot-backup-20260101-000000,
+       ~/.zshrc.homebot-backup-20260101-000000
+       → homebot cleanup
+  4  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

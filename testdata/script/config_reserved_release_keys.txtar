@@ -1,0 +1,24 @@
+# homebot.yml may carry ai before this build knows it: it is ignored,
+# and a near miss is still an unknown key.
+
+exec homebot cleanup --list
+! stderr .
+
+env HOMEBOT_DEBUG=1
+exec homebot cleanup --list
+stderr 'ignoring reserved key.*key=ai '
+
+# A near miss is still an unknown key.
+cp home/.home/homebot.bad home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'updates'
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+ai:
+  provider: x
+-- home/.home/homebot.bad --
+profiles:
+  default: workstation
+updates: auto

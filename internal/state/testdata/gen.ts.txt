@@ -1,0 +1,58 @@
+import { mkdirSync, writeFileSync, readFileSync, cpSync } from "node:fs";
+import { join } from "node:path";
+import { sandbox } from "../test/fixtures";
+import { updateState, journal, snooze } from "../src/state";
+import { writeJson } from "../src/fsutil";
+import { writeCache } from "../src/inbox";
+
+const out = process.argv[2]!;
+const sb = sandbox();
+const ctx = sb.ctx;
+let t = 1767225600000;
+Date.now = () => (t += 1000);
+mkdirSync(ctx.stateDir, { recursive: true });
+
+// state.json: unknown field first, then typed updates incl. delete+re-add
+writeFileSync(join(ctx.stateDir, "state.json"), JSON.stringify({ futureThing: { a: [1, 2], b: "<x>&" }, lastSeen: 5 }, null, 2) + "\n");
+updateState(ctx, (s) => { s.lastTidy = Date.now(); s.tidyErrors = [{ step: "links", message: "boom <1> &   é", at: Date.now() }]; });
+updateState(ctx, (s) => { s.exports["zed"] = { at: Date.now(), ok: true }; s.exports["alpha"] = { at: Date.now(), ok: false, error: "no \"tool\"\nfound" }; });
+updateState(ctx, (s) => { s.notify = { key: "k", at: Date.now() }; });
+updateState(ctx, (s) => { s.blocked = { reason: "plaintext", at: Date.now() }; });
+updateState(ctx, (s) => { s.unpack = { profile: "workstation", hash: "abc123", at: Date.now() }; });
+updateState(ctx, (s) => { s.lastSync = Date.now(); });
+updateState(ctx, (s) => { s.lastAutosave = Date.now(); });
+cpSync(join(ctx.stateDir, "state.json"), join(out, "state-full.json"));
+updateState(ctx, (s) => { delete s.notify; });
+updateState(ctx, (s) => { s.notify = { key: "k2", at: Date.now() }; delete s.blocked; });
+cpSync(join(ctx.stateDir, "state.json"), join(out, "state-readd.json"));
+
+// minimal: nothing on disk, then a lastSeen update
+sb.cleanup;
+const sb2 = sandbox();
+updateState(sb2.ctx, (s) => { s.lastSeen = Date.now(); });
+cpSync(join(sb2.ctx.stateDir, "state.json"), join(out, "state-minimal.json"));
+updateState(sb2.ctx, () => {});
+cpSync(join(sb2.ctx.stateDir, "state.json"), join(out, "state-noop-empty.json"));
+
+// journal
+journal(ctx, "tidy: fixed 2 links");
+journal(ctx, "save failed <bad> & \"quoted\"   é 🚚", true);
+journal(ctx, "plain", false);
+cpSync(join(ctx.stateDir, "journal.jsonl"), join(out, "journal.jsonl"));
+
+writeJson(join(ctx.stateDir, "links.json"), ["/h/.config/a", "/h/.zshrc"]);
+cpSync(join(ctx.stateDir, "links.json"), join(out, "links.json"));
+writeJson(join(ctx.stateDir, "links.json"), []);
+cpSync(join(ctx.stateDir, "links.json"), join(out, "links-empty.json"));
+writeJson(join(ctx.stateDir, "secrets.json"), { "zeta/key": { plain: "a".repeat(64), age: "b".repeat(64) }, "alpha.env": { plain: "c".repeat(64), age: "d".repeat(64) } });
+cpSync(join(ctx.stateDir, "secrets.json"), join(out, "secrets.json"));
+snooze(ctx, "link:/h/.zshrc", 7); snooze(ctx, "a-first", 7);
+cpSync(join(ctx.stateDir, "snooze.json"), join(out, "snooze.json"));
+
+const item = (level: string): any => ({ level });
+for (const [name, items] of [["none", []], ["one", [item("info")]], ["three-urgent", [item("urgent"), item("info"), item("urgent")]]] as const) {
+  writeCache(ctx, items as any);
+  cpSync(join(ctx.cacheDir, "nudge"), join(out, `nudge-${name}`));
+  cpSync(join(ctx.cacheDir, "count"), join(out, `count-${name}`));
+}
+sb.cleanup(); sb2.cleanup();

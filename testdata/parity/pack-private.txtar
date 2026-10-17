@@ -1,0 +1,76 @@
+[!linux] skip 'recorded on linux'
+
+# pack --private seals the file under private/ with age (recipients.txt is in the repo).
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot pack --private ~/.netrc
+cmpwork stdout pack-private.stdout
+cmpwork stderr pack-private.stderr
+exists home/.home/private/common/netrc.age
+exists home/.home/private/common/netrc
+# exit: 0
+exec homebot
+# deliberate: triage skips private/ in the repo, since save stages it itself (recorded from bun src/cli.ts with the same skip)
+cmpwork stdout inbox-after-private.stdout
+# exit: 0
+exec homebot lock --wipe
+cmpwork stdout lock-wipe.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.netrc --
+machine example.com login me password pw
+-- pack-private.stdout --
+packed ~/.netrc → private/common/netrc (sealed 1)
+Commit it with:
+  homebot save
+-- pack-private.stderr --
+-- inbox-after-private.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! The commit guard is not installed
+       → homebot setup
+  2  • 1 link to make or fix
+       → homebot link
+  3  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+
+  Do the first one now: homebot next
+-- lock-wipe.stdout --
+Sealed 0, removed 1 plaintext file.

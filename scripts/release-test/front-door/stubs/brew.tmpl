@@ -1,0 +1,23 @@
+#!/bin/bash
+# Stub brew; the fake installer writes it with @PREFIX@ filled in.
+prefix=@PREFIX@
+echo "brew $*" >>"${STUB_LOG:?}"
+case "${1:-}" in
+  --prefix) echo "$prefix" ;;
+  --version) echo "Homebrew 5.0.0-stub" ;;
+  shellenv) echo "export HOMEBREW_PREFIX=\"$prefix\"; export PATH=\"$prefix/bin:\${PATH}\";" ;;
+  install)
+    shift
+    if [ -n "${STUB_BREW_INSTALL_FAIL:-}" ]; then
+      echo "Error: stub brew refuses to install" >&2
+      exit 1
+    fi
+    for t in "$@"; do
+      case $t in
+        git) printf '#!/bin/bash\nSTUB_GIT_VERSION=2.50.0 exec "%s/stubs/git" "$@"\n' "$STUB_FIXTURES" >"$prefix/bin/git" ;;
+        *) cp "$STUB_FIXTURES/stubs/tool" "$prefix/bin/$t" ;;
+      esac
+      chmod +x "$prefix/bin/$t"
+    done
+    ;;
+esac

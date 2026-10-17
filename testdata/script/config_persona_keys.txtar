@@ -1,0 +1,41 @@
+# The synced persona key is parsed; personaAlias remains unknown.
+
+exec homebot cleanup --list
+! stderr .
+
+cp home/.home/persona.none home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr .
+
+cp home/.home/persona.number home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'persona must be a string'
+
+cp home/.home/persona.path home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'persona "../x" must be'
+
+cp home/.home/persona.alias home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'unknown key "personaAlias"'
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+persona: tester
+-- home/.home/persona.none --
+profiles:
+  default: workstation
+persona: none
+-- home/.home/persona.number --
+profiles:
+  default: workstation
+persona: 3
+-- home/.home/persona.path --
+profiles:
+  default: workstation
+persona: ../x
+-- home/.home/persona.alias --
+profiles:
+  default: workstation
+personaAlias: zork

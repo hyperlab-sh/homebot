@@ -1,0 +1,44 @@
+[!linux] skip 'recorded on linux'
+
+# triage with no terminal: stdin is closed, so every question gets the empty answer. The sh wrapper adds the final newline that txtar needs.
+exec sh -c 'homebot triage; echo'
+cmpwork stdout triage.stdout
+cmpwork stderr triage.stderr
+# exit: 0
+exec homebot
+cmpwork stdout inbox-after-triage.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.bashrc --
+mine
+-- home/.config/foo/conf --
+mine
+-- triage.stdout --
+2 things to decide. Each answer is saved right away; q stops.
+
+[1/2] ~/.config/foo  (folder, 5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+> 
+[2/2] ~/.bashrc  (5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+> 
+-- triage.stderr --
+-- inbox-after-triage.stdout --
+homebot · testhost · 5 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 2 new things to sort: track, ignore or snooze
+       ~/.config/foo, ~/.bashrc
+       → homebot triage
+  4  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

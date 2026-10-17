@@ -1,0 +1,61 @@
+# D14: keys init on a new home writes private/.gitignore before the keys, so
+# the first save after pack --private commits only sealed files, with no
+# pre-commit hook installed. An existing .gitignore is never replaced.
+chmod 755 bin/gitleaks
+env HOMEBOT_TEST_PASSPHRASE='a passphrase 2b7e10c4'
+env HOMEBOT_TEST_SCRYPT_WORK_FACTOR=10
+env PRIVATE=$WORK/home/.home/private
+
+exec git -C home/.home init -q
+exec homebot keys init
+cmp $PRIVATE/.gitignore want.gitignore
+exists $PRIVATE/identity.age
+exists $PRIVATE/recipients.txt
+
+exec homebot pack --private ~/.netrc
+! stdout 'canary-'
+! stderr 'canary-'
+exec homebot save
+! stdout 'canary-|AGE-SECRET-KEY'
+! stderr 'canary-|AGE-SECRET-KEY'
+exec git -C home/.home ls-tree -r --name-only HEAD
+cmp stdout first.files
+exec git -C home/.home log -p --all
+! stdout 'canary-|AGE-SECRET-KEY|2b7e10c4'
+
+# keys init refuses on existing keys before it looks at the .gitignore; with
+# the keys gone and a .gitignore of the person's own, it keeps that one.
+rm $PRIVATE/identity.age
+rm $PRIVATE/recipients.txt
+cp mine.gitignore $PRIVATE/.gitignore
+exec homebot keys init
+cmp $PRIVATE/.gitignore mine.gitignore
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.netrc --
+machine example.com password canary-58c2d913
+-- want.gitignore --
+*
+!*/
+!*.age
+!/README.md
+!/.gitignore
+!/.gitkeep
+!/recipients.txt
+-- mine.gitignore --
+# mine
+*
+!*/
+!*.age
+!/recipients.txt
+-- first.files --
+homebot.yml
+private/.gitignore
+private/common/netrc.age
+private/identity.age
+private/recipients.txt

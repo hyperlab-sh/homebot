@@ -1,0 +1,28 @@
+# Two tidies never run at once: the second one finds the lock held, says so
+# and exits 0, and the first one finishes its chores. The export writes
+# "started" once the first tidy holds the lock, and waits for "release".
+[!unix] skip 'flock is unix'
+
+exec sh -c 'homebot tidy & pid=$!; i=0; while [ ! -e home/.home/started ] && [ $i -lt 400 ]; do sleep 0.05; i=$((i+1)); done; homebot tidy > second.out 2> second.err; echo second=$?; touch home/.home/release; wait $pid; echo first=$?'
+stdout '^second=0$'
+stdout '^first=0$'
+cmp second.err empty
+grep 'Another tidy is running\.' second.out
+exists home/.home/manifests/slow.txt
+
+# With the lock free, a tidy runs and says what it did.
+exec homebot tidy
+stdout 'Nothing to tidy\.'
+! stdout 'Another tidy'
+
+# A lock file left behind holds nothing.
+exists xdg/state/homebot/tidy.lock
+exec homebot tidy
+! stdout 'Another tidy'
+
+-- empty --
+-- home/.home/homebot.yml --
+exports:
+  - name: slow
+    out: manifests/slow.txt
+    run: touch started; while [ ! -e release ]; do sleep 0.05; done; echo done

@@ -1,0 +1,67 @@
+[!linux] skip 'recorded on linux'
+
+# A tracked change is committed and pushed to the bare remote.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+exec sh -c 'echo more >> home/.home/autolink/common/zshrc'
+# exit: 0
+exec homebot save
+cmpwork stdout save-change.stdout
+cmpwork stderr save-change.stderr
+exec git -C home/.home log --format=%s%n%b
+cmpwork stdout log.stdout
+exec git -C remote.git log --format=%s main
+cmpwork stdout remote-log.stdout
+# exit: 0
+exec homebot save
+cmpwork stdout save-again.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- save-change.stdout --
+committed 1 file
+pushed 1 commit
+-- save-change.stderr --
+-- log.stdout --
+chore(home): save changes from testhost
+1 file(s) changed on testhost (linux):
+
+- autolink/common/zshrc
+
+init
+
+-- remote-log.stdout --
+chore(home): save changes from testhost
+init
+-- save-again.stdout --
+Nothing new to commit.

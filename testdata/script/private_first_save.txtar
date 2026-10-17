@@ -1,0 +1,87 @@
+# D14, the final security review's F1: a new home whose private/ has keys but
+# no .gitignore (copied from another machine, say). Nothing ever wrote one,
+# so pack --private followed by save committed the plaintext secret, and no
+# pre-commit hook was there to stop it (setup was never run). Now pack
+# --private and save write private/.gitignore when there is none, and save
+# runs the guard itself, hook or no hook. Nothing plaintext may be committed.
+chmod 755 bin/gitleaks
+env PRIVATE=$WORK/home/.home/private
+
+exec git -C home/.home init -q
+! exists $PRIVATE/.gitignore
+exec homebot pack --private ~/.netrc
+! stdout 'canary-'
+! stderr 'canary-'
+cmp $PRIVATE/.gitignore want.gitignore
+exists $PRIVATE/common/netrc.age
+grep 'canary-3e8f0a6c' home/.netrc
+
+# No hook is installed: save is the only thing checking.
+! exec git -C home/.home config --get core.hooksPath
+exec homebot save
+! stdout 'canary-'
+! stderr 'canary-'
+exec git -C home/.home ls-tree -r --name-only HEAD
+cmp stdout first.files
+exec git -C home/.home log -p --all
+! stdout 'canary-'
+
+# Take the .gitignore away again and change the secret: save writes it back
+# before it stages anything, and commits only the sealed file.
+rm $PRIVATE/.gitignore
+exec sh -c 'echo "machine example.org password canary-91d4b27e" >> "$HOME/.netrc"'
+exec homebot save
+! stderr .
+cmp $PRIVATE/.gitignore want.gitignore
+exec git -C home/.home ls-tree -r --name-only HEAD
+cmp stdout first.files
+exec git -C home/.home log -p --all
+! stdout 'canary-'
+
+# A private/.gitignore edited to let the plaintext through: save stages it,
+# refuses to commit it in the guard's words, names the file to fix, and HEAD
+# stays put.
+exec git -C home/.home rev-parse HEAD
+cp stdout head-2
+cp loose.gitignore $PRIVATE/.gitignore
+exec sh -c 'echo "machine example.net password canary-5a0c7d21" >> "$HOME/.netrc"'
+! exec homebot save
+! stdout .
+stderr '^homebot: Commit refused: private/common/netrc is plaintext, and private/\.gitignore does not ignore it, so every save stages it again\.'
+stderr '^  git rm --cached private/common/netrc$'
+! stderr 'canary-'
+exec git -C home/.home rev-parse HEAD
+cmp stdout head-2
+exec git -C home/.home log -p --all
+! stdout 'canary-'
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.netrc --
+machine example.com password canary-3e8f0a6c
+-- want.gitignore --
+*
+!*/
+!*.age
+!/README.md
+!/.gitignore
+!/.gitkeep
+!/recipients.txt
+-- first.files --
+homebot.yml
+private/.gitignore
+private/common/netrc.age
+private/recipients.txt
+-- loose.gitignore --
+*
+!*/
+!*.age
+!/.gitignore
+!/recipients.txt
+!netrc

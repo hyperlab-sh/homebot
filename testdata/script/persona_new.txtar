@@ -1,0 +1,76 @@
+# The whole scaffold is recorded by TestPersonaNewScaffoldGolden in
+# internal/cli (internal/cli/testdata/persona-preview/new.golden): it lists
+# every voice id, which is too long to hold in a script. Here the file is
+# checked as a user would meet it.
+exec homebot persona new tester
+stdout 'Created persona file'
+stdout 'homebot pack'
+exists xdg/config/homebot/personas/tester.toml
+grep '^# "save.success.committed"' xdg/config/homebot/personas/tester.toml
+exec homebot persona validate tester
+stdout 'Persona tester is valid'
+
+! exec homebot persona new tester
+stderr 'already exists'
+
+# --from copies the header and the lines: the whole file is the golden.
+exec homebot persona new copy --from source
+exists xdg/config/homebot/personas/copy.toml
+cmp xdg/config/homebot/personas/copy.toml copy.golden
+
+# --from copies the language tag too: without it the copied lines would be read
+# as English. A source with no lang gets no lang line (copy.golden above).
+exec homebot persona new copyfr --from french
+cmp xdg/config/homebot/personas/copyfr.toml copyfr.golden
+exec homebot persona validate copyfr
+stdout 'Persona copyfr is valid'
+
+# The source must exist and load; nothing is written when it does not.
+! exec homebot persona new other --from nosuch
+stderr 'No persona named nosuch'
+! stderr 'Invalid header'
+! exists xdg/config/homebot/personas/other.toml
+
+-- xdg/config/homebot/personas/source.toml --
+schema = 1
+id = "source"
+name = "Source"
+emoji = "🧪"
+extends = "neatpik"
+[lines]
+"save.success.committed" = ["Filed {n:# file|# files}"]
+-- xdg/config/homebot/personas/french.toml --
+schema = 1
+id = "french"
+name = "Français"
+emoji = "🥖"
+tagline = "Bonjour"
+extends = "neatpik"
+lang = "fr"
+[lines]
+"next.success.nothing" = ["Rien ne vous attend."]
+-- copyfr.golden --
+schema = 1
+id = "copyfr"
+name = "Français"
+emoji = "🥖"
+tagline = "Bonjour"
+extends = "neatpik"
+lang = "fr"
+
+[colors]
+
+[lines]
+"next.success.nothing" = ["Rien ne vous attend."]
+-- copy.golden --
+schema = 1
+id = "copy"
+name = "Source"
+emoji = "🧪"
+tagline = ""
+extends = "neatpik"
+
+[colors]
+
+[lines]
+"save.success.committed" = ["Filed {n:# file|# files}"]

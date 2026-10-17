@@ -1,0 +1,6 @@
+self-hosted-runner:
+  labels:
+    - homebot-mac
+
+config-variables:
+  - MACOS_CI

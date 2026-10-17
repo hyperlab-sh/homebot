@@ -1,0 +1,56 @@
+# Valid update modes load without warnings.
+cp home/.home/off home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr 'Unknown update value'
+cp home/.home/notify home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr 'Unknown update value'
+cp home/.home/auto home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr 'Unknown update value'
+
+# A typo and other YAML kinds load, warn once, and use off.
+cp home/.home/typo home/.home/homebot.yml
+exec homebot cleanup --list
+stderr 'Unknown update value "atuo" at .*homebot.yml:2; using off'
+cp home/.home/bool home/.home/homebot.yml
+exec homebot cleanup --list
+stderr 'Unknown update value true at .*homebot.yml:2; using off'
+cp home/.home/list home/.home/homebot.yml
+exec homebot cleanup --list
+stderr 'Unknown update value \["auto"\] at .*homebot.yml:2; using off'
+cp home/.home/map home/.home/homebot.yml
+exec homebot cleanup --list
+stderr 'Unknown update value \{mode: "auto"\} at .*homebot.yml:2; using off'
+cp home/.home/null home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr 'Unknown update value'
+
+# The key belongs only at the top level.
+cp home/.home/nested home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'unknown key "update" under autosave'
+
+-- home/.home/off --
+update: off
+-- home/.home/notify --
+update: notify
+-- home/.home/auto --
+update: auto
+-- home/.home/typo --
+ai: null
+update: atuo
+-- home/.home/bool --
+ai: null
+update: true
+-- home/.home/list --
+ai: null
+update: [auto]
+-- home/.home/map --
+ai: null
+update: {mode: auto}
+-- home/.home/null --
+update:
+-- home/.home/nested --
+autosave:
+  update: auto

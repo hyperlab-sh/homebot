@@ -1,0 +1,121 @@
+[!linux] skip 'recorded on linux'
+
+# The commit guard (core.hooksPath) refuses a commit because gitleaks flags it.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot setup
+exec sh -c 'echo "token = hunter2" >> home/.home/autolink/common/zshrc'
+exec cp leaky-gitleaks bin/gitleaks
+chmod 755 bin/gitleaks
+# exit: 1
+! exec homebot save
+cmpwork stdout save-refused.stdout
+cmpwork stderr save-refused.stderr
+# exit: 0
+exec homebot
+# deliberate: the TypeScript setup made homebot/hooks/pre-commit executable, a second uncommitted change (mode); the Go guard shim lives under $XDG_DATA_HOME, so only the edited zshrc is uncommitted
+cmpwork stdout inbox-refused.stdout
+exec cp clean-gitleaks bin/gitleaks
+chmod 755 bin/gitleaks
+# exit: 0
+exec homebot save
+# deliberate: only the edited zshrc is committed; the TypeScript setup also changed the mode of homebot/hooks/pre-commit (see inbox-refused above)
+cmpwork stdout save-fixed.stdout
+# exit: 0
+exec homebot
+cmpwork stdout inbox-fixed.stdout
+-- leaky-gitleaks --
+#!/bin/sh
+echo "Finding:     token = REDACTED"
+echo "File:        autolink/common/zshrc"
+exit 99
+-- clean-gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot/hooks/pre-commit --
+#!/bin/sh
+# homebot commit guard: seals secrets, then refuses plaintext secrets, oversized
+# files and anything gitleaks flags. Bypass once with: git commit --no-verify
+root=$(git rev-parse --show-toplevel) || exit 1
+
+# Prefer the source in this repo so the guard always matches the checked-out tool.
+if command -v bun >/dev/null 2>&1 && [ -f "$root/homebot/src/cli.ts" ]; then
+  exec bun "$root/homebot/src/cli.ts" hook pre-commit
+fi
+if command -v homebot >/dev/null 2>&1; then
+  exec homebot hook pre-commit
+fi
+echo "homebot: neither bun nor homebot is installed, so this commit can't be checked. Refusing." >&2
+exit 1
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- save-refused.stdout --
+-- save-refused.stderr --
+homebot: Commit refused: gitleaks found something that looks like a secret. Move it to private/ (homebot pack --private <path>) or unstage it.
+  Finding:     token = REDACTED
+  File:        autolink/common/zshrc
+-- inbox-refused.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! A commit was refused
+       Commit refused: gitleaks found something that looks like a secret. Move
+       it to private/ (homebot pack --private <path>) or unstage it.
+         Finding:     token = REDACTED
+         File:        autolink/common/zshrc
+       → homebot save
+  2  • 1 link to make or fix
+       → homebot link
+  3  • 1 uncommitted change
+       → homebot save
+  4  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+
+  Do the first one now: homebot next
+-- save-fixed.stdout --
+committed 1 file
+pushed 1 commit
+-- inbox-fixed.stdout --
+homebot · testhost · 2 things need you
+
+  1  • 1 link to make or fix
+       → homebot link
+  2  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+
+  Do the first one now: homebot next

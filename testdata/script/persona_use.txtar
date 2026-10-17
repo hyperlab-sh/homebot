@@ -1,0 +1,36 @@
+exec homebot persona use none
+stdout 'Neutral voice selected'
+grep '^persona: none$' home/.home/homebot.yml
+
+exec homebot persona use neatpik
+stdout 'is selected'
+grep '^persona: neatpik$' home/.home/homebot.yml
+grep '^# keep this comment$' home/.home/homebot.yml
+
+! exec homebot persona use broken
+stderr 'Persona broken is unusable'
+grep '^persona: neatpik$' home/.home/homebot.yml
+
+# A persona that does not exist says so, and the config stays as it was.
+! exec homebot persona use nosuch
+stderr 'No persona named nosuch'
+! stderr 'Invalid header'
+grep '^persona: neatpik$' home/.home/homebot.yml
+
+# Outside a home repo there is no config to write: the command refuses, for a
+# built-in and for none, and creates nothing.
+rm home/.home
+! exec homebot persona use neatpik
+stderr 'No homebot.yml found'
+! exists home/.home
+! exec homebot persona use none
+stderr 'No homebot.yml found'
+! exists home/.home
+
+-- home/.home/homebot.yml --
+# keep this comment
+profiles:
+  default: workstation
+-- xdg/config/homebot/personas/broken.toml --
+schema = 1
+name = "Broken"

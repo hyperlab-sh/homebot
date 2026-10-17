@@ -1,0 +1,118 @@
+[!linux] skip 'uses the linux layer'
+
+# unpack through a machine's life: a dry run, a failing step with its resume
+# hint, the resume, a link step, and the state it leaves. The parity scripts
+# unpack-run and unpack-dry-run hold the TypeScript's words for the same
+# runs.
+
+# A dry run lists every step and changes nothing.
+exec homebot unpack --dry-run
+cmp stdout dry.stdout
+! stderr .
+! exists home/touched-one
+! exists xdg/state/homebot/state.json
+
+# A failing step stops the run; the error says how to resume.
+! exec homebot unpack
+cmp stdout fails.stdout
+cmp stderr fails.stderr
+exists home/touched-one
+! exists home/touched-three
+! exists xdg/state/homebot/state.json
+
+# Resuming runs the rest and records the profile.
+exec homebot unpack --from 3
+cmp stdout resume.stdout
+! stderr .
+exists home/touched-three
+grep '"profile": "workstation"' xdg/state/homebot/state.json
+grep '"hash": "[0-9a-f]{64}"' xdg/state/homebot/state.json
+grep '"at": 1767225600000' xdg/state/homebot/state.json
+
+# --from takes anything JavaScript's Number() reads as a whole number.
+exec homebot unpack --dry-run --from ' 0x3 '
+cmp stdout from3.stdout
+exec homebot unpack --dry-run --from 3e0
+cmp stdout from3.stdout
+
+# A profile named on the command line wins over profiles.default, and a
+# second word after it is ignored.
+exec homebot unpack other ignored
+cmp stdout other.stdout
+grep '"profile": "other"' xdg/state/homebot/state.json
+
+# The link step links, then a layout error stops the run before the next step.
+exec homebot unpack linker
+cmp stdout linker.stdout
+exec test -L home/.zshrc
+rm home/after
+mkdir home/.home/autolink/common/a/(b)
+cp c home/.home/autolink/common/a/(b)/c
+! exec homebot unpack linker
+cmp stdout linker-bad.stdout
+stderr '^homebot: Step 1 failed: link: the repo breaks a layout rule:$'
+stderr 'rename "a" to "\(a\)"'
+stderr 'homebot unpack linker --from 1$'
+! exists home/after
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1
+-- c --
+c
+-- home/.home/manifests/profiles/workstation.yml --
+steps:
+  - run: echo one && touch ../../touched-one
+  - run: echo two; exit 7
+  - run: echo three && touch ../../touched-three
+-- home/.home/manifests/profiles/other.yml --
+steps:
+  - run: echo other
+-- home/.home/manifests/profiles/linker.yml --
+steps:
+  - link
+  - run: touch ../../after
+-- dry.stdout --
+Would unpack workstation on testhost (linux): 3 steps
+[1/3] run echo one && touch ../../touched-one
+[2/3] run echo two; exit 7
+[3/3] run echo three && touch ../../touched-three
+-- fails.stdout --
+Unpacking workstation on testhost (linux): 3 steps
+[1/3] run echo one && touch ../../touched-one
+one
+[2/3] run echo two; exit 7
+two
+-- fails.stderr --
+homebot: Step 2 failed: run: "echo two; exit 7" exited with 7
+Fix it, then resume:
+  homebot unpack workstation --from 2
+-- resume.stdout --
+Unpacking workstation on testhost (linux): 3 steps
+[1/3] run echo one && touch ../../touched-one  (skipped)
+[2/3] run echo two; exit 7  (skipped)
+[3/3] run echo three && touch ../../touched-three
+three
+Unpacked workstation.
+-- from3.stdout --
+Would unpack workstation on testhost (linux): 3 steps
+[1/3] run echo one && touch ../../touched-one  (skipped)
+[2/3] run echo two; exit 7  (skipped)
+[3/3] run echo three && touch ../../touched-three
+-- other.stdout --
+Unpacking other on testhost (linux): 1 steps
+[1/1] run echo other
+other
+Unpacked other.
+-- linker.stdout --
+Unpacking linker on testhost (linux): 2 steps
+[1/2] link
+link: 1 changed
+[2/2] run touch ../../after
+Unpacked linker.
+-- linker-bad.stdout --
+Unpacking linker on testhost (linux): 2 steps
+[1/2] link
+link: 0 changed

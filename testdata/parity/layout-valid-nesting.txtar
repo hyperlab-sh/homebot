@@ -1,0 +1,31 @@
+[!linux] skip 'recorded on linux'
+
+# The valid forms: (name) keeps a real folder; .config and friends are always real.
+# exit: 0
+exec homebot link
+cmpwork stdout layout-valid-link.stdout
+cmpwork stderr layout-valid-link.stderr
+exists home/.zshrc
+exists home/.claude/settings.json
+exists home/.config/nvim/init.lua
+# exit: 0
+exec homebot link
+cmpwork stdout layout-valid-again.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.home/autolink/common/(claude)/settings.json --
+{}
+-- home/.home/autolink/common/config/nvim/init.lua --
+-- home/.home/autolink/common/.hidden --
+x
+-- layout-valid-link.stdout --
+  link    ~/.claude/settings.json
+  link    ~/.config/nvim
+  link    ~/.zshrc
+3 changes, 0 already linked
+-- layout-valid-link.stderr --
+-- layout-valid-again.stdout --
+0 changes, 3 already linked

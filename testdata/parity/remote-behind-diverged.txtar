@@ -1,0 +1,31 @@
+[!linux] skip 'recorded on linux'
+
+# origin exists and is reachable: remote pushes what is missing and pulls what is new.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-pushes.stdout
+exec git clone -q remote.git other
+exec sh -c 'echo x > other/new.txt'
+exec git -C other add -A
+exec git -C other commit -q -m 'from other'
+exec git -C other push -q
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-pulls.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-pushes.stdout --
+reachable $WORK/remote.git
+pushed the repo is backed up
+-- remote-pulls.stdout --
+reachable $WORK/remote.git
+pulled 1 commit
+Already backed up: the remote has every commit.

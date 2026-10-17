@@ -1,0 +1,74 @@
+[!linux] skip 'recorded on linux'
+
+# An export that fails shows up in the inbox with its error, and keeps failing until it works.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot setup
+# exit: 0
+exec homebot unpack
+# exit: 0
+exec homebot export
+cmpwork stdout export-failing.stdout
+cmpwork stderr export-failing.stderr
+# exit: 0
+exec homebot
+cmpwork stdout inbox-failing-export.stdout
+cmpwork stderr inbox-failing-export.stderr
+# exit: 0
+exec homebot next
+cmpwork stdout next-failing-export.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+exports:
+  - name: packages
+    out: manifests/packages.txt
+    run: "echo 'no such package manager' >&2; exit 3"
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- export-failing.stdout --
+failed    packages: exited with 3: no such package manager
+-- export-failing.stderr --
+-- inbox-failing-export.stdout --
+homebot · testhost · 1 thing needs you
+
+  1  • Export packages is failing
+       exited with 3: no such package manager
+       → homebot export packages
+
+  Do the first one now: homebot next
+-- inbox-failing-export.stderr --
+-- next-failing-export.stdout --
+Export packages is failing
+exited with 3: no such package manager
+→ homebot export packages
+failed    packages: exited with 3: no such package manager

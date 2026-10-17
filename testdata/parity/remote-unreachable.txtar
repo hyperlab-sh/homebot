@@ -1,0 +1,22 @@
+[!linux] skip 'recorded on linux'
+
+# A URL git cannot reach: reported, nothing pushed.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+# exit: 0
+exec homebot remote $WORK/missing.git
+cmpwork stdout remote-unreachable.stdout
+cmpwork stderr remote-unreachable.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-unreachable.stdout --
+remote $WORK/missing.git
+Can't reach the remote.
+  $WORK/missing.git
+  git: Please make sure you have the correct access rights
+  git: and the repository exists.
+-- remote-unreachable.stderr --

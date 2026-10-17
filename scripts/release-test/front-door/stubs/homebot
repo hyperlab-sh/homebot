@@ -1,0 +1,15 @@
+#!/bin/bash
+# The "built" homebot. `setup` records whether stdin is a terminal.
+case "${1:-}" in
+  --version) echo "homebot version 0.0.0-stub" ;;
+  --help) echo "homebot stub help" ;;
+  setup)
+    tty=0
+    if [ -t 0 ]; then tty=1; fi
+    echo "homebot setup args=$* stdin_tty=$tty" >>"${STUB_LOG:?}"
+    # Replaced by exec, the script's bash is this very process, so the parent is
+    # the test's outer shell (bash -c ...), not a `bash -s` running the script.
+    echo "homebot parent=$(tr '\0' ' ' </proc/$PPID/cmdline 2>/dev/null)" >>"$STUB_LOG"
+    exit "${STUB_SETUP_RC:-0}"
+    ;;
+esac

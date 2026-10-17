@@ -1,0 +1,44 @@
+[!linux] skip 'recorded on linux'
+
+# The same file in two layers, and a folder spelled two ways.
+# exit: 1
+! exec homebot link
+cmpwork stdout layout-two-layers-link.stdout
+cmpwork stderr layout-two-layers-link.stderr
+# exit: 0
+exec homebot
+cmpwork stdout layout-two-layers-inbox.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.home/autolink/linux/zshrc --
+export A=2
+-- home/.home/autolink/common/(tool)/a --
+a
+-- home/.home/autolink/linux/tool/b --
+b
+-- layout-two-layers-link.stdout --
+  invalid autolink/common/(tool)  spelled "(tool)" in autolink/common/(tool) but "tool" in autolink/linux/tool; use one spelling everywhere
+  invalid autolink/common/zshrc  provided by both autolink/common/zshrc and autolink/linux/zshrc; keep it in one place
+0 changes, 0 already linked, 2 layout errors in the repo
+-- layout-two-layers-link.stderr --
+-- layout-two-layers-inbox.stdout --
+homebot · testhost · 5 things need you (2 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  ! 2 layout errors in the repo; those parts aren't linked
+       spelled "(tool)" in autolink/common/(tool) but "tool" in
+       autolink/linux/tool; use one spelling everywhere; provided by both
+       autolink/common/zshrc and autolink/linux/zshrc; keep it in one place
+       → homebot link --dry-run
+  3  • Secrets are not set up yet
+       → homebot keys init
+  4  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

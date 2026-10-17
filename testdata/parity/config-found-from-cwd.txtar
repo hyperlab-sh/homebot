@@ -1,0 +1,26 @@
+[!linux] skip 'recorded on linux'
+
+# The repo is found by walking up from the current folder, before ~/.home.
+mkdir elsewhere/repo/sub
+cd elsewhere/repo/sub
+# exit: 0
+exec homebot
+# cmpwork reads its golden from the current folder, so go back to $WORK first.
+cd $WORK
+cmpwork stdout config-found-from-cwd.stdout
+-- elsewhere/repo/homebot.yml --
+profiles:
+  default: workstation
+-- config-found-from-cwd.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! $WORK/elsewhere/repo is not a git repository
+       → git -C $WORK/elsewhere/repo init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR $WORK/elsewhere/repo/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

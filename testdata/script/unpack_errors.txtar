@@ -1,0 +1,101 @@
+# What unpack refuses before it runs anything, and how a step can fail
+# without a resume hint. Every one leaves the state alone. Nothing here names
+# the OS; unpack_errors_linux.txtar holds the two cases whose stdout does.
+
+# No profile named and none chosen.
+! exec homebot unpack
+! stdout .
+cmp stderr no-profile.stderr
+
+# An empty profile name is no name: the same refusal (today's behavior).
+! exec homebot unpack ''
+! stdout .
+cmp stderr no-profile.stderr
+rm home/.home/homebot.yml
+cp config.yml home/.home/homebot.yml
+
+# --from must be a whole number, checked before the profile is read.
+! exec homebot unpack --from x
+! stdout .
+cmp stderr nan.stderr
+! exec homebot unpack --from 2.5
+cmp stderr nan.stderr
+! exec homebot unpack --from Infinity
+cmp stderr nan.stderr
+! exec homebot unpack --from 0x
+cmp stderr nan.stderr
+! exec homebot unpack nosuchprofile --from x
+cmp stderr nan.stderr
+
+# --from must name a step. An empty value is 0.
+! exec homebot unpack --from 0
+! stdout .
+cmp stderr range.stderr
+! exec homebot unpack --from ''
+cmp stderr range.stderr
+! exec homebot unpack --from 4
+cmp stderr range.stderr
+! exec homebot unpack --from=-1
+cmp stderr range.stderr
+! exec homebot unpack --from -1
+stderr 'homebot: Option .--from. argument is ambiguous'
+! exec homebot unpack --from 1e400
+cmp stderr nan.stderr
+! exec homebot unpack --from 1e30
+cmp stderr range.stderr
+
+# --from without a value is an option error, not a step number.
+! exec homebot unpack --from
+stderr 'homebot: .*--from'
+
+# A profile that does not exist.
+! exec homebot unpack missing
+! stdout .
+stderr '^homebot: No profile named "missing" in '
+
+# A step with no action: no resume hint, nothing recorded.
+exec cp unknown.yml home/.home/manifests/profiles/workstation.yml
+! exec homebot unpack
+stdout '^\[1/1\] teleport x$'
+cmp stderr unknown.stderr
+
+# A script action that exits non-zero names the step and how to resume.
+exec cp script.yml home/.home/manifests/profiles/workstation.yml
+! exec homebot unpack
+stdout '^\[1/1\] flaky a, b$'
+stdout '^flaky a b$'
+cmp stderr script.stderr
+
+! exists xdg/state/homebot/state.json
+
+-- home/.home/homebot.yml --
+exports: []
+-- config.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+steps:
+  - run: echo a
+  - run: echo b
+  - run: echo c
+-- unknown.yml --
+steps:
+  - teleport: x
+-- script.yml --
+steps:
+  - flaky: [a, b]
+-- home/.home/manifests/actions/flaky.sh --
+echo flaky "$@"
+exit 3
+-- no-profile.stderr --
+homebot: Which profile? Pass one (homebot unpack workstation) or set profiles.default in homebot.yml.
+-- nan.stderr --
+homebot: --from takes a step number
+-- range.stderr --
+homebot: --from must be between 1 and 3
+-- unknown.stderr --
+homebot: Step 1: no action named "teleport". See: homebot actions
+-- script.stderr --
+homebot: Step 1 (flaky a, b) exited with 3.
+Fix it, then resume:
+  homebot unpack workstation --from 1

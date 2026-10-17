@@ -1,0 +1,19 @@
+[!linux] skip 'recorded on linux'
+
+# No homebot.yml anywhere: not in $WORK, not in ~/.home.
+# exit: 1
+! exec homebot
+cmpwork stdout config-none.stdout
+# deliberate: guided setup: after the no-homebot.yml error the Go build points at homebot setup, which clones or starts the home repo; the TypeScript stopped at the error
+cmpwork stderr config-none.stderr
+# exit: 1
+! exec homebot link
+# deliberate: guided setup: after the no-homebot.yml error the Go build points at homebot setup, which clones or starts the home repo; the TypeScript stopped at the error
+cmpwork stderr config-none-link.stderr
+-- config-none.stdout --
+-- config-none.stderr --
+homebot: No homebot.yml found. Run homebot inside your home repo, or set HOMEBOT_ROOT.
+New here? This clones your home repo or starts one: homebot setup
+-- config-none-link.stderr --
+homebot: No homebot.yml found. Run homebot inside your home repo, or set HOMEBOT_ROOT.
+New here? This clones your home repo or starts one: homebot setup

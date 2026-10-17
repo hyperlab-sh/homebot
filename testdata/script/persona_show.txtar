@@ -1,0 +1,70 @@
+exec homebot persona show neatpik
+stdout 'Neatpik'
+stdout 'accent: light'
+! stderr .
+
+# The samples read like a run, not like a template: real counts, no slot names.
+# (Neatpik has three variants of each and show picks one, so each line is a
+# match on any of them.)
+stdout 'committed 3 files|3 files committed'
+stdout 'pulled 3 commits|3 commits pulled'
+stdout '[Nn]othing needs you'
+! stdout '[{}]'
+! stdout 'homebot --help'
+
+# A header without a tagline has no dash and no trailing space.
+exec homebot persona show untagged
+stdout '^🧪 Untagged$'
+! stdout ' $'
+
+# A persona that ends its chain with extends = "none" and sets no colours has
+# the terminal's own: the lines say so and never print an empty value.
+exec homebot persona show bare
+stdout '^accent: terminal default$'
+stdout '^ok: terminal default$'
+stdout '^muted: terminal default$'
+! stdout 'light ,'
+! stdout ' $'
+! stderr .
+
+# One side set and the other not: the missing side says so, the set one shows.
+exec homebot persona show half
+stdout '^accent: light #31466B, dark terminal default$'
+stdout '^ok: terminal default$'
+! stdout ' $'
+! stderr .
+
+! exec homebot persona show broken
+stderr 'Persona broken is unusable'
+! exec homebot persona show ../escape
+stderr 'Invalid persona id'
+
+# A persona that does not exist says so, not "Invalid header".
+! exec homebot persona show nosuch
+stderr 'No persona named nosuch'
+! stdout 'Invalid header'
+! stderr 'Invalid header'
+
+-- xdg/config/homebot/personas/broken.toml --
+schema = 1
+name = "Broken"
+-- xdg/config/homebot/personas/untagged.toml --
+schema = 1
+id = "untagged"
+name = "Untagged"
+emoji = "🧪"
+extends = "neatpik"
+-- xdg/config/homebot/personas/bare.toml --
+schema = 1
+id = "bare"
+name = "Bare"
+emoji = "🧪"
+extends = "none"
+-- xdg/config/homebot/personas/half.toml --
+schema = 1
+id = "half"
+name = "Half"
+emoji = "🧪"
+extends = "none"
+[colors.accent]
+light = "#31466B"

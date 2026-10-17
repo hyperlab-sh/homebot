@@ -1,0 +1,6 @@
+#!/bin/bash
+# Stub git: logs, and answers --version (STUB_GIT_VERSION).
+echo "git $* (cwd=$PWD)" >>"${STUB_LOG:?}"
+case "${1:-}" in
+  --version) echo "git version ${STUB_GIT_VERSION:-2.47.1}" ;;
+esac

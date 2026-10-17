@@ -1,0 +1,25 @@
+[!linux] skip 'recorded on linux'
+
+# No remote and no gh or glab: explains, asks nothing.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-none.stdout
+cmpwork stderr remote-none.stderr
+# exit: 1
+! exec homebot remote one two
+cmpwork stderr remote-usage.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-none.stdout --
+Nothing is backed up yet: the repo has no remote.
+Use a repository you already have:
+  homebot remote <url>
+-- remote-none.stderr --
+-- remote-usage.stderr --
+homebot: Usage: homebot remote [url]

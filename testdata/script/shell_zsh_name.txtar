@@ -1,0 +1,34 @@
+# No record preserves the neutral script, pinned by parity/shell-zsh.txtar.
+# exit: 0
+exec homebot shell zsh
+cp stdout neutral.stdout
+! stdout 'compdef zork=homebot'
+
+# A valid record and symlink to homebot add exactly the named compdef.
+# exit: 0
+exec sh setup.sh
+env PATH=$HOME/.local/bin:$WORK/bin:/usr/bin:/bin
+# exit: 0
+exec homebot shell zsh
+stdout '^if \(\( \$\+functions\[compdef\] && \$\+_comps\[homebot\] \)\); then compdef zork=homebot; fi$'
+
+# The rc file may add ~/.local/bin later; this line still appears.
+env PATH=$WORK/bin:/usr/bin:/bin
+# exit: 0
+exec homebot shell zsh
+stdout '^if \(\( \$\+functions\[compdef\] && \$\+_comps\[homebot\] \)\); then compdef zork=homebot; fi$'
+
+# A dangling link cannot register the name; the neutral output returns.
+rm home/.local/bin/zork
+exec sh -c 'ln -s "$WORK/bin/missing" "$HOME/.local/bin/zork"'
+# exit: 0
+exec homebot shell zsh
+cmp stdout neutral.stdout
+
+-- setup.sh --
+set -eu
+mkdir -p "$HOME/.local/bin" "$XDG_STATE_HOME/homebot"
+stable=$(command -v homebot)
+ln -s "$stable" "$WORK/bin/homebot"
+ln -s "$stable" "$HOME/.local/bin/zork"
+printf 'name=zork\ntarget=%s\nmade=true\n' "$stable" > "$XDG_STATE_HOME/homebot/name"

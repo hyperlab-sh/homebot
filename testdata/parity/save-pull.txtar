@@ -1,0 +1,77 @@
+[!linux] skip 'recorded on linux'
+
+# Another machine pushed first: save fast-forwards, then relinks.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+exec git clone -q remote.git other
+exec sh -c 'echo from-other > other/autolink/common/gitconfig'
+exec git -C other add -A
+exec git -C other commit -q -m 'from the other machine'
+exec git -C other push -q
+# exit: 0
+exec homebot
+cmpwork stdout inbox-behind.stdout
+# exit: 0
+exec homebot save
+cmpwork stdout save-pull.stdout
+cmpwork stderr save-pull.stderr
+exec git -C home/.home log --format=%s
+cmpwork stdout log.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/gitconfig --
+[user]
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- inbox-behind.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! The commit guard is not installed
+       → homebot setup
+  2  • 2 links to make or fix
+       → homebot link
+  3  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+
+  Do the first one now: homebot next
+-- save-pull.stdout --
+Nothing new to commit.
+pulled 1 commit
+-- save-pull.stderr --
+-- log.stdout --
+from the other machine
+init

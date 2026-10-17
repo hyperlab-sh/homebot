@@ -1,0 +1,103 @@
+# homebot.sh: serves dist/ (the homepage at /, the docs at /docs/, the install
+# script at /install, the JSON Schemas at /schema/) inside the Docker image.
+# Coolify's Traefik sits in front, terminates TLS and talks plain HTTP to port
+# 80, so Caddy does no TLS and no certificate work here. /install is the front
+# door script, never a redirect: the release installer lives at the GitHub
+# release URL (naming plan R10).
+
+{
+	admin off
+	auto_https off
+	servers {
+		# Traefik is on Coolify's private Docker network; trust its X-Forwarded-*.
+		trusted_proxies static private_ranges
+	}
+}
+
+:80 {
+	root * /srv
+
+	log {
+		output stdout
+		format json
+	}
+
+	# www.homebot.sh is only an alias: send it to the one real name.
+	@www host www.homebot.sh
+	redir @www https://homebot.sh{uri} permanent
+
+	# Coolify's health check (and the image's HEALTHCHECK).
+	handle /healthz {
+		log_skip
+		header Cache-Control "no-store"
+		respond "ok" 200
+	}
+
+	redir /docs /docs/ 308
+
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
+		-Server
+	}
+
+	# Caching. The homepage stamps its assets with a content hash (?v=1a2b3c4d,
+	# see scripts/assemble.ts), so those never change under the same URL.
+	@versioned {
+		query v=*
+		not path /schema/*
+	}
+	header @versioned Cache-Control "public, max-age=31536000, immutable"
+
+	# docmd's own CSS and JS keep the same name from build to build: an hour.
+	@code {
+		not query v=*
+		path *.css *.js *.mjs
+	}
+	header @code Cache-Control "public, max-age=3600"
+
+	# Images and fonts without a stamp: a week.
+	@media {
+		not query v=*
+		path *.avif *.webp *.jpg *.jpeg *.png *.gif *.svg *.ico *.woff2
+	}
+	header @media Cache-Control "public, max-age=604800"
+
+	# Generated JSON Schemas can be fetched by other sites and clients.
+	@schema path /schema/*
+	header @schema Cache-Control "public, max-age=3600"
+	header @schema Access-Control-Allow-Origin "*"
+
+	# Pages and everything else (HTML, sitemap, robots.txt, llms.txt): short,
+	# so a deploy shows up within minutes.
+	@pages {
+		not query v=*
+		not path /schema/*
+		not path *.css *.js *.mjs *.avif *.webp *.jpg *.jpeg *.png *.gif *.svg *.ico *.woff2
+	}
+	header @pages Cache-Control "public, max-age=300, must-revalidate"
+
+	# The install script (landing/install.sh) at /install and /install.sh, as
+	# plain text so a browser shows it: people should read it before they pipe it
+	# to bash. It gets the pages' short cache, set here as well so that a query
+	# string (/install?v=1 would match @versioned above) cannot change it: a fix
+	# reaches everyone within minutes.
+	@install path /install /install.sh
+	handle @install {
+		rewrite * /install.sh
+		header Content-Type "text/plain; charset=utf-8"
+		header Cache-Control "public, max-age=300, must-revalidate"
+		file_server
+	}
+
+	file_server
+
+	# A real 404, with the homepage's not-found page, for any path.
+	handle_errors 404 {
+		rewrite * /404.html
+		file_server
+	}
+}

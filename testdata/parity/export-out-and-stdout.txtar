@@ -1,0 +1,45 @@
+[!linux] skip 'recorded on linux'
+
+# One export writes {out} itself, one prints to stdout. A second run finds nothing changed.
+# exit: 0
+exec homebot export
+cmpwork stdout export-first.stdout
+cmpwork stderr export-first.stderr
+exec cat home/.home/manifests/list.txt
+cmpwork stdout list.txt
+exec cat home/.home/manifests/printed.txt
+cmpwork stdout printed.txt
+# exit: 0
+exec homebot export
+cmpwork stdout export-second.stdout
+# exit: 0
+exec homebot export printed
+cmpwork stdout export-named.stdout
+exec sh -c 'echo changed > home/.home/manifests/printed.txt'
+# exit: 0
+exec homebot export printed
+cmpwork stdout export-restored.stdout
+-- home/.home/homebot.yml --
+exports:
+  - name: list
+    out: manifests/list.txt
+    run: printf 'one\ntwo\n' > {out}
+  - name: printed
+    out: "manifests/printed.txt"
+    run: printf 'hello\n'
+-- export-first.stdout --
+updated   manifests/list.txt
+updated   manifests/printed.txt
+-- export-first.stderr --
+-- list.txt --
+one
+two
+-- printed.txt --
+hello
+-- export-second.stdout --
+unchanged manifests/list.txt
+unchanged manifests/printed.txt
+-- export-named.stdout --
+unchanged manifests/printed.txt
+-- export-restored.stdout --
+updated   manifests/printed.txt

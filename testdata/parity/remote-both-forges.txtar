@@ -1,0 +1,43 @@
+[!linux] skip 'recorded on linux'
+
+# gh logged in, glab installed but not: only GitHub is offered. Then both logged in.
+# deliberate: testscript's chmod takes one path, so the one line is two
+chmod 755 bin/gh
+chmod 755 bin/glab
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-gh-only.stdout
+exec cp glab-ok bin/glab
+chmod 755 bin/glab
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-both.stdout
+-- bin/gh --
+#!/bin/sh
+exit 0
+-- bin/glab --
+#!/bin/sh
+exit 1
+-- glab-ok --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-gh-only.stdout --
+Nothing is backed up yet: the repo has no remote.
+Run this in a terminal to create a private GitHub repository for it:
+  homebot remote
+Or use a repository you already have:
+  homebot remote <url>
+-- remote-both.stdout --
+Nothing is backed up yet: the repo has no remote.
+Run this in a terminal to create a private GitHub or GitLab repository for it:
+  homebot remote
+Or use a repository you already have:
+  homebot remote <url>

@@ -1,0 +1,159 @@
+# The TTY seam makes the configured user voice audible, in the fixture's own
+# words.
+env HOMEBOT_PERSONA= HOMEBOT_TEST_TTY=1
+exec homebot --all
+stdout '🧪 Tester'
+stdout 'things wait for you'
+
+# A pipe stays neutral; --plain and none win even on a terminal.
+env HOMEBOT_TEST_TTY=0
+exec homebot --all
+! stdout '🧪 Tester'
+env HOMEBOT_TEST_TTY=1
+exec homebot --plain --all
+! stdout '🧪 Tester'
+env HOMEBOT_PLAIN=1
+exec homebot --all
+! stdout '🧪 Tester'
+env HOMEBOT_PLAIN=0 HOMEBOT_PERSONA=none
+exec homebot --all
+! stdout '🧪 Tester'
+
+# NO_COLOR removes paint, not the voice.
+env HOMEBOT_PERSONA= NO_COLOR=1
+exec homebot --all
+stdout '🧪 Tester'
+! stdout '\x1b'
+
+# The fixture's accent paints under forced colour (I2): CLICOLOR_FORCE asks
+# for colour, the sandbox's NO_COLOR is lifted, and HOMEBOT_THEME picks which
+# side of the accent pair is worn. Dark is the fixture's #FDBA74 (253;186;116),
+# light its #9A3412 (154;52;18).
+env NO_COLOR= CLICOLOR_FORCE=1 TERM=xterm-256color COLORTERM=truecolor
+env HOMEBOT_THEME=dark
+exec homebot --all
+stdout '🧪 Tester'
+stdout '\x1b\[[0-9;]*38;2;253;186;116m'
+! stdout '38;2;154;52;18'
+env HOMEBOT_THEME=light
+exec homebot --all
+stdout '🧪 Tester'
+stdout '\x1b\[[0-9;]*38;2;154;52;18m'
+! stdout '38;2;253;186;116'
+
+# Neither --plain nor none borrows the accent, colour or not.
+env HOMEBOT_THEME=dark
+exec homebot --plain --all
+! stdout '🧪 Tester'
+! stdout '38;2;253;186;116'
+env HOMEBOT_PERSONA=none
+exec homebot --all
+! stdout '🧪 Tester'
+! stdout '38;2;253;186;116'
+
+# NO_COLOR beats CLICOLOR_FORCE and still keeps the voice: bold and faint
+# stay, colour does not.
+env HOMEBOT_PERSONA= NO_COLOR=1
+exec homebot --all
+stdout '🧪 Tester'
+! stdout '38;2;'
+env CLICOLOR_FORCE= TERM= COLORTERM= HOMEBOT_THEME=
+
+# persona show speaks as the persona wherever stdout goes (ForceVoice) ...
+env HOMEBOT_TEST_TTY=0
+exec homebot persona show tester
+stdout 'Tester filed 3 files'
+! stdout 'committed 3 files'
+# ... but --plain and HOMEBOT_PLAIN beat ForceVoice: neutral.
+exec homebot --plain persona show tester
+stdout 'committed 3 files'
+! stdout 'Tester filed 3 files'
+exec homebot persona show tester --plain
+stdout 'committed 3 files'
+! stdout 'Tester filed 3 files'
+env HOMEBOT_PLAIN=1
+exec homebot persona show tester
+stdout 'committed 3 files'
+! stdout 'Tester filed 3 files'
+env HOMEBOT_PLAIN=0 HOMEBOT_TEST_TTY=1
+
+# An unusable environment choice falls back with one warning.
+env HOMEBOT_PERSONA=no-such-persona
+exec homebot --all
+stderr 'could not be loaded'
+! stdout '🧪 Tester'
+
+# So does a malformed one: it is not an id, so no file is looked up for it.
+# The fallback is neatpik, the default, not the neutral voice.
+env HOMEBOT_PERSONA=../x
+exec homebot --all
+stderr 'could not be loaded'
+! stdout '🧪 Tester'
+stdout 'Neatpik'
+env HOMEBOT_PERSONA=Bad
+exec homebot --all
+stderr 'could not be loaded'
+! stdout '🧪 Tester'
+stdout 'Neatpik'
+
+# A persona that overrides a fact or a help text is refused: validate says
+# which ids, use leaves the config alone, and the help pages read the same
+# under it as under the neutral voice.
+env HOMEBOT_PERSONA=
+! exec homebot persona validate overrider
+stderr 'guard.plaintext: Message cannot be voiced'
+stderr 'help.persona.about: Message cannot be voiced'
+stderr 'Persona overrider is unusable'
+! exec homebot persona use overrider
+stderr 'Persona overrider is unusable'
+grep '^persona: tester$' home/.home/homebot.yml
+env HOMEBOT_PERSONA=none
+exec homebot help
+cp stdout help.neutral
+exec homebot help persona
+cp stdout help-persona.neutral
+env HOMEBOT_PERSONA=overrider
+exec homebot --all
+stdout '🧯 Overrider'
+! stdout 'Overrider says'
+exec homebot help
+cmp stdout help.neutral
+! stdout 'Overrider says'
+exec homebot help persona
+cmp stdout help-persona.neutral
+! stdout 'Overrider says'
+env HOMEBOT_PERSONA=
+
+# A neutral config choice works when the environment is empty.
+cp home/.home/none.yml home/.home/homebot.yml
+exec homebot --all
+! stdout '🧪 Tester'
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+persona: tester
+-- home/.home/none.yml --
+profiles:
+  default: workstation
+persona: none
+-- xdg/config/homebot/personas/tester.toml --
+schema = 1
+id = "tester"
+name = "Tester"
+emoji = "🧪"
+extends = "neatpik"
+[colors]
+accent = { light = "#9A3412", dark = "#FDBA74" }
+[lines]
+"inbox.header.count" = ["{n:# thing waits|# things wait} for you"]
+"save.success.committed" = ["Tester filed {n:# file|# files}"]
+-- xdg/config/homebot/personas/overrider.toml --
+schema = 1
+id = "overrider"
+name = "Overrider"
+emoji = "🧯"
+extends = "neatpik"
+[lines]
+"guard.plaintext" = ["Overrider says {file_path} stays out of the commit"]
+"help.persona.about" = ["Overrider says hello"]

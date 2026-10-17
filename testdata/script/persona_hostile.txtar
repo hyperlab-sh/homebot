@@ -1,0 +1,64 @@
+# A tagline that is a shell command is data: every command refuses the persona
+# and the command never runs. No command writes an ESC byte, on either stream,
+# so what a persona file holds can't reach the terminal; each is checked after
+# it runs, since a later command's output replaces the earlier one's.
+! exec homebot persona validate hostile
+stderr 'Persona hostile is unusable'
+! stdout '\x1b'
+! stderr '\x1b'
+! exec homebot persona show hostile
+stderr 'Persona hostile is unusable'
+! stdout '\x1b'
+! stderr '\x1b'
+exec homebot persona list
+stdout 'hostile  \[unusable\]'
+! stdout '\x1b'
+! stderr '\x1b'
+! exec homebot persona use hostile
+stderr 'Persona hostile is unusable'
+! stdout '\x1b'
+! stderr '\x1b'
+! exists pwned
+
+# A valid header with one variant that carries an ESC: validate refuses it and
+# names the line, and the load drops that variant alone. Preview lists what
+# was dropped, shows the variant that survives, and never the ESC.
+! exec homebot persona validate badline
+stderr 'save.success.committed: Unsafe text'
+stderr 'Persona badline is unusable'
+! stdout '\x1b'
+! stderr '\x1b'
+! exists pwned
+exec homebot persona preview badline --event save.success.committed --all-variants
+stderr 'save.success.committed: Unsafe text'
+! stdout 'Unsafe text'
+stdout 'save.success.committed \[1\]: Filed 3 files'
+! stdout 'save.success.committed \[2\]'
+! stdout '31m'
+! stdout '\x1b'
+! stderr '\x1b'
+exec homebot persona show badline
+stderr 'save.success.committed: Unsafe text'
+! stdout 'Unsafe text'
+! stdout '\x1b'
+! stderr '\x1b'
+! exists pwned
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- xdg/config/homebot/personas/hostile.toml --
+schema = 1
+id = "hostile"
+name = "Hostile"
+emoji = "🧪"
+tagline = "$(touch $WORK/pwned)"
+extends = "neatpik"
+-- xdg/config/homebot/personas/badline.toml --
+schema = 1
+id = "badline"
+name = "Badline"
+emoji = "🧪"
+extends = "neatpik"
+[lines]
+"save.success.committed" = ["A\u001b[31m {n:# file|# files}", "Filed {n:# file|# files}"]

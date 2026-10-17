@@ -1,0 +1,101 @@
+[!linux] skip 'uses the linux layer'
+# save runs the commit guard itself (D14), which needs gitleaks.
+chmod 755 bin/gitleaks
+
+# save through a repo's life with a remote: -m and --no-push keep a commit
+# local, the next save pushes it, a commit from another machine is pulled and
+# linked, and a conflict with the other machine is left for a person. The
+# parity scripts save-* hold the TypeScript's words for the plain cases.
+
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+
+# -m names the commit, --no-push keeps it here.
+exec sh -c 'echo more >> home/.home/autolink/common/zshrc'
+exec homebot save -m 'tweak: zshrc' --no-push
+cmp stdout message.stdout
+! stderr .
+exec git -C home/.home log --format=%s
+cmp stdout log-message.stdout
+exec git -C remote.git log --format=%s main
+cmp stdout remote-init.stdout
+
+# The next save has nothing to commit and pushes what was left.
+exec homebot save
+cmp stdout push.stdout
+! stderr .
+exec git -C remote.git log --format=%s main
+cmp stdout remote-pushed.stdout
+
+# A file is left for triage, not committed.
+exec sh -c 'echo new > home/.home/untracked.txt'
+exec homebot save
+cmp stdout nothing.stdout
+exec git -C home/.home status --porcelain
+cmp stdout untracked.stdout
+rm home/.home/untracked.txt
+
+# Another machine adds a file to autolink/: save pulls it and links it.
+exec git clone -q remote.git other
+exec sh -c 'echo from-other > other/autolink/common/newrc'
+exec git -C other add -A
+exec git -C other commit -q -m 'add newrc'
+exec git -C other push -q
+! exists home/.newrc
+exec homebot save
+cmp stdout pull.stdout
+! stderr .
+exists home/.newrc
+grep from-other home/.newrc
+
+# Both machines change zshrc: the commit is made, the rebase is undone, and
+# the message says how to resolve it.
+exec sh -c 'echo theirs > other/autolink/common/zshrc'
+exec git -C other commit -q -am 'theirs'
+exec git -C other push -q
+exec sh -c 'echo mine > home/.home/autolink/common/zshrc'
+# exit: 1
+! exec homebot save
+cmp stdout conflict.stdout
+cmpwork stderr conflict.stderr
+! exists home/.home/.git/rebase-merge
+exec git -C home/.home status --porcelain
+! stdout .
+grep mine home/.home/autolink/common/zshrc
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- message.stdout --
+committed 1 file
+-- log-message.stdout --
+tweak: zshrc
+init
+-- remote-init.stdout --
+init
+-- push.stdout --
+Nothing new to commit.
+pushed 1 commit
+-- remote-pushed.stdout --
+tweak: zshrc
+init
+-- nothing.stdout --
+Nothing new to commit.
+-- untracked.stdout --
+?? untracked.txt
+-- pull.stdout --
+Nothing new to commit.
+pulled 1 commit
+-- conflict.stdout --
+committed 1 file
+-- conflict.stderr --
+homebot: This machine and the remote changed the same files. Resolve it by hand:
+  git -C $WORK/home/.home pull --rebase

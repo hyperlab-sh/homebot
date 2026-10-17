@@ -1,0 +1,18 @@
+[!linux] skip 'recorded on linux'
+
+# A step names an action that does not exist.
+# exit: 1
+! exec homebot unpack
+cmpwork stdout unpack-unknown-action.stdout
+cmpwork stderr unpack-unknown-action.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+steps:
+  - nosuchaction: x
+-- unpack-unknown-action.stdout --
+Unpacking workstation on testhost (linux): 1 steps
+[1/1] nosuchaction x
+-- unpack-unknown-action.stderr --
+homebot: Step 1: no action named "nosuchaction". See: homebot actions

@@ -1,0 +1,88 @@
+[!linux] skip 'uses the linux layer'
+
+# link through a machine's life: what is in the way, --backup, a second
+# layer, a file gone from the repo, a sealed secret. The parity scripts
+# link-conflict and link-backup hold the TypeScript's words for the first
+# two.
+
+# Real files in the way are reported and left alone; link exits 0.
+exec homebot link
+cmp stdout conflict.stdout
+! stderr .
+exists home/.vim
+grep 'a file where the repo has a folder' home/.vim
+
+# --backup moves them aside, named with the clock, then links.
+exec homebot link --backup
+cmp stdout backup.stdout
+! stderr .
+grep 'a file where the repo has a folder' home/.vim.homebot-backup-20260101-000000
+exists home/.tmux.homebot-backup-20260101-000000/keep
+
+# A second layer unfolds a folded folder; a file gone from the repo is
+# pruned; a sealed secret is locked.
+mkdir home/.home/autolink/linux/vim
+cp extra home/.home/autolink/linux/vim/extra
+rm home/.home/autolink/common/tmux
+mkdir home/.home/private/common
+cp sealed home/.home/private/common/token.age
+exec homebot link --dry-run
+cmp stdout dry.stdout
+exec homebot link
+cmp stdout grow.stdout
+! exists home/.tmux
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1
+-- home/.home/autolink/common/gitconfig --
+[user]
+-- home/.home/autolink/common/tmux --
+tmux
+-- home/.home/autolink/common/vim/vimrc --
+set nu
+-- home/.zshrc --
+export MINE=1
+-- home/.gitconfig --
+[user]
+-- home/.tmux/keep --
+a folder where the repo has a file
+-- home/.vim --
+a file where the repo has a folder
+-- extra --
+extra
+-- sealed --
+age
+-- conflict.stdout --
+  adopt   ~/.gitconfig
+  blocked ~/.tmux  is a folder, but the repo has a file here
+  blocked ~/.vim  is a file, but the repo has a folder here
+  blocked ~/.zshrc  already exists with different content
+1 change, 0 already linked, 3 blocked
+To move what is in the way aside (renamed *.homebot-backup-<time>, nothing is deleted):
+  homebot link --backup
+-- backup.stdout --
+moved aside ~/.tmux.homebot-backup-20260101-000000
+moved aside ~/.vim.homebot-backup-20260101-000000
+moved aside ~/.zshrc.homebot-backup-20260101-000000
+Compare and delete them when you have a minute:
+  homebot cleanup
+  link    ~/.tmux
+  link    ~/.vim
+  link    ~/.zshrc
+3 changes, 1 already linked
+-- dry.stdout --
+  unfold  ~/.vim
+  link    ~/.vim/extra
+  link    ~/.vim/vimrc
+  locked  ~/.token
+  remove  ~/.tmux
+2 already linked
+-- grow.stdout --
+  unfold  ~/.vim
+  link    ~/.vim/extra
+  link    ~/.vim/vimrc
+  remove  ~/.tmux
+4 changes, 2 already linked, 1 locked (homebot unlock)

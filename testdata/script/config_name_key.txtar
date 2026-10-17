@@ -1,0 +1,99 @@
+# name: is the command the user gave their homebot. The config checks its
+# syntax only: a word of 2 to 32 lowercase letters, digits and hyphens,
+# starting with a letter. "homebot" means no name. personaAlias is gone.
+
+# accepted
+exec homebot cleanup --list
+! stderr .
+cp home/.home/names/zork.yml home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr .
+cp home/.home/names/hb.yml home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr .
+cp home/.home/names/homebot.yml home/.home/homebot.yml
+exec homebot cleanup --list
+! stderr .
+
+# refused
+cp home/.home/names/empty.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'homebot.yml:3:7: name "" must be 2 to 32 lowercase letters'
+cp home/.home/names/number.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'homebot.yml:3:7: name must be a word'
+cp home/.home/names/upper.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'homebot.yml:3:7: name "Zork" must be 2 to 32'
+cp home/.home/names/path.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'name "../x" must be'
+cp home/.home/names/dash.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'name "-x" must be'
+cp home/.home/names/short.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'name "z" must be'
+cp home/.home/names/long.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'name "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" must be'
+cp home/.home/names/list.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'homebot.yml:3:7: name must be a word'
+
+# personaAlias was never a key of this build: it is unknown now.
+cp home/.home/names/alias.yml home/.home/homebot.yml
+! exec homebot cleanup --list
+stderr 'unknown key "personaAlias"'
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/names/zork.yml --
+profiles:
+  default: workstation
+name: zork
+-- home/.home/names/hb.yml --
+profiles:
+  default: workstation
+name: hb
+-- home/.home/names/homebot.yml --
+profiles:
+  default: workstation
+name: homebot
+-- home/.home/names/empty.yml --
+profiles:
+  default: workstation
+name: ""
+-- home/.home/names/number.yml --
+profiles:
+  default: workstation
+name: 3
+-- home/.home/names/upper.yml --
+profiles:
+  default: workstation
+name: Zork
+-- home/.home/names/path.yml --
+profiles:
+  default: workstation
+name: ../x
+-- home/.home/names/dash.yml --
+profiles:
+  default: workstation
+name: -x
+-- home/.home/names/short.yml --
+profiles:
+  default: workstation
+name: z
+-- home/.home/names/long.yml --
+profiles:
+  default: workstation
+name: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+-- home/.home/names/list.yml --
+profiles:
+  default: workstation
+name: [a]
+-- home/.home/names/alias.yml --
+profiles:
+  default: workstation
+personaAlias: zork

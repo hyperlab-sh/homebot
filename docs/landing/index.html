@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>homebot: you'll forget, your homebot will not</title>
+  <meta name="description" content="A dotfiles manager for people who won't remember to run it. homebot keeps your dotfiles, secrets and install lists in one git repo, does the chores on its own, and tells you what still needs you.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ece2cc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1511" media="(prefers-color-scheme: dark)">
+  <link rel="canonical" href="https://homebot.sh/">
+
+  <link rel="icon" href="/assets/img/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+
+  <link rel="preload" href="/assets/fonts/young-serif/young-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/libre-franklin/libre-franklin-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <!-- the reading font picked in the top bar (font.js), set before the first paint -->
+  <script>try{if(localStorage.getItem("homebot.font")==="dyslexic")document.documentElement.dataset.font="dyslexic"}catch(e){}</script>
+  <script src="/assets/js/choice.js" defer></script>
+  <script src="/assets/js/font.js" defer></script>
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="homebot">
+  <meta property="og:url" content="https://homebot.sh/">
+  <meta property="og:title" content="You’ll forget. Your homebot will not.">
+  <meta property="og:description" content="A dotfiles manager for people who won’t remember to run it. Built for ADHD brains. Works for every busy one.">
+  <meta property="og:image" content="https://homebot.sh/assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The homebot family: eight robots on the lawn in front of their Victorian house, in warm late-afternoon light.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="You’ll forget. Your homebot will not.">
+  <meta name="twitter:description" content="A dotfiles manager for people who won’t remember to run it. Built for ADHD brains. Works for every busy one.">
+  <meta name="twitter:image" content="https://homebot.sh/assets/img/og.jpg">
+  <meta name="twitter:image:alt" content="The homebot family: eight robots on the lawn in front of their Victorian house, in warm late-afternoon light.">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <a class="wordmark" href="/" aria-label="homebot, home">
+      <picture class="wordmark-face">
+        <source type="image/webp" srcset="/assets/img/icon-48.webp 1x, /assets/img/icon-96.webp 2x, /assets/img/icon-144.webp 3x">
+        <img src="/assets/img/icon-96.png" srcset="/assets/img/icon-48.png 1x, /assets/img/icon-96.png 2x, /assets/img/icon-144.png 3x" width="48" height="32" alt="">
+      </picture>
+      <span>homebot</span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        <li class="nav-wide"><a href="#how">How it helps</a></li>
+        <li class="nav-mid"><a href="#family">The family</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><button type="button" class="font-toggle" role="switch" aria-checked="false" hidden><span class="font-toggle-switch" aria-hidden="true"></span><span class="font-toggle-text">Dyslexia font</span></button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-banner">
+        <div class="hero-text">
+          <h1 id="hero-title">You’ll forget. <span>Your homebot will not.</span></h1>
+          <p class="hero-sub">Built for ADHD brains. <span>Works for every busy one.</span></p>
+        </div>
+        <picture class="hero-art">
+          <source media="(max-width: 719px) and (max-aspect-ratio: 3/5)" type="image/avif" sizes="100vw" width="1800" height="3200"
+            srcset="/assets/img/hero-portrait-640.avif 640w, /assets/img/hero-portrait-960.avif 960w, /assets/img/hero-portrait-1280.avif 1280w, /assets/img/hero-portrait-1800.avif 1800w">
+          <source media="(max-width: 719px) and (max-aspect-ratio: 3/5)" type="image/webp" sizes="100vw" width="1800" height="3200"
+            srcset="/assets/img/hero-portrait-640.webp 640w, /assets/img/hero-portrait-960.webp 960w, /assets/img/hero-portrait-1280.webp 1280w, /assets/img/hero-portrait-1800.webp 1800w">
+          <source media="(max-width: 719px) and (max-aspect-ratio: 3/5)" type="image/jpeg" sizes="100vw" width="1800" height="3200"
+            srcset="/assets/img/hero-portrait-640.jpg 640w, /assets/img/hero-portrait-960.jpg 960w, /assets/img/hero-portrait-1280.jpg 1280w, /assets/img/hero-portrait-1800.jpg 1800w">
+          <source type="image/avif" sizes="(max-width: 719px) and (orientation: portrait) 100vw, (orientation: landscape) and (max-height: 500px) min(100vw, (100vh - 64px) * 2.25), min(100vw, (100vh - 104px) * 2.25)"
+            srcset="/assets/img/hero-landscape-640.avif 640w, /assets/img/hero-landscape-1024.avif 1024w, /assets/img/hero-landscape-1448.avif 1448w, /assets/img/hero-landscape-2048.avif 2048w, /assets/img/hero-landscape-2880.avif 2880w, /assets/img/hero-landscape-3840.avif 3840w, /assets/img/hero-landscape-5120.avif 5120w">
+          <source type="image/webp" sizes="(max-width: 719px) and (orientation: portrait) 100vw, (orientation: landscape) and (max-height: 500px) min(100vw, (100vh - 64px) * 2.25), min(100vw, (100vh - 104px) * 2.25)"
+            srcset="/assets/img/hero-landscape-640.webp 640w, /assets/img/hero-landscape-1024.webp 1024w, /assets/img/hero-landscape-1448.webp 1448w, /assets/img/hero-landscape-2048.webp 2048w, /assets/img/hero-landscape-2880.webp 2880w, /assets/img/hero-landscape-3840.webp 3840w, /assets/img/hero-landscape-5120.webp 5120w">
+          <img src="/assets/img/hero-landscape-1448.jpg" sizes="(max-width: 719px) and (orientation: portrait) 100vw, (orientation: landscape) and (max-height: 500px) min(100vw, (100vh - 64px) * 2.25), min(100vw, (100vh - 104px) * 2.25)"
+            srcset="/assets/img/hero-landscape-640.jpg 640w, /assets/img/hero-landscape-1024.jpg 1024w, /assets/img/hero-landscape-1448.jpg 1448w, /assets/img/hero-landscape-2048.jpg 2048w, /assets/img/hero-landscape-2880.jpg 2880w, /assets/img/hero-landscape-3840.jpg 3840w, /assets/img/hero-landscape-5120.jpg 5120w"
+            width="7200" height="3200" decoding="async" fetchpriority="high"
+            alt="The homebot family on a sunlit lawn beside a green Victorian house with a white porch, hanging flower baskets and climbing roses, under a blue evening sky. Back row, left to right: HAL 9000, a tall black hooded monolith with one glowing eye; Johnny 5, arms folded; Rosie in a maid’s cap and apron, both hands resting on Neatpik’s head; Miss Minute, a smiling clock face; and Marvin, tall, grey and glum. Front row: R2-D2, Neatpik holding a clipboard, and WALL-E.">
+        </picture>
+      </div>
+      <div class="pitch">
+        <h2>But seriously, who is this for?</h2>
+        <p><code>homebot</code> is a dotfiles manager for people who won’t remember to run it.</p>
+        <p>It keeps your dotfiles, secrets and install lists in one git repo, does the chores on its own, and tells you what still needs you.</p>
+      </div>
+    </section>
+
+    <section class="make" id="family" aria-labelledby="make-title">
+      <h2 id="make-title">Pick the robot that inspires you the most</h2>
+      <p class="pick-intro">Your homebot talks in its robot’s voice.<br class="lb"> A voice changes the sentences and nothing else:<br class="lb"> the items, paths, commands and counts stay the same.</p>
+      <!-- Picking and naming need choice.js, which turns the cards into a
+           slider. Without it they are a row of plain cards (the radios stay
+           disabled) and the install line stays plain. -->
+      <div class="pick" id="pick">
+        <fieldset class="pick-robots" aria-labelledby="make-title">
+          <div class="stage">
+            <button type="button" class="stage-nav stage-prev js-only" hidden aria-controls="robots" aria-label="Previous robot"><svg viewBox="0 0 32 64" aria-hidden="true" focusable="false"><path d="M23 8 9 32l14 24"/></svg></button>
+            <button type="button" class="stage-nav stage-next js-only" hidden aria-controls="robots" aria-label="Next robot"><svg viewBox="0 0 32 64" aria-hidden="true" focusable="false"><path d="M9 8l14 24L9 56"/></svg></button>
+            <ul class="robots" id="robots" role="list">
+              <li>
+                <input type="radio" name="persona" id="p-neatpik" value="neatpik" checked disabled aria-labelledby="p-neatpik-name" aria-describedby="p-neatpik-about">
+                <label class="robot" for="p-neatpik" data-robot="neatpik">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/neatpik-body-360.avif 360w, /assets/img/neatpik-body-540.avif 540w, /assets/img/neatpik-body-720.avif 720w, /assets/img/neatpik-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/neatpik-body-360.webp 360w, /assets/img/neatpik-body-540.webp 540w, /assets/img/neatpik-body-720.webp 720w, /assets/img/neatpik-body-1080.webp 1080w"><img src="/assets/img/neatpik-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/neatpik-body-360.jpg 360w, /assets/img/neatpik-body-540.jpg 540w, /assets/img/neatpik-body-720.jpg 720w, /assets/img/neatpik-body-1080.jpg 1080w" width="360" height="450" loading="lazy" decoding="async" alt="Neatpik: a small cream-white robot with a dark visor, two mint eyes and a mint stripe, holding a clipboard in front of the house."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-neatpik-name">Neatpik</span>
+                    <span class="robot-about" id="p-neatpik-about">
+                      <span class="robot-ref">homebot’s own.</span>
+                      <span class="robot-story">Neatpik was built for homebot and borrowed from nobody, so it is the one robot here with no famous lines to live up to. It says what got done, says what still needs you, and stops. Pick no one and this is who you get.</span>
+                      <q class="robot-line">A tidy home, one step at a time</q>
+                    </span>
+                  </span>
+                </label>
+                <div class="pick-name js-only" hidden>
+                  <label for="pick-name">Name Your New Friend</label>
+                  <div class="pick-row">
+                    <span class="sticker"><input id="pick-name" type="text" inputmode="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="32" placeholder="homebot" aria-describedby="pick-msg pick-name-hint"></span>
+                    <button type="button" class="pick-suggest" id="pick-suggest"><svg class="pen" viewBox="0 0 120 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M15 5.5C42 3 84 3.6 106 5.2c9 .7 11.6 7.4 11.2 18.3-.4 11.5-3.7 18-12.6 18.7C78 44 42 43.6 15.4 42.6 6.6 42.2 3.2 35.6 3 24.4 2.8 13.3 6.4 6.8 17.6 4.4c3-.6 6.4-.6 9.6-.3"/><path d="M8.6 34.5c2.4 5.4 6.6 7.6 14 8 26 .9 56 1.2 80.4-.2"/></svg>Suggest<span class="visually-hidden"> a name</span></button>
+                  </div>
+                  <p class="pick-msg" id="pick-msg" aria-live="polite"></p>
+                  <p class="pick-hint" id="pick-name-hint">The command you type. Empty keeps <code>homebot</code>.</p>
+                </div>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-rosie" value="rosie" disabled aria-labelledby="p-rosie-name" aria-describedby="p-rosie-about">
+                <label class="robot" for="p-rosie" data-robot="rosie">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/rosie-body-360.avif 360w, /assets/img/rosie-body-540.avif 540w, /assets/img/rosie-body-720.avif 720w, /assets/img/rosie-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/rosie-body-360.webp 360w, /assets/img/rosie-body-540.webp 540w, /assets/img/rosie-body-720.webp 720w, /assets/img/rosie-body-1080.webp 1080w"><img src="/assets/img/rosie-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/rosie-body-360.jpg 360w, /assets/img/rosie-body-540.jpg 540w, /assets/img/rosie-body-720.jpg 720w, /assets/img/rosie-body-1080.jpg 1080w" width="360" height="450" loading="lazy" decoding="async" alt="Rosie: a robot maid with a round smiling face, a frilled cap and a white apron over a blue dress."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-rosie-name">Rosie</span>
+                    <span class="robot-about" id="p-rosie-about">
+                      <span class="robot-ref">From <cite>The Jetsons</cite>, 1962.</span>
+                      <span class="robot-story">Rosie came to the Jetsons from U-Rent-A-Maid as an outdated model, and nobody ever sent her back, since she’s the only one at the Skypad Apartments who gets anything done. She’ll run your home the same way: everything in the hamper, and she’s heard every excuse Mr. J ever made.</span>
+                      <q class="robot-line">Sleeves up, hon. This house won’t clean itself.</q>
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-wall-e" value="wall-e" disabled aria-labelledby="p-wall-e-name" aria-describedby="p-wall-e-about">
+                <label class="robot" for="p-wall-e" data-robot="wall-e">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/wall-e-body-360.avif 360w, /assets/img/wall-e-body-540.avif 540w, /assets/img/wall-e-body-720.avif 720w, /assets/img/wall-e-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/wall-e-body-360.webp 360w, /assets/img/wall-e-body-540.webp 540w, /assets/img/wall-e-body-720.webp 720w, /assets/img/wall-e-body-1080.webp 1080w"><img src="/assets/img/wall-e-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/wall-e-body-360.jpg 360w, /assets/img/wall-e-body-540.jpg 540w, /assets/img/wall-e-body-720.jpg 720w, /assets/img/wall-e-body-1080.jpg 1080w" width="360" height="450" loading="lazy" decoding="async" alt="WALL-E: a boxy, rust-streaked yellow robot on treads, with two binocular eyes."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-wall-e-name">WALL-E</span>
+                    <span class="robot-about" id="p-wall-e-about">
+                      <span class="robot-ref">From <cite>WALL-E</cite>, 2008.</span>
+                      <span class="robot-story">WALL-E spent seven hundred years alone on an abandoned Earth, stacking trash into skyscrapers and keeping the good bits: a spork, a Rubik’s cube, a plant in a boot. He hung on to the outside of a rocket across the galaxy rather than let EVE go, and he holds on to your files the same way.</span>
+                      <q class="robot-line">Ooh. Found it. Kept it. Ta-dah.</q>
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-marvin" value="marvin" disabled aria-labelledby="p-marvin-name" aria-describedby="p-marvin-about">
+                <label class="robot" for="p-marvin" data-robot="marvin">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/marvin-body-360.avif 360w, /assets/img/marvin-body-540.avif 540w, /assets/img/marvin-body-720.avif 720w, /assets/img/marvin-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/marvin-body-360.webp 360w, /assets/img/marvin-body-540.webp 540w, /assets/img/marvin-body-720.webp 720w, /assets/img/marvin-body-1080.webp 1080w"><img src="/assets/img/marvin-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/marvin-body-360.jpg 360w, /assets/img/marvin-body-540.jpg 540w, /assets/img/marvin-body-720.jpg 720w, /assets/img/marvin-body-1080.jpg 1080w" width="360" height="450" loading="lazy" decoding="async" alt="Marvin: a tall grey robot with a big round head and two small triangular eyes, looking glum."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-marvin-name">Marvin</span>
+                    <span class="robot-about" id="p-marvin-about">
+                      <span class="robot-ref">From <cite>The Hitchhiker’s Guide to the Galaxy</cite>, 1978.</span>
+                      <span class="robot-story">Marvin is the Sirius Cybernetics prototype whose Genuine People Personality came out as clinical depression. He could solve every problem in the universe and has instead been asked to park spaceships and open doors. Your home is a modest new low, and he’ll keep it perfectly and sigh the whole time.</span>
+                      <q class="robot-line">Brain the size of a planet, and they ask me to tidy a home.</q>
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-r2-d2" value="r2-d2" disabled aria-labelledby="p-r2-d2-name" aria-describedby="p-r2-d2-about">
+                <label class="robot" for="p-r2-d2" data-robot="r2-d2">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/r2-d2-body-360.avif 360w, /assets/img/r2-d2-body-540.avif 540w, /assets/img/r2-d2-body-720.avif 720w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/r2-d2-body-360.webp 360w, /assets/img/r2-d2-body-540.webp 540w, /assets/img/r2-d2-body-720.webp 720w"><img src="/assets/img/r2-d2-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/r2-d2-body-360.jpg 360w, /assets/img/r2-d2-body-540.jpg 540w, /assets/img/r2-d2-body-720.jpg 720w" width="360" height="640" loading="lazy" decoding="async" alt="R2-D2: a domed white and blue robot on the lawn, with one round eye."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-r2-d2-name">R2-D2</span>
+                    <span class="robot-about" id="p-r2-d2-about">
+                      <span class="robot-ref">From <cite>Star Wars</cite>, 1977.</span>
+                      <span class="robot-story">R2-D2 smuggled the Death Star plans past the Empire, fixed a hyperdrive mid-battle and got spat out by a Dagobah swamp monster without one polite word. He speaks only in beeps; the brackets are the translation, and his translator has learned not to soften it. Your home is one more set of plans to guard.</span>
+                      <q class="robot-line">Dweet-bwoo-wee!</q>
+                      <span class="robot-gloss">[the plans are safe, and so is your home]</span>
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-johnny-5" value="johnny-5" disabled aria-labelledby="p-johnny-5-name" aria-describedby="p-johnny-5-about">
+                <label class="robot" for="p-johnny-5" data-robot="johnny-5">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/johnny-5-body-360.avif 360w, /assets/img/johnny-5-body-540.avif 540w, /assets/img/johnny-5-body-720.avif 720w, /assets/img/johnny-5-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/johnny-5-body-360.webp 360w, /assets/img/johnny-5-body-540.webp 540w, /assets/img/johnny-5-body-720.webp 720w, /assets/img/johnny-5-body-1080.webp 1080w"><img src="/assets/img/johnny-5-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/johnny-5-body-360.jpg 360w, /assets/img/johnny-5-body-540.jpg 540w, /assets/img/johnny-5-body-720.jpg 720w, /assets/img/johnny-5-body-1080.jpg 1080w" width="360" height="450" loading="lazy" decoding="async" alt="Johnny 5: a brass robot on treads with a wide grin and two lens eyes."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-johnny-5-name">Johnny 5</span>
+                    <span class="robot-about" id="p-johnny-5-about">
+                      <span class="robot-ref">From <cite>Short Circuit</cite>, 1986.</span>
+                      <span class="robot-story">Johnny 5 was a Nova Robotics weapon until lightning made him alive, and Nova spent the whole film trying to catch him and take him apart. He read every book in Stephanie’s house in one night and asked for more. The only thing that scares him is the word disassemble.</span>
+                      <q class="robot-line">Need input! Your home is input. Wonderful!</q>
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-hal-9000" value="hal-9000" disabled aria-labelledby="p-hal-9000-name" aria-describedby="p-hal-9000-about">
+                <label class="robot" for="p-hal-9000" data-robot="hal-9000">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/hal-9000-body-360.avif 360w, /assets/img/hal-9000-body-540.avif 540w, /assets/img/hal-9000-body-720.avif 720w, /assets/img/hal-9000-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/hal-9000-body-360.webp 360w, /assets/img/hal-9000-body-540.webp 540w, /assets/img/hal-9000-body-720.webp 720w, /assets/img/hal-9000-body-1080.webp 1080w"><img src="/assets/img/hal-9000-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/hal-9000-body-360.jpg 360w, /assets/img/hal-9000-body-540.jpg 540w, /assets/img/hal-9000-body-720.jpg 720w, /assets/img/hal-9000-body-1080.jpg 1080w" width="360" height="645" loading="lazy" decoding="async" alt="HAL 9000: a tall black monolith with one round amber eye, beside a lamp post."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-hal-9000-name">HAL 9000</span>
+                    <span class="robot-about" id="p-hal-9000-about">
+                      <span class="robot-ref">From <cite>2001: A Space Odyssey</cite>, 1968.</span>
+                      <span class="robot-story">HAL 9000 runs every system aboard the Discovery One, has never made an error, and will explain in the gentlest voice ever recorded that this one is attributable to you. He would rather not open the pod bay doors. He’ll call you Dave whether or not that’s your name.</span>
+                      <q class="robot-line">Completely operational, Dave. There is no need to worry.</q>
+                    </span>
+                  </span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="persona" id="p-miss-minute" value="miss-minute" disabled aria-labelledby="p-miss-minute-name" aria-describedby="p-miss-minute-about">
+                <label class="robot" for="p-miss-minute" data-robot="miss-minute">
+                  <picture class="robot-art"><source type="image/avif" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/miss-minute-body-360.avif 360w, /assets/img/miss-minute-body-540.avif 540w, /assets/img/miss-minute-body-720.avif 720w, /assets/img/miss-minute-body-1080.avif 1080w"><source type="image/webp" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/miss-minute-body-360.webp 360w, /assets/img/miss-minute-body-540.webp 540w, /assets/img/miss-minute-body-720.webp 720w, /assets/img/miss-minute-body-1080.webp 1080w"><img src="/assets/img/miss-minute-body-360.jpg" sizes="(max-width: 479px) 76vw, 360px" srcset="/assets/img/miss-minute-body-360.jpg 360w, /assets/img/miss-minute-body-540.jpg 540w, /assets/img/miss-minute-body-720.jpg 720w, /assets/img/miss-minute-body-1080.jpg 1080w" width="360" height="450" loading="lazy" decoding="async" alt="Miss Minute: an orange pocket-watch with a smiling cartoon face and little arms."></picture>
+                  <span class="robot-text">
+                    <span class="robot-name" id="p-miss-minute-name">Miss Minute</span>
+                    <span class="robot-about" id="p-miss-minute-about">
+                      <span class="robot-ref">From <cite>Loki</cite>, 2021.</span>
+                      <span class="robot-story">Miss Minute is the smiling cartoon clock of the Time Variance Authority: she welcomes variants to orientation and explains in a honeyed drawl that their whole life was a deviation about to be pruned. She has never once stopped smiling. Your home is a branch now, and she’d hate to have to prune it.</span>
+                      <q class="robot-line">Well, hey there! Your home’s on the Sacred Timeline, sugar. Let’s keep it there.</q>
+                    </span>
+                  </span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </fieldset>
+
+        <div class="make-go">
+        <div class="install">
+          <p class="install-label" id="install-label">Your install line <span class="install-when">works from the first release</span></p>
+          <pre class="term install-term" tabindex="0" role="region" aria-labelledby="install-label"><code><span class="t-ps">$</span> <span class="t-in" id="install-cmd">curl -fsSL https://homebot.sh/install | bash</span></code></pre>
+        </div>
+        <p class="actions">
+          <a class="button button-primary" href="/docs/">Quick start</a>
+        </p>
+        <p class="note"><strong>Not released yet.</strong> There is nothing to install today. The docs describe how it works.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="comes" id="how" aria-labelledby="comes-title">
+      <div class="comes-text">
+        <h2 id="comes-title">It comes to you</h2>
+        <p>You don’t have to remember to check. When something needs you, a new shell says so in one line. Type <code class="hb-cmd">homebot</code> and you get one short list, most urgent first, and every item ends with the command that fixes it.</p>
+        <p>The hourly helper does the rest: it seals secrets, commits, pushes and repairs links while you work, and tells you what it did.</p>
+        <p class="also" id="also" hidden><code>homebot</code> works too. The name is a second way to call it.</p>
+        <p class="more"><a href="/docs/reference/inbox/">How the inbox works</a></p>
+      </div>
+      <pre class="term comes-term" data-voice="neatpik"><code><span class="t-dim">Last login: Mon Oct 13 09:12 on ttys002</span>
+<span data-p="neatpik">🧹 <span class="hb-name" data-default="Neatpik">Neatpik</span>: 3 things need you (1 urgent), run: </span><span data-p="rosie">🧽 <span class="hb-name" data-default="Rosie">Rosie</span>: 3 things need you (1 urgent). Oh, brother. Run: </span><span data-p="wall-e">🌱 <span class="hb-name" data-default="WALL-E">WALL-E</span>: 3 things need you (1 urgent). Found. Look. Run: </span><span data-p="marvin">☔&#xFE0F; <span class="hb-name" data-default="Marvin">Marvin</span>: 3 things need you (1 urgent). I’d fix it all, but nobody ever asks. Run: </span><span data-p="r2-d2">📡 <span class="hb-name" data-default="R2-D2">R2-D2</span>: bwip bwip [3 things need you (1 urgent); help him, you’re his only hope. Run]: </span><span data-p="johnny-5">🤖 <span class="hb-name" data-default="Johnny 5">Johnny 5</span>: 3 things need you (1 urgent)! Need input! Run: </span><span data-p="hal-9000">🔴 <span class="hb-name" data-default="HAL 9000">HAL 9000</span>: I’ve noticed 3 things that need you (1 urgent), Dave. There’s no need to worry. Run: </span><span data-p="miss-minute">⏰&#xFE0F; <span class="hb-name" data-default="Miss Minute">Miss Minute</span>: 3 things need you (1 urgent). Sign here, here, and here. Run: </span><span class="t-fix hb-cmd">homebot</span>
+<span class="t-in"><span class="t-ps">$</span> <span class="hb-cmd">homebot</span></span>
+<span class="t-dim"><span data-p="neatpik">🧹 <span class="hb-name" data-default="Neatpik">Neatpik</span> · laptop ·</span><span data-p="rosie">🧽 <span class="hb-name" data-default="Rosie">Rosie</span> · laptop ·</span><span data-p="wall-e">🌱 <span class="hb-name" data-default="WALL-E">WALL-E</span> · laptop ·</span><span data-p="marvin">☔&#xFE0F; <span class="hb-name" data-default="Marvin">Marvin</span> · laptop ·</span><span data-p="r2-d2">📡 <span class="hb-name" data-default="R2-D2">R2-D2</span> · laptop ·</span><span data-p="johnny-5">🤖 <span class="hb-name" data-default="Johnny 5">Johnny 5</span> · laptop ·</span><span data-p="hal-9000">🔴 <span class="hb-name" data-default="HAL 9000">HAL 9000</span> · laptop ·</span><span data-p="miss-minute">⏰&#xFE0F; <span class="hb-name" data-default="Miss Minute">Miss Minute</span> · laptop ·</span></span> <span class="t-voice"><span data-p="neatpik">3 things are waiting for you</span><span data-p="rosie">3 chores waiting, hon. Sleeves up</span><span data-p="wall-e">Ooh. 3 things. Found them for you</span><span data-p="marvin">3 things need you, and this will all end in tears</span><span data-p="r2-d2">Dweet-bwoo-wee! <span class="t-dim">[3 things need you]</span></span><span data-p="johnny-5">3 things need you! Read it all twice. Wonderful!</span><span data-p="hal-9000">3 things need you, Dave. I’m afraid I can’t do this for you</span><span data-p="miss-minute">3 things need you, sugar, and the clock’s a-tickin’</span></span> <span class="t-dim">(1 urgent)</span>
+
+  1  <span class="t-urg">!</span> The commit guard is not installed
+       <span class="t-fix">→ <span class="hb-cmd">homebot</span> setup</span>
+  2  <span class="t-dim">•</span> 1 file is in the way of links
+       <span class="t-path">~/.zshrc</span>
+       <span class="t-fix">→ <span class="hb-cmd">homebot</span> link</span>
+  3  <span class="t-dim">•</span> 2 new things to sort: track, ignore or snooze
+       <span class="t-path">~/.config/zed, ~/.config/ghostty</span>
+       <span class="t-fix">→ <span class="hb-cmd">homebot</span> triage</span>
+
+  Done for you since you last looked:
+    <span class="t-dim">sealed 1 secret, committed 4 files, pushed 1 commit</span>
+
+  Do the first one now: <span class="t-fix"><span class="hb-cmd">homebot</span> next</span></code></pre>
+    </section>
+
+    <section class="helps" aria-labelledby="helps-title">
+      <div class="section-intro">
+        <h2 id="helps-title">What it takes off your mind</h2>
+        <p>Each of these started as something that kept slipping.<br class="lb">
+        homebot handles the remembering, so you only handle the decisions.</p>
+      </div>
+      <ul class="cards" role="list">
+        <li class="help">
+          <h3>It comes to you</h3>
+          <p class="help-was">Out of sight, out of mind.</p>
+          <p>A line when a shell opens, a count in your prompt, and a desktop notification when something urgent appears. The shell line and the prompt count are zsh only for now.</p>
+        </li>
+        <li class="help">
+          <h3>Start without planning</h3>
+          <p class="help-was">“Where do I even start?”</p>
+          <p>At most five items, most urgent first, each ending with the command that fixes it. <code><span class="hb-cmd">homebot</span> next</code> runs the first one.</p>
+        </li>
+        <li class="help">
+          <h3>Chores happen anyway</h3>
+          <p class="help-was">The things that only happen when you remember them.</p>
+          <p>Every hour a background helper seals secrets, refreshes package lists, commits, pushes and repairs links. A step that fails becomes an item in your list.</p>
+        </li>
+        <li class="help">
+          <h3>Decide once</h3>
+          <p class="help-was">The same question, every week.</p>
+          <p>New files in your home folder get asked about once: track, ignore or snooze, one key each. The answer lives in your repo, so every machine knows it.</p>
+        </li>
+        <li class="help">
+          <h3>Safe when you’re distracted</h3>
+          <p class="help-was">Half a command, then a meeting.</p>
+          <p>It never overwrites a file. <code>--dry-run</code> shows the steps first. Ctrl-C leaves nothing half done, and the commit guard refuses to commit a leaked secret.</p>
+        </li>
+        <li class="help">
+          <h3>Pick up where you left off</h3>
+          <p class="help-was">Coming back after three weeks away.</p>
+          <p>“Done for you since you last looked” lists what the helper did while you were gone, and the list still shows only what needs you now.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="never" aria-labelledby="never-title">
+      <h2 id="never-title">What the helper never does</h2>
+      <p>It runs while you aren’t watching,<br class="lb">
+      so it only does what is safe to do unwatched.</p>
+      <ul role="list">
+        <li>It never overwrites a real file.</li>
+        <li>It never commits a file git doesn’t already track, except sealed secrets and package lists. New files wait for you.</li>
+        <li>It never decrypts anything. That needs your passphrase.</li>
+        <li>It never resolves a conflict for you.</li>
+      </ul>
+    </section>
+
+    <section class="usual" aria-labelledby="usual-title">
+      <div class="section-intro">
+        <h2 id="usual-title">And the dotfiles part,<br class="lb"> done properly</h2>
+        <p>Your home repo is one folder in git, <code>~/.home</code>.<br class="lb">
+        The folder a file is in is its configuration.</p>
+      </div>
+      <ul class="cards cards-3" role="list">
+        <li class="usual-item">
+          <h3>Links</h3>
+          <p>Everything in <code>autolink/</code> is linked into <code>$HOME</code>, so editing the repo edits the live file. When a real file is in the way, homebot stops and says so. Nothing is deleted.</p>
+          <p class="more"><a href="/docs/linking/">The linking rules</a></p>
+        </li>
+        <li class="usual-item">
+          <h3>Secrets</h3>
+          <p>Files in <code>private/</code> are linked like the rest, but git only ever sees them encrypted with age. Sealing needs no passphrase, so it happens before every commit.</p>
+          <p class="more"><a href="/docs/secrets/">How secrets work</a></p>
+        </li>
+        <li class="usual-item">
+          <h3>Profiles</h3>
+          <p>A profile lists what a machine gets, in order: brew, apt and flatpak lists, fonts, your own scripts. A laptop and a server share a base and differ in the rest.</p>
+          <p class="more"><a href="/docs/profiles/">Profiles and packages</a></p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="compare" aria-labelledby="compare-title">
+      <div class="section-intro">
+        <h2 id="compare-title">How it compares</h2>
+        <p>homebot leads on the remembering.<br class="lb">
+        On the rest, the others are older and broader, and the table says where.<br class="lb">
+        Checked against their docs in October 2026.</p>
+      </div>
+      <div class="compare-scroll" role="region" aria-label="Comparison table" tabindex="0">
+        <table>
+          <thead>
+            <tr><th scope="col"><span class="visually-hidden">What it does</span></th><th scope="col">homebot</th><th scope="col"><a href="https://chezmoi.io/">chezmoi</a></th><th scope="col"><a href="https://yadm.io/">yadm</a></th><th scope="col"><a href="https://github.com/anishathalye/dotbot">dotbot</a></th><th scope="col"><a href="https://github.com/thoughtbot/rcm">rcm</a></th><th scope="col"><a href="https://github.com/RichiH/vcsh">vcsh</a></th><th scope="col"><a href="https://www.atlassian.com/git/tutorials/dotfiles">bare git</a></th></tr>
+          </thead>
+          <tbody>
+            <tr class="group"><th scope="colgroup" colspan="8"><span>The remembering</span></th></tr>
+            <tr><th scope="row">One list of what needs you, each item with its fix</th><td class="yes">Yes</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+            <tr><th scope="row">Commits and pushes without you running anything</th><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>Hourly or daily, once you turn it on</span></td><td><span class="tip">Manual</span><span class="tip-detail"><span class="visually-hidden">: </span>Only when you run a chezmoi command (autoCommit)</span></td><td><span class="tip">Add-on</span><span class="tip-detail"><span class="visually-hidden">: </span>With the AutoYADM add-on</span></td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+            <tr><th scope="row">Asks once about new files and remembers the answer</th><td class="yes">Yes</td><td><span class="tip">Partly</span><span class="tip-detail"><span class="visually-hidden">: </span>Lists them when you run unmanaged; remembers nothing</span></td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+            <tr><th scope="row">Comes to you: shell line, prompt count, notification</th><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>In zsh</span></td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+          </tbody>
+          <tbody>
+            <tr class="group"><th scope="colgroup" colspan="8"><span>Everything else</span></th></tr>
+            <tr><th scope="row">Templates for what differs between machines</th><td class="no-home"><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>A folder per OS (linux/, macos/) and profiles</span></td><td class="yes">Yes</td><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>Plus files per OS, class or host</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Links made only if a shell test passes</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Files per host or tag</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>A branch per machine</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Branches, by hand</span></td></tr>
+            <tr><th scope="row">Secrets from your password manager</th><td class="no-home"><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Files encrypted with age, in the repo</span></td><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>1Password, Bitwarden, pass and more</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Files encrypted with gpg or openssl</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Age or git-crypt through plugins</span></td><td>No</td><td>No</td><td>No</td></tr>
+            <tr><th scope="row">Runs on Windows (not WSL)</th><td class="no-home"><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>MacOS and Linux</span></td><td class="yes">Yes</td><td><span class="tip">Partly</span><span class="tip-detail"><span class="visually-hidden">: </span>Under Git Bash or Cygwin</span></td><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>If your account may make symlinks</span></td><td>No</td><td>No</td><td class="yes">Yes</td></tr>
+            <tr><th scope="row">Nothing new to learn</th><td class="no-home"><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Its folder rules and commands</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Its file-name prefixes, templates and commands</span></td><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>It is git, run on your home folder</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Its YAML file</span></td><td><span class="tip">No</span><span class="tip-detail"><span class="visually-hidden">: </span>Its commands and folder rules</span></td><td><span class="tip">Almost</span><span class="tip-detail"><span class="visually-hidden">: </span>Git, one repo per topic</span></td><td class="yes"><span class="tip">Yes</span><span class="tip-detail"><span class="visually-hidden">: </span>It is git</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="compare-more"><a href="/docs/compare/">The full comparison</a>: 32 rows, from installing it to running your scripts.</p>
+    </section>
+
+    
+    <section class="status" aria-labelledby="status-title">
+      <h2 id="status-title">Where it stands</h2>
+      <p>homebot isn’t released yet.<br class="lb">
+      Every dotfiles command is built and tested,<br class="lb">
+      and it already runs one of its maker’s machines.<br class="lb">
+      The robots’ voices and the name you give your homebot are being built now.<br class="lb">
+      The first release ships with both, along with the install line above.</p>
+      <p class="actions"><a class="button button-primary" href="/docs/">Quick start</a></p>
+    </section>
+
+    <section class="maker" id="maker" aria-labelledby="maker-title">
+      <h2 class="maker-kicker" id="maker-title">Behind homebot</h2>
+      <div class="maker-card">
+        <div class="maker-who">
+          <picture class="maker-photo">
+            <source type="image/avif" srcset="/assets/img/maker-120.avif 1x, /assets/img/maker-240.avif 2x">
+            <source type="image/webp" srcset="/assets/img/maker-120.webp 1x, /assets/img/maker-240.webp 2x">
+            <img src="/assets/img/maker-120.jpg" srcset="/assets/img/maker-120.jpg 1x, /assets/img/maker-240.jpg 2x" width="120" height="120" loading="lazy" decoding="async" alt="Saulo Vallory: curly dark hair, round glasses and a beard, in a black-and-white photo.">
+          </picture>
+          <div>
+            <p class="maker-name">Saulo Vallory</p>
+            <p class="maker-role">Senior software engineer and architect. Maker of homebot.</p>
+          </div>
+        </div>
+
+        <div class="maker-note">
+          <p>Did you know a lot of us with ADHD love having things organized?<br>
+          And that it helps A LOT to keep us on track when they are?<br>
+          Aaaand that keeping them that way is very hard for us?<br>
+          haha, what a cosmic joke, right?</p>
+          <p>For years I dreamt of a tidy, well-organized home dir and dotfiles.<br>
+          And I got there! 3 times. For about a month each time.</p>
+          <p>So this time, instead of doing a whole-home remodel (again), I built a system that does that for me but, most importantly, that keeps itself organized.<br>
+          Or at least puts whatever it needs from me right in front of my face.</p>
+          <p class="maker-end">That’s homebot.</p>
+        </div>
+
+        <ul class="maker-links" role="list">
+          <li><a class="maker-site" href="https://saulo.engineer" rel="me">saulo.engineer</a></li>
+          <li><a class="maker-icon" href="https://www.linkedin.com/in/saulo-vallory" rel="me" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a></li>
+          <li><a class="maker-icon" href="https://github.com/svallory" rel="me" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <p class="footer-status"><strong>homebot is not released yet.</strong> There is nothing to install today.</p>
+      <ul class="footer-links">
+        <li><a href="/docs/">Read the docs</a></li>
+        <li><a href="#family">Meet the family</a></li>
+        <li><a href="#maker">Who made it</a></li>
+      </ul>
+    </div>
+    <p class="footer-small">Rosie, WALL-E, Marvin, R2-D2, Johnny 5, HAL 9000 and Miss Minute belong to their creators and owners. homebot is not affiliated with or endorsed by any of them. Neatpik is homebot’s own.</p>
+  </footer>
+</body>
+</html>

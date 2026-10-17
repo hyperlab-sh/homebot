@@ -1,0 +1,20 @@
+{
+  "name": "home-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "docmd dev",
+    "build": "bun run build:images && bun run build:docs && bun run assemble && bun test",
+    "build:images": "bun scripts/images.ts",
+    "build:docs": "docmd build",
+    "assemble": "bun scripts/assemble.ts",
+    "test:browser": "bun scripts/choice.browser.ts",
+    "preview": "bun scripts/preview.ts",
+    "validate": "docmd validate"
+  },
+  "devDependencies": {
+    "@docmd/core": "0.9.7",
+    "playwright": "1.54.2",
+    "sharp": "^0.35.5"
+  }
+}

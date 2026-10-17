@@ -1,0 +1,35 @@
+[!linux] skip 'recorded on linux'
+
+# Give it a URL: origin is set, checked, and the repo pushed. A second run has nothing to push.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+# exit: 0
+exec homebot remote $WORK/remote.git
+cmpwork stdout remote-url.stdout
+cmpwork stderr remote-url.stderr
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-again.stdout
+exec git -C home/.home remote get-url origin
+cmpwork stdout origin.stdout
+exec git -C remote.git log --format=%s main
+cmpwork stdout remote-log.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-url.stdout --
+remote $WORK/remote.git
+reachable $WORK/remote.git
+pushed the repo is backed up
+-- remote-url.stderr --
+-- remote-again.stdout --
+reachable $WORK/remote.git
+Already backed up: the remote has every commit.
+-- origin.stdout --
+$WORK/remote.git
+-- remote-log.stdout --
+init

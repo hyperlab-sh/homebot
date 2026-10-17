@@ -1,0 +1,19 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: duplicate export names
+# exit: 1
+! exec homebot
+cmpwork stdout config-export-duplicate.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-export-duplicate.stderr
+-- home/.home/homebot.yml --
+exports:
+  - name: list
+    out: manifests/a.txt
+    run: echo a
+  - name: list
+    out: manifests/b.txt
+    run: echo b
+-- config-export-duplicate.stdout --
+-- config-export-duplicate.stderr --
+homebot: $WORK/home/.home/homebot.yml:5:5: exports[1]: duplicate export name "list" (give each one profiles that don't overlap)

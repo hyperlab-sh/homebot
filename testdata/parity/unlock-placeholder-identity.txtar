@@ -1,0 +1,26 @@
+[!linux] skip 'recorded on linux'
+
+# identity.age is not an age file: unlock stops before asking for a passphrase.
+# exit: 1
+! exec homebot unlock
+cmpwork stdout unlock-placeholder.stdout
+# deliberate: the TypeScript let the age CLI print its raw header error, then guessed "wrong passphrase?"; Go opens the file in-process, sees it is not a passphrase-encrypted age file before asking, and says so
+cmpwork stderr unlock-placeholder.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- unlock-placeholder.stdout --
+-- unlock-placeholder.stderr --
+homebot: private/identity.age is not a passphrase-encrypted age key. Restore it from the repo's history.

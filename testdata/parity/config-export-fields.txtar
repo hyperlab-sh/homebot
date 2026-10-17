@@ -1,0 +1,15 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: export entry missing fields and unknown OS
+# exit: 1
+! exec homebot
+cmpwork stdout config-export-fields.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-export-fields.stderr
+-- home/.home/homebot.yml --
+exports:
+  - name: brewfile
+    out: manifests/Brewfile
+-- config-export-fields.stdout --
+-- config-export-fields.stderr --
+homebot: $WORK/home/.home/homebot.yml:2:5: exports[0]: run is required

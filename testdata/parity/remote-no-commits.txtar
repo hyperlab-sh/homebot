@@ -1,0 +1,16 @@
+[!linux] skip 'recorded on linux'
+
+# A reachable remote but nothing committed yet.
+exec git -C home/.home init -q
+exec git init -q --bare remote.git
+# exit: 0
+exec homebot remote $WORK/remote.git
+cmpwork stdout remote-no-commits.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- remote-no-commits.stdout --
+remote $WORK/remote.git
+reachable $WORK/remote.git
+Nothing committed yet. This commits and pushes:
+  homebot save

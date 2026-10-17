@@ -1,0 +1,113 @@
+[!linux] skip 'uses the linux layer'
+
+# pack --private moves the file under private/, seals it with age and links
+# the plaintext back. The plaintext never leaves private/ (plan 8.4, secret
+# canary): not into autolink/, not into git, not into any output, and not
+# when the seal fails after the move.
+env HOMEBOT_DEBUG=1
+env PRIVATE=$WORK/home/.home/private
+
+exec git -C home/.home init -q
+exec homebot pack --private ~/.netrc
+cmp stdout private.stdout
+! stderr 'canary-'
+exists home/.home/private/common/netrc.age
+grep 'canary-7a41c0d9' home/.home/private/common/netrc
+exec readlink home/.netrc
+stdout '^'$PRIVATE'/common/netrc$'
+
+# A folder of secrets: one sealed file each, counted in the line.
+exec homebot pack --private --layer linux ~/.vault
+cmp stdout folder.stdout
+! stderr 'canary-'
+exists home/.home/private/linux/vault/id_a.age
+exists home/.home/private/linux/vault/sub/id_b.age
+
+# Git is asked to take everything: it takes the sealed files and never the
+# plaintext.
+exec git -C home/.home add -A
+exec git -C home/.home ls-files --cached
+stdout '^private/common/netrc\.age$'
+stdout '^private/linux/vault/id_a\.age$'
+! stdout '^private/common/netrc$'
+! stdout 'vault/id_a$|vault/sub/id_b$'
+! stdout '^autolink/'
+exec git -C home/.home diff --cached
+! stdout 'canary-'
+
+# The seal fails when the recipients file lists a key age cannot encrypt to:
+# the file is already in private/ and nowhere else in the repo, git does not
+# take it, nothing prints it. pack links before it seals, so ~/.token still
+# works from $HOME (the final security review's F2).
+cp bad-recipients home/.home/private/recipients.txt
+! exec homebot pack --private ~/.token
+! stdout 'canary-'
+! stderr 'canary-'
+stderr 'Line 1 of private/recipients.txt holds a key age cannot encrypt to \(ecdsa-sha2-nistp256\)'
+exists home/.home/private/common/token
+exec readlink home/.token
+stdout '^'$PRIVATE'/common/token$'
+grep 'canary-b83e5d12' home/.token
+! exists home/.home/private/common/token.age
+! exists home/.home/autolink/common/token
+exec git -C home/.home add -A
+exec git -C home/.home ls-files --cached
+! stdout 'private/common/token$'
+exec git -C home/.home diff --cached
+! stdout 'canary-b83e5d12'
+
+# Names the private folder does not ignore (and a .git folder) are refused
+# before anything moves, at any depth.
+! exec homebot pack --private ~/.stash
+! stdout .
+stderr 'homebot: ~/\.stash/deep/README\.md can.t go into private/: git would stage it'
+exists home/.stash/deep/README.md
+! exists home/.home/private/common/stash
+! exec homebot pack --private --layer macos ~/.stash
+! stdout .
+stderr 'The macos layer is not linked on linux'
+exists home/.stash/deep/README.md
+
+# Nothing outside private/ holds a planted value (links are not followed).
+exec sh -c 'find "$WORK" -path "$PRIVATE" -prune -o -type f -exec grep -lE "canary-" {} + || true'
+! stdout .
+! stderr .
+# Inside the repo, only plaintext under private/ holds one, and no .age does.
+exec sh -c 'grep -rl "canary-" "$PRIVATE" --include="*.age" || true'
+! stdout .
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- bad-recipients --
+ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOiWRqZZjeKL057CAFo6yHIBtQf844Rx8tB6q0IlnkXO3mstPRXRFtDpTroAx2xVzvEi4amCToaSqGC5Q1VysvM= me@laptop
+-- home/.netrc --
+machine example.com password canary-7a41c0d9
+-- home/.vault/id_a --
+canary-5e2a77f0
+-- home/.vault/sub/id_b --
+canary-0c91d3aa
+-- home/.token --
+canary-b83e5d12
+-- home/.stash/deep/README.md --
+notes
+-- home/.stash/key --
+a key
+-- private.stdout --
+packed ~/.netrc → private/common/netrc (sealed 1)
+Commit it with:
+  homebot save
+-- folder.stdout --
+packed ~/.vault → private/linux/vault (sealed 2)
+Commit it with:
+  homebot save

@@ -1,0 +1,35 @@
+[!linux] skip 'uses the linux layer'
+
+# triage with no terminal and stdin closed: every question gets the empty
+# answer, which moves on. The words are the TypeScript's, byte for byte
+# (parity triage-noninteractive, which also runs the inbox). The sh wrapper
+# adds the final newline that txtar needs.
+exec sh -c 'homebot triage; echo'
+cmp stdout triage.stdout
+! stderr .
+
+# Nothing was decided: both are still there to sort, and still where they were.
+exec homebot inventory
+stdout '^  Triage    2 to sort, 0 ignored$'
+exec test -d home/.config/foo
+! exec test -L home/.bashrc
+! exists home/.home/decisions.yml
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.bashrc --
+mine
+-- home/.config/foo/conf --
+mine
+-- triage.stdout --
+2 things to decide. Each answer is saved right away; q stops.
+
+[1/2] ~/.config/foo  (folder, 5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+> 
+[2/2] ~/.bashrc  (5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+> 

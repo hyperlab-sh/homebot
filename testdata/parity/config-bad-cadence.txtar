@@ -1,0 +1,14 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: bad autosave.commit
+# exit: 1
+! exec homebot
+cmpwork stdout config-bad-cadence.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-bad-cadence.stderr
+-- home/.home/homebot.yml --
+autosave:
+  commit: weekly
+-- config-bad-cadence.stdout --
+-- config-bad-cadence.stderr --
+homebot: $WORK/home/.home/homebot.yml:2:11: autosave.commit must be off, hourly or daily

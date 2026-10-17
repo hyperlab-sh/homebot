@@ -1,0 +1,29 @@
+[!linux] skip 'recorded on linux'
+
+# HOMEBOT_ROOT beats everything else. (The sandbox leaves it unset; this scenario sets it.)
+env HOMEBOT_ROOT=$WORK/custom
+# exit: 0
+exec homebot
+cmpwork stdout config-homebot-root.stdout
+-- custom/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/homebot.yml --
+profiles:
+  default: other
+-- config-homebot-root.stdout --
+homebot · testhost · 5 things need you (1 urgent)
+
+  1  ! $WORK/custom is not a git repository
+       → git -C $WORK/custom init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 1 new thing to sort: track, ignore or snooze
+       ~/.home
+       → homebot triage
+  4  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR $WORK/custom/manifests/profiles/workstation.yml
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

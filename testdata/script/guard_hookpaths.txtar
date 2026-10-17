@@ -1,0 +1,75 @@
+# The commit guard on every road a commit takes through the shim: git
+# commit -a and a partial commit (git checks a temporary index for both),
+# a linked worktree (git sets GIT_DIR and GIT_INDEX_FILE), and a
+# HOMEBOT_ROOT naming another home. Each carries plaintext under private/,
+# and each is refused.
+chmod 755 bin/gitleaks
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+installguard
+
+# A plaintext file committed past the guard (--no-verify), then changed.
+mkdir home/.home/private/common
+exec cp secret-file home/.home/private/common/token
+exec git -C home/.home add -f private/common/token
+exec git -C home/.home commit -q --no-verify -m planted
+exec cp secret-file-v2 home/.home/private/common/token
+
+# git commit -a
+! exec git -C home/.home commit -q -a -m all
+stderr '^  - private/common/token is plaintext\.'
+exec git -C home/.home rev-list --count HEAD
+stdout '^2$'
+
+# git commit <path>
+! exec git -C home/.home commit -q -m partial private/common/token
+stderr '^  - private/common/token is plaintext\.'
+exec git -C home/.home rev-list --count HEAD
+stdout '^2$'
+
+# A linked worktree of the home.
+exec git -C home/.home worktree add -q ../wt
+mkdir home/wt/private/linux
+exec cp secret-file home/wt/private/linux/key
+exec git -C home/wt add -f private/linux/key
+! exec git -C home/wt commit -q -m wt
+stderr '^  - private/linux/key is plaintext\.'
+exec git -C home/wt rev-list --count HEAD
+stdout '^2$'
+
+# HOMEBOT_ROOT naming another home: the commit's own repo is checked, and
+# the other home's state is left as it was.
+exec git -C home/.home checkout -q -- private/common/token
+exec cp secret-file home/.home/private/common/new
+exec git -C home/.home add -f private/common/new
+exec cp xdg/state/homebot/state.json state-before.json
+env HOMEBOT_ROOT=$WORK/other
+! exec git -C home/.home commit -q -m other-root
+stderr '^  - private/common/new is plaintext\.'
+cmp xdg/state/homebot/state.json state-before.json
+env HOMEBOT_ROOT=
+exec git -C home/.home rev-list --count HEAD
+stdout '^2$'
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- other/homebot.yml --
+profiles:
+  default: workstation
+-- secret-file --
+password=1
+-- secret-file-v2 --
+password=2

@@ -1,0 +1,285 @@
+exec homebot persona validate neatpik
+stdout 'is valid'
+env HOMEBOT_PERSONA=
+exec homebot persona validate
+stdout 'Persona tester is valid'
+exec homebot persona validate $XDG_CONFIG_HOME/homebot/personas/tester.toml
+stdout 'is valid'
+! exec homebot persona validate broken
+stderr 'Persona broken is unusable'
+
+# A persona that does not exist says so; the loader's header wording stays out.
+! exec homebot persona validate nosuch
+stderr 'No persona named nosuch'
+! stderr 'unusable'
+! stdout 'Invalid header'
+! stderr 'Invalid header'
+
+# The neutral voice is a valid choice with no file to validate: it succeeds,
+# whether the environment or the config names it. Naming it as the argument is
+# still refused, as it is for show, new and preview.
+env HOMEBOT_PERSONA=none
+exec homebot persona validate
+stdout 'Neutral voice selected'
+! stdout 'Invalid'
+! stderr .
+env HOMEBOT_PERSONA=
+cp home/.home/none.yml home/.home/homebot.yml
+exec homebot persona validate
+stdout 'Neutral voice selected'
+! stdout 'Invalid'
+! stderr .
+! exec homebot persona validate none
+stderr 'none is reserved for the neutral voice'
+! stderr 'Invalid persona id'
+
+# validate loads the whole chain, by id or by file: a persona is only valid
+# when everything it extends is usable too.
+! exec homebot persona validate orphan
+stderr 'Invalid header: "extends"'
+stderr 'Persona orphan is unusable'
+! stdout 'is valid'
+! exec homebot persona validate $XDG_CONFIG_HOME/homebot/personas/orphan.toml
+stderr 'Persona .*orphan.toml is unusable'
+! stdout 'is valid'
+
+# Every finding says which file it is about, and what the problem is. A
+# finding in a parent is never printed as if it were in the persona asked for.
+! exec homebot persona validate broken
+stderr 'personas/broken.toml: Invalid emoji: "emoji"'
+! exec homebot persona validate heir
+stderr 'personas/broken.toml: Invalid emoji: "emoji"'
+! stderr 'heir.toml: Invalid emoji'
+stderr 'Persona heir is unusable'
+! stdout .
+! exec homebot persona validate ring-a
+stderr 'personas/ring-b.toml: Extends cycle: "ring-a" is already earlier in the chain'
+stderr 'Persona ring-a is unusable'
+! stdout .
+! exec homebot persona validate deep-1
+stderr 'personas/deep-4.toml: Extends chain too long: "deep-5" would be a fifth file'
+stderr 'Persona deep-1 is unusable'
+! stdout .
+exec homebot persona validate deep-2
+stdout 'is valid'
+
+# An unknown key is a finding of the file it is in, whether that file is
+# validated or only extended.
+! exec homebot persona validate unk
+stderr 'personas/unk.toml: Unknown field: "mystery"'
+stderr 'Persona unk is unusable'
+! exec homebot persona validate kin
+stderr 'personas/unk.toml: Unknown field: "mystery"'
+! stderr 'kin.toml: Unknown field'
+stderr 'Persona kin is unusable'
+! stdout .
+
+# A file that is not installed yet extends the installed ones by id; its own
+# name is the id the chain judges it under.
+exec homebot persona validate draft.toml
+stdout 'draft.toml is valid'
+! exec homebot persona validate wip.toml
+stderr 'Persona wip.toml is unusable'
+stderr 'Invalid header: "extends"'
+
+# The chain behind a file that is not installed is judged as it will be once
+# it is. Each case fails on the reason it names, from the file that has it.
+# It extends a persona that is broken.
+! exec homebot persona validate k-broken.toml
+stderr 'personas/broken.toml: Invalid emoji: "emoji"'
+! stderr 'k-broken.toml: Invalid emoji'
+stderr 'Persona k-broken.toml is unusable'
+! stdout .
+# It extends a persona with an unknown key.
+! exec homebot persona validate k-unk.toml
+stderr 'personas/unk.toml: Unknown field: "mystery"'
+! stderr 'k-unk.toml: Unknown field'
+stderr 'Persona k-unk.toml is unusable'
+! stdout .
+# It would be the fifth file of a chain: the four installed ones are chain-1
+# to chain-4. The finding is in the file whose extends goes one too far.
+! exec homebot persona validate k-tall.toml
+stderr 'personas/chain-3.toml: Extends chain too long: "chain-4" would be a fifth file'
+stderr 'Persona k-tall.toml is unusable'
+! stdout .
+# It extends one side of a cycle, and it closes one.
+! exec homebot persona validate k-ring.toml
+stderr 'personas/ring-b.toml: Extends cycle: "ring-a" is already earlier in the chain'
+stderr 'Persona k-ring.toml is unusable'
+! stdout .
+! exec homebot persona validate ring-a.toml
+stderr 'personas/ring-b.toml: Extends cycle: "ring-a" is already earlier in the chain'
+stderr 'Persona ring-a.toml is unusable'
+! stdout .
+# A file that fits is still valid: three installed files and the draft.
+exec homebot persona validate k-fits.toml
+stdout 'k-fits.toml is valid'
+! stderr .
+
+# Findings name an installed file relative to the config directory, as the user
+# keeps them ("personas/broken.toml"), and a file from anywhere else by its
+# absolute path. The config directory itself ($WORK/xdg/config/homebot) never
+# shows for a file under it.
+! exec homebot persona validate broken
+stderr '^error: personas/broken.toml: Invalid emoji: "emoji"$'
+! stderr '^error:.*xdg/config'
+! exec homebot persona validate heir
+stderr '^error: personas/broken.toml: Invalid emoji: "emoji"$'
+! stderr '^error:.*xdg/config'
+! exec homebot persona validate deep-1
+stderr '^error: personas/deep-4.toml: Extends chain too long'
+! stderr '^error:.*xdg/config'
+! exec homebot persona validate k-broken.toml
+stderr '^error: personas/broken.toml: Invalid emoji'
+! stderr '^error:.*xdg/config'
+! exec homebot persona validate wip.toml
+stderr '^error: /.*/wip.toml: Invalid header: "extends"$'
+! exec homebot persona validate $XDG_CONFIG_HOME/homebot/personas/broken.toml
+stderr '^error: personas/broken.toml: Invalid emoji: "emoji"$'
+! stderr '^error:.*xdg/config'
+
+# Diagnostics are not output: they go to stderr, the verdict of a valid
+# persona to stdout.
+exec homebot persona validate tester
+! stderr .
+! exec homebot persona validate broken
+! stdout .
+
+-- xdg/config/homebot/personas/tester.toml --
+schema = 1
+id = "tester"
+name = "Tester"
+emoji = "🧪"
+extends = "neatpik"
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+persona: tester
+-- home/.home/none.yml --
+profiles:
+  default: workstation
+persona: none
+-- xdg/config/homebot/personas/broken.toml --
+schema = 1
+name = "Broken"
+-- xdg/config/homebot/personas/orphan.toml --
+schema = 1
+name = "Orphan"
+emoji = "🧪"
+extends = "missing-parent"
+-- xdg/config/homebot/personas/heir.toml --
+schema = 1
+name = "Heir"
+emoji = "🧪"
+extends = "broken"
+-- xdg/config/homebot/personas/ring-a.toml --
+schema = 1
+name = "Ring A"
+emoji = "🧪"
+extends = "ring-b"
+-- xdg/config/homebot/personas/ring-b.toml --
+schema = 1
+name = "Ring B"
+emoji = "🧪"
+extends = "ring-a"
+-- xdg/config/homebot/personas/deep-1.toml --
+schema = 1
+name = "Deep 1"
+emoji = "🧪"
+extends = "deep-2"
+-- xdg/config/homebot/personas/deep-2.toml --
+schema = 1
+name = "Deep 2"
+emoji = "🧪"
+extends = "deep-3"
+-- xdg/config/homebot/personas/deep-3.toml --
+schema = 1
+name = "Deep 3"
+emoji = "🧪"
+extends = "deep-4"
+-- xdg/config/homebot/personas/deep-4.toml --
+schema = 1
+name = "Deep 4"
+emoji = "🧪"
+extends = "deep-5"
+-- xdg/config/homebot/personas/deep-5.toml --
+schema = 1
+name = "Deep 5"
+emoji = "🧪"
+-- draft.toml --
+schema = 1
+id = "draft"
+name = "Draft"
+emoji = "🧪"
+extends = "tester"
+-- wip.toml --
+schema = 1
+id = "wip"
+name = "Wip"
+emoji = "🧪"
+extends = "missing-parent"
+-- xdg/config/homebot/personas/unk.toml --
+schema = 1
+name = "Unk"
+emoji = "🧪"
+mystery = 1
+-- xdg/config/homebot/personas/kin.toml --
+schema = 1
+name = "Kin"
+emoji = "🧪"
+extends = "unk"
+-- xdg/config/homebot/personas/chain-1.toml --
+schema = 1
+name = "Chain 1"
+emoji = "🧪"
+extends = "chain-2"
+-- xdg/config/homebot/personas/chain-2.toml --
+schema = 1
+name = "Chain 2"
+emoji = "🧪"
+extends = "chain-3"
+-- xdg/config/homebot/personas/chain-3.toml --
+schema = 1
+name = "Chain 3"
+emoji = "🧪"
+extends = "chain-4"
+-- xdg/config/homebot/personas/chain-4.toml --
+schema = 1
+name = "Chain 4"
+emoji = "🧪"
+-- k-broken.toml --
+schema = 1
+id = "k-broken"
+name = "K Broken"
+emoji = "🧪"
+extends = "broken"
+-- k-unk.toml --
+schema = 1
+id = "k-unk"
+name = "K Unk"
+emoji = "🧪"
+extends = "unk"
+-- k-tall.toml --
+schema = 1
+id = "k-tall"
+name = "K Tall"
+emoji = "🧪"
+extends = "chain-1"
+-- k-fits.toml --
+schema = 1
+id = "k-fits"
+name = "K Fits"
+emoji = "🧪"
+extends = "chain-3"
+-- k-ring.toml --
+schema = 1
+id = "k-ring"
+name = "K Ring"
+emoji = "🧪"
+extends = "ring-a"
+-- ring-a.toml --
+schema = 1
+id = "ring-a"
+name = "Ring A, not installed"
+emoji = "🧪"
+extends = "ring-b"

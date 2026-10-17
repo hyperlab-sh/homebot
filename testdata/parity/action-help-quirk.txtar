@@ -1,0 +1,49 @@
+[!linux] skip 'recorded on linux'
+
+# "action --help" is the page; after the action's name, --help belongs to the action.
+# exit: 0
+exec homebot action --help
+cmpwork stdout page.stdout
+# exit: 0
+exec homebot action greet --help
+cmpwork stdout greet-help.stdout
+cmpwork stderr greet-help.stderr
+# exit: 0
+exec homebot action greet -- --help
+cmpwork stdout greet-dashes.stdout
+# exit: 0
+exec homebot action greet one 'two words' -h
+cmpwork stdout greet-short.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/actions/greet.sh --
+#!/bin/bash
+# Say hello with the arguments given.
+echo "greet: $# args"
+for a in "$@"; do echo "  [$a]"; done
+-- page.stdout --
+Usage: homebot action <name> [args...]
+
+Runs one action with the environment a profile step gets. Everything after
+the name goes to the action, so `homebot action <name> --help` reaches the
+action; this page is `homebot action --help`.
+
+Options:
+  -h, --help   this page
+
+Examples:
+  homebot action apt-repos linux/apt-repos   add the vendor apt repositories
+-- greet-help.stdout --
+greet: 1 args
+  [--help]
+-- greet-help.stderr --
+-- greet-dashes.stdout --
+greet: 2 args
+  [--]
+  [--help]
+-- greet-short.stdout --
+greet: 3 args
+  [one]
+  [two words]
+  [-h]

@@ -1,0 +1,40 @@
+{
+  "exports": {
+    "zed": {
+      "at": 1767225603000,
+      "ok": true
+    },
+    "alpha": {
+      "at": 1767225604000,
+      "ok": false,
+      "error": "no \"tool\"\nfound"
+    }
+  },
+  "tidyErrors": [
+    {
+      "step": "links",
+      "message": "boom <1> &   é",
+      "at": 1767225602000
+    }
+  ],
+  "futureThing": {
+    "a": [
+      1,
+      2
+    ],
+    "b": "<x>&"
+  },
+  "lastSeen": 5,
+  "lastTidy": 1767225601000,
+  "unpack": {
+    "profile": "workstation",
+    "hash": "abc123",
+    "at": 1767225607000
+  },
+  "lastSync": 1767225608000,
+  "lastAutosave": 1767225609000,
+  "notify": {
+    "key": "k2",
+    "at": 1767225610000
+  }
+}

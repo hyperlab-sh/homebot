@@ -1,0 +1,7 @@
+#!/bin/bash
+# Stub uname: STUB_OS and STUB_ARCH pretend to be another machine.
+case "${1:-}" in
+  "" | -s) if [ -n "${STUB_OS:-}" ]; then echo "$STUB_OS"; exit 0; fi ;;
+  -m) if [ -n "${STUB_ARCH:-}" ]; then echo "$STUB_ARCH"; exit 0; fi ;;
+esac
+exec /usr/bin/uname "$@"

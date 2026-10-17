@@ -1,0 +1,14 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: invalid YAML
+# exit: 1
+! exec homebot
+cmpwork stdout config-invalid-yaml.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": config errors name the line and column, and invalid YAML carries goccy's message instead of Bun's
+cmpwork stderr config-invalid-yaml.stderr
+-- home/.home/homebot.yml --
+profiles: [unclosed
+  default: x
+-- config-invalid-yaml.stdout --
+-- config-invalid-yaml.stderr --
+homebot: $WORK/home/.home/homebot.yml:1:11: invalid YAML: sequence end token ']' not found

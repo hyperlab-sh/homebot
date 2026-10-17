@@ -1,0 +1,27 @@
+[!linux] skip 'uses the linux layer'
+
+# D8: when the inbox refresh after a command fails, the command still
+# succeeds and says nothing about it; the failure goes to the debug log only.
+# Here the cache folder is a file, so writing the nudge line fails.
+exec homebot export
+stdout 'No exports configured'
+! stderr .
+
+# With HOMEBOT_DEBUG on, the failure shows up in the debug log.
+env HOMEBOT_DEBUG=1
+exec homebot export
+stdout 'No exports configured'
+stderr 'inbox refresh failed'
+
+# inbox itself is the refresh, so there the same failure is an error, as in
+# the TypeScript (refresh throws out of the inbox command).
+env HOMEBOT_DEBUG=
+! exec homebot inbox
+! stdout .
+stderr .
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- xdg/cache/homebot --
+a file where the cache folder belongs

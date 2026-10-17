@@ -1,0 +1,35 @@
+[!linux] skip 'uses the linux layer'
+# save runs the commit guard itself (D14), which needs gitleaks.
+chmod 755 bin/gitleaks
+
+# next shows the first item and, when its fix is a homebot command, runs it
+# as if it had been typed: here the refused commit's fix, homebot save.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec sh -c 'echo more >> home/.home/autolink/common/zshrc'
+exec homebot next
+cmpwork stdout next.stdout
+exec git -C home/.home log --format=%s
+stdout -count=2 '(?m)^.+$'
+stdout '^chore\(home\): save changes from testhost$'
+
+# The commit went through, so the refusal is gone from the inbox.
+exec homebot
+! stdout 'A commit was refused'
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+x
+-- xdg/state/homebot/state.json --
+{"blocked":{"reason":"too big","at":1767225500000}}
+-- next.stdout --
+A commit was refused
+too big
+→ homebot save
+committed 1 file

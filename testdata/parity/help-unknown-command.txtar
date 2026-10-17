@@ -1,0 +1,8 @@
+
+# exit: 1
+! exec homebot help frobnicate
+cmpwork stdout help-unknown-command.stdout
+cmpwork stderr help-unknown-command.stderr
+-- help-unknown-command.stdout --
+-- help-unknown-command.stderr --
+homebot: Unknown command "frobnicate". See: homebot --help

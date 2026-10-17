@@ -1,0 +1,71 @@
+# The commit guard end to end: a real git commit runs the shim installed in
+# $XDG_DATA_HOME/homebot/hooks, the shim runs homebot hook pre-commit, and a
+# planted plaintext secret is refused. The repo's own .git/hooks/pre-commit
+# runs after the guard, and only when the guard passes.
+chmod 755 bin/gitleaks
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+installguard
+exec git -C home/.home config --local --get core.hooksPath
+cmpwork stdout hookspath.stdout
+exec test -x xdg/data/homebot/hooks/pre-commit
+exec cp own-hook home/.home/.git/hooks/pre-commit
+chmod 755 home/.home/.git/hooks/pre-commit
+
+# A plaintext file under private/, force-added past private/.gitignore.
+mkdir home/.home/private/common
+exec cp secret-file home/.home/private/common/token
+exec git -C home/.home add -f private/common/token
+! exec git -C home/.home commit -q -m 'add token'
+cmpwork stderr refused.stderr
+exec git -C home/.home rev-list --count HEAD
+stdout '^1$'
+grep '"reason": "private/common/token is plaintext. Only \*.age files may be committed from private/. Unstage it:"' xdg/state/homebot/state.json
+
+# Unstaged, the next commit goes through, runs the repo's own hook after
+# the guard, and clears the refusal.
+exec git -C home/.home rm -q --cached private/common/token
+exec cp zshrc-v2 home/.home/autolink/common/zshrc
+exec git -C home/.home commit -q -a -m 'change zshrc'
+cmp stderr own-hook-ran.stderr
+exec git -C home/.home rev-list --count HEAD
+stdout '^2$'
+! grep blocked xdg/state/homebot/state.json
+
+# Installing again changes nothing.
+installguard
+exec git -C home/.home config --local --get core.hooksPath
+cmpwork stdout hookspath.stdout
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- zshrc-v2 --
+export A=2
+-- secret-file --
+password=1
+-- own-hook --
+#!/bin/sh
+echo 'own hook ran' >&2
+-- hookspath.stdout --
+$WORK/xdg/data/homebot/hooks
+-- refused.stderr --
+homebot refused this commit:
+  - private/common/token is plaintext. Only *.age files may be committed from private/. Unstage it:
+    git rm --cached private/common/token
+-- own-hook-ran.stderr --
+own hook ran

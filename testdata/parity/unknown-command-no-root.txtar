@@ -1,0 +1,11 @@
+
+# The root is looked up before the command name is checked.
+# exit: 1
+! exec homebot frobnicate
+cmpwork stdout unknown-command-no-root.stdout
+# deliberate: guided setup: after the no-homebot.yml error the Go build points at homebot setup, which clones or starts the home repo; the TypeScript stopped at the error
+cmpwork stderr unknown-command-no-root.stderr
+-- unknown-command-no-root.stdout --
+-- unknown-command-no-root.stderr --
+homebot: No homebot.yml found. Run homebot inside your home repo, or set HOMEBOT_ROOT.
+New here? This clones your home repo or starts one: homebot setup

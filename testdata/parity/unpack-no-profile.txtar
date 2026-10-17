@@ -1,0 +1,27 @@
+[!linux] skip 'recorded on linux'
+
+# No profile chosen anywhere.
+# exit: 1
+! exec homebot unpack
+cmpwork stderr unpack-no-profile.stderr
+# exit: 0
+exec homebot
+cmpwork stdout inbox-no-profile.stdout
+-- home/.home/homebot.yml --
+triage:
+  watch: ["~/.config/*"]
+-- unpack-no-profile.stderr --
+homebot: Which profile? Pass one (homebot unpack workstation) or set profiles.default in homebot.yml.
+-- inbox-no-profile.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • No profile chosen for testhost
+       Set profiles.default or profiles.hosts in homebot.yml
+       → $EDITOR ~/.home/homebot.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

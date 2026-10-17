@@ -1,0 +1,27 @@
+[!linux] skip 'recorded on linux'
+
+# systemctl cannot reach a user session: setup stops before writing anything, and says what to do.
+chmod 755 bin/systemctl
+# deliberate: the Go setup checks for gitleaks before anything else and stops without it; the TypeScript did not look
+chmod 755 bin/gitleaks
+exec git -C home/.home init -q
+# exit: 1
+! exec homebot setup
+cmpwork stdout setup-nosystemd.stdout
+cmpwork stderr setup-nosystemd.stderr
+! exists home/.config/systemd
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 1
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- setup-nosystemd.stdout --
+installed commit guard (core.hooksPath)
+-- setup-nosystemd.stderr --
+homebot: No systemd user session here, so the hourly helper can't be installed.
+Run this yourself, or from cron:
+  homebot tidy

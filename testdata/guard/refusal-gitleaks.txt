@@ -1,0 +1,4 @@
+homebot refused this commit:
+  - gitleaks found something that looks like a secret. Move it to private/ (homebot pack --private <path>) or unstage it.
+    Finding:     token = REDACTED
+    File:        autolink/common/zshrc

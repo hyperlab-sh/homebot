@@ -1,0 +1,20 @@
+# Ctrl-C (SIGINT) and SIGTERM stop homebot as they stopped the TypeScript
+# build, which died of the signal: exit 130 and 143, and no error about the
+# program the command was running, which is stopped too. The export writes
+# "started" once it runs, so the signal reaches homebot mid-command.
+[!unix] skip 'signals are unix'
+
+exec sh -c 'homebot export slow & pid=$!; i=0; while [ ! -e home/.home/started ] && [ $i -lt 400 ]; do sleep 0.05; i=$((i+1)); done; kill -INT $pid; wait $pid; echo exit=$?'
+stdout '^exit=130$'
+! stderr .
+
+rm home/.home/started
+exec sh -c 'homebot export slow & pid=$!; i=0; while [ ! -e home/.home/started ] && [ $i -lt 400 ]; do sleep 0.05; i=$((i+1)); done; kill -TERM $pid; wait $pid; echo exit=$?'
+stdout '^exit=143$'
+! stderr .
+
+-- home/.home/homebot.yml --
+exports:
+  - name: slow
+    out: manifests/slow.txt
+    run: touch started; exec sleep 30

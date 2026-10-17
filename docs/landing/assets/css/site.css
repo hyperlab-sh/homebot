@@ -1,0 +1,1591 @@
+/* homebot.sh: the homepage.
+   Old paper with a sky-blue tint in light mode, a night-blue page in dark
+   mode, under a picture of the robot family by their house at sunset, shown
+   whole with hard edges. Cards are paper a shade lighter, with their own
+   grain; terminals are dark in both themes. Neatpik's mint is the accent,
+   used for links, the picked robot and fixes. */
+
+@font-face {
+  font-family: "Young Serif";
+  src: url(/assets/fonts/young-serif/young-serif-latin-400-normal.woff2) format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Libre Franklin";
+  src: url(/assets/fonts/libre-franklin/libre-franklin-latin-wght-normal.woff2) format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Libre Franklin";
+  src: url(/assets/fonts/libre-franklin/libre-franklin-latin-wght-italic.woff2) format("woff2-variations");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Kalam, cut down to ASCII with kerning only (12 KB): the Suggest button's
+   handwriting, neat enough to read at a glance */
+@font-face {
+  font-family: "Kalam";
+  src: url(/assets/fonts/kalam/kalam-ascii-400-normal.woff2) format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+2019;
+}
+
+/* OpenDyslexic 3, cut down to Latin-1 and the usual punctuation (about 20 KB a
+   face, regular and bold; it has no italic, so the browser slants it): every
+   sans-serif text once the reader turns the top bar's switch on (font.js).
+   Its letters are 27-37% wider than Libre Franklin's, so size-adjust shrinks
+   it, but not so far that its small text stops reading as small text next to
+   the serif titles: 86% (88% for bold) puts its capitals at Libre Franklin's
+   height and its lowercase at 89% of it. Lines wrap a little more. Its
+   ascent is 1556 and its descent 426, so its letters sat low in every box
+   (buttons, fields); the overrides put the middle of the capitals on the
+   middle of the line. The regular face also covers the page's in-between
+   weights (560, 620), so only real bold is bold. */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url(/assets/fonts/opendyslexic/opendyslexic3-latin1-400-normal.woff2) format("woff2");
+  size-adjust: 86%;
+  ascent-override: 142.6%;
+  descent-override: 55.6%;
+  line-gap-override: 0%;
+  font-weight: 100 599;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2014, U+2018-201D, U+2022, U+2026, U+20AC, U+2122;
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url(/assets/fonts/opendyslexic/opendyslexic3-latin1-700-normal.woff2) format("woff2");
+  size-adjust: 88%;
+  ascent-override: 142.6%;
+  descent-override: 55.6%;
+  line-gap-override: 0%;
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2014, U+2018-201D, U+2022, U+2026, U+20AC, U+2122;
+}
+
+/* ------------------------------------------------------------------ tokens */
+
+:root {
+  color-scheme: light dark;
+
+  --serif: "Young Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: "Libre Franklin", "Franklin Gothic", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --dyslexic: "OpenDyslexic", "Comic Sans MS", "Trebuchet MS", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", monospace;
+
+  /* The type scale. Six steps and a hero; every size on the page is one of
+     these (the terminal and the table's caps excepted). Body, lead (the
+     paragraph under a heading), title (a card or a name), sub (a box's own
+     heading) and h2 (a section's) climb about 1.2x to 1.3x a step. */
+  --t-micro: .8125rem;  /* labels in caps, badges */
+  --t-small: .9375rem;  /* what supports the text: notes, hints, table, credits */
+  --t-body: 1.0625rem;
+  --t-lead: clamp(1.125rem, 1.05rem + .35vw, 1.25rem);
+  --t-title: clamp(1.25rem, 1.1rem + .6vw, 1.5rem);
+  --t-sub: clamp(1.6rem, 1.3rem + 1vw, 2.0625rem);
+  --t-h2: clamp(1.9rem, 1.4rem + 1.8vw, 2.75rem);
+
+  /* The space scale, on a 4px base: gaps inside a part are 4 to 16, between
+     parts 24 to 32, between a heading's block and what it introduces 48, and
+     between sections --section. A section pads only above itself, so two
+     neighbours never add their padding up. */
+  --s-1: .25rem;
+  --s-2: .5rem;
+  --s-3: .75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --section: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+
+  /* the album page: the old cream paper turned sky blue (same lightness and
+     saturation, hue 205), deeper at the edges, with its stains and grain */
+  --paper: #ccdfec;
+  --paper-light: #ddecf6;
+  --paper-edge: #9cc0d9;
+  --stain-opacity: .15;
+  --grain-opacity: .2;
+  /* cards, blocks and tables: near-white, so they lift off the blue page */
+  --card-bg: #fffffb;
+
+  --ink: #2a2017;
+  --ink-soft: #5b4a39;
+  --rule: rgb(42 32 23 / .18);
+  --code-bg: rgb(42 32 23 / .08);
+
+  /* Neatpik's mint, the accent */
+  --mint: #8fdcc2;
+  --mint-ink: #0f2b23;
+  --link-line: #2a7a62;
+  --focus: #2a7a62;
+  --bad: #a63a1c;
+  --chevron: #000; /* the slider's previous and next */
+
+  /* the robot cards: a lighter paper with its own fine grain and fibres */
+  --card-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .26 0 0 0 0 .2 1.6 0 0 0 -.62'/%3E%3C/filter%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.025 .07' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .26 0 0 0 0 .2 1.5 0 0 0 -.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.5'/%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='.28'/%3E%3C/svg%3E");
+  --card-paper-opacity: .25;
+
+  /* the name field is a white sticky label; Suggest is written on the card
+     in pencil and turns to blue ballpoint under the pointer */
+  --hand: "Kalam", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  --label: #fbfcfd;
+  --label-shade: #edf2f5;
+  --label-edge: rgb(30 50 70 / .12);
+  --label-ink: #1d2733;
+  --lift: rgb(22 34 50 / .3);
+  --pencil: #4d5157;
+  --pen: #1f3fa6;
+
+  /* terminals: dark in both themes */
+  --term-bg: #211a14;
+  --term-edge: #120d09;
+  --term-ink: #ece3d0;
+  --term-bright: #fff8ea;
+  --term-dim: #a09079;
+  --term-urgent: #ff9b80;
+  --term-fix: #8fdcc2;
+  --term-path: #e9c98a;
+  --term-step: #a9d2df;
+  --term-warn: #f2c46d;
+
+  /* The bot's icon, wherever the page shows it (.hb-icon). Set it here and
+     nowhere else. --bot-icon is an emoji; --bot-icon-image is an image that
+     replaces it (set --bot-icon to "" next to it, and use an absolute
+     /assets/ URL: the build checks the file exists and stamps it).
+     choice.js puts the picked robot on <html data-persona>, so each robot
+     can have its own icon:
+       :root[data-persona="rosie"] {
+         --bot-icon: "";
+         --bot-icon-image: url("/assets/img/icons/<robot>.svg");
+       } */
+  --bot-icon: "🤖";
+  --bot-icon-image: none;
+
+  --gutter: clamp(16px, 4vw, 48px);
+  --page: 1240px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* the night sky: a dark page with a blue tint */
+    --paper: #121921;
+    --paper-light: #19222d;
+    --paper-edge: #0a0f15;
+    --stain-opacity: .15;
+    --card-bg: #19222d;
+    --grain-opacity: .14;
+
+    --ink: #ece2cc;
+    --ink-soft: #b9a98f;
+    --rule: rgb(236 226 204 / .15);
+    --code-bg: rgb(236 226 204 / .09);
+
+    --link-line: #8fdcc2;
+    --focus: #8fdcc2;
+    --bad: #ff9b80;
+    --chevron: #fff;
+
+    --card-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .97 0 0 0 0 .9 1.6 0 0 0 -.62'/%3E%3C/filter%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.025 .07' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .97 0 0 0 0 .9 1.5 0 0 0 -.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.35'/%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='.2'/%3E%3C/svg%3E");
+    --card-paper-opacity: .25;
+    --label: #e4eaef;
+    --label-shade: #d3dbe2;
+    --label-edge: rgb(0 0 0 / .3);
+    --lift: rgb(0 0 0 / .6);
+    --pencil: #b4b8be; /* graphite, lightened to show on a dark card */
+    --pen: #9db6ff; /* ballpoint blue, lightened likewise */
+
+    --term-bg: #110d0a;
+    --term-edge: #3b3026;
+  }
+}
+
+/* ------------------------------------------------------------------- base */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* the sticky header's height, so a jump to #family lands below it */
+  scroll-padding-top: calc(2 * var(--masthead-pad) + 2.1rem + 8px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  font-optical-sizing: auto;
+  /* Young Serif's default figures are old-style, which turns "HAL 9000" into
+     "HAL 9ooo"; set here so every serif use inherits it, spans included. */
+  font-variant-numeric: lining-nums;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(80% 60% at 30% 0%, var(--paper-light), transparent 70%),
+    radial-gradient(70% 70% at 100% 100%, var(--paper-edge), transparent 72%),
+    radial-gradient(55% 50% at 0% 100%, var(--paper-edge), transparent 70%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* The paper's age: soft stains and foxing, tinted blue like the paper, then a
+   fine fibre grain. Both sit behind everything and stay put while the page
+   scrolls. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  opacity: var(--stain-opacity);
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='900' viewBox='0 0 1200 900' preserveAspectRatio='none'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.004 .006' numOctaves='5' seed='11'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.7' intercept='-.45'/%3E%3CfeFuncG type='linear' slope='1.7' intercept='-.4'/%3E%3CfeFuncB type='linear' slope='1.7' intercept='-.35'/%3E%3CfeFuncA type='linear' slope='0' intercept='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+body::after {
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85 .55' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+img { max-width: 100%; }
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: var(--link-line);
+  text-decoration-thickness: 2px;
+  text-underline-offset: .22em;
+}
+a:hover { text-decoration-thickness: 3px; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: .86em;
+  background: var(--code-bg);
+  padding: .08em .32em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0; }
+
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 30;
+  padding: .6em 1em;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 6px;
+  text-decoration: none;
+}
+.skip:focus { top: 12px; }
+
+/* the page column */
+.masthead,
+main > section,
+.footer {
+  width: min(100% - 2 * var(--gutter), var(--page));
+  margin-inline: auto;
+}
+
+/* ---------------------------------------------------------------- masthead */
+
+/* The header stays at the top while the page scrolls. Its paper runs the
+   full width of the window (::before), nearly opaque and blurring what
+   passes under it, with a hairline along the bottom. */
+:root { --masthead-pad: clamp(16px, 2.4vw, 28px); }
+/* The reader's font (font.js): every sans-serif text turns OpenDyslexic. */
+:root[data-font="dyslexic"] { --sans: var(--dyslexic); }
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: var(--masthead-pad);
+}
+.masthead::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  box-shadow: 0 1px 0 var(--rule);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.wordmark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  line-height: 1;
+  text-decoration: none;
+  letter-spacing: -.01em;
+}
+/* The robot head, about 3:2: as tall as the wordmark's capitals and a bit. */
+.wordmark-face { display: flex; }
+.wordmark-face img {
+  width: auto;
+  height: 1.05em;
+}
+
+.masthead ul {
+  display: flex;
+  gap: clamp(16px, 3vw, 32px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.masthead nav a {
+  font-weight: 560;
+  white-space: nowrap;
+  text-decoration-color: transparent;
+}
+.masthead nav a:hover { text-decoration-color: var(--link-line); }
+.masthead ul { align-items: center; }
+
+/* The font switch: a switch whose knob slides right, on mint, while it is on,
+   and its name, a little smaller than the links. */
+.font-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 560;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.font-toggle-text { font-family: "Libre Franklin", "Franklin Gothic", "Helvetica Neue", Arial, system-ui, sans-serif; font-size: .8125rem; }
+.font-toggle-switch {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 999px;
+  transition: background-color .15s, border-color .15s;
+}
+.font-toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  transition: translate .15s, background-color .15s;
+}
+.font-toggle:hover .font-toggle-switch { border-color: var(--ink); }
+.font-toggle:hover .font-toggle-switch::after { background: var(--ink); }
+.font-toggle[aria-checked="true"] .font-toggle-switch {
+  border-color: var(--mint-ink);
+  background: var(--mint);
+}
+.font-toggle[aria-checked="true"] .font-toggle-switch::after {
+  translate: 16px 0;
+  background: var(--mint-ink);
+}
+.font-toggle[hidden] { display: none; }
+/* The bar has to fit the wordmark, the links and the switch, in OpenDyslexic
+   too, whose letters are about a third wider. So as the window narrows the
+   links go first ("How it helps", then "The family"), and the switch's name
+   after them; the switch itself stays, and the name is still there for a
+   screen reader. */
+@media (max-width: 959px) {
+  .font-toggle-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 767px) { .masthead .nav-wide { display: none; } }
+@media (max-width: 599px) { .masthead .nav-mid { display: none; } }
+/* The narrowest phones, in OpenDyslexic, need the gaps tighter still. */
+@media (max-width: 399px) { .masthead, .masthead ul { gap: 8px; } }
+
+/* -------------------------------------------------------------------- hero */
+
+/* The family by their house, in one of two pictures drawn for this page. Both
+   are shown whole, with hard edges, and each has empty sky for the headline.
+
+   Wide screens get the 9:4 one, full bleed under the header: as wide as the
+   window, or narrower and centred when the window is too short for it to fit
+   under the header. The text sits in the sky between HAL's head and the house,
+   at the place and size the picture was drawn with: the headline left-aligned,
+   the subline right-aligned under its end. Every position and size is a share
+   of the picture (% and cqw), so the text scales with it and never reaches
+   the robots or the house.
+
+   Phones held upright get the 9:16 one, full width under the header, with the
+   text in the sky above the trees. On a screen too short for all of it, it
+   loses a strip of sky and lawn (more sky than lawn). Other narrow windows
+   held upright put the text above the 9:4 picture, in ink. */
+.hero { padding-top: 0; }
+.hero-banner {
+  --hero-w: min(100vw, (100svh - 104px) * 2.25);
+  position: relative;
+  width: var(--hero-w);
+  aspect-ratio: 9 / 4;
+  margin-inline: calc(50% - var(--hero-w) / 2);
+  container-type: inline-size;
+}
+.hero-art,
+.hero-art img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Forty percent less colour than the artwork has; the files stay as drawn. */
+.hero-art img { object-fit: cover; filter: saturate(.6); }
+.hero-text {
+  position: absolute;
+  z-index: 1;
+  left: 27.3%;
+  top: 5.3%;
+  width: max-content;
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(24 14 4 / .55), 0 3px 18px rgb(24 14 4 / .45), 0 0 46px rgb(24 14 4 / .3);
+}
+.hero h1 {
+  color: inherit;
+  font-size: 3.65cqw;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+}
+.hero h1 span,
+.hero-sub span { display: block; }
+.hero-sub {
+  margin-top: .1em;
+  font-family: var(--serif);
+  font-size: max(12px, 1.535cqw);
+  line-height: 1.4;
+  text-align: right;
+  color: inherit;
+}
+/* A landscape phone: a slimmer header, so the picture can be wider. */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --masthead-pad: 10px; }
+  .hero-banner { --hero-w: min(100vw, (100svh - 64px) * 2.25); }
+}
+/* A narrow window held upright: the text above the 9:4 picture. */
+@media (max-width: 719px) and (orientation: portrait) {
+  .hero-banner {
+    --hero-w: 100vw;
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: auto;
+  }
+  .hero-text {
+    position: static;
+    max-width: 100%;
+    margin: 0 auto 14px;
+    padding: 8px var(--gutter) 0;
+    color: var(--ink);
+    text-shadow: none;
+  }
+  .hero h1 { font-size: min(8vw, 3rem); line-height: 1.15; }
+  .hero-sub { margin-top: .4em; font-size: max(15px, 4vw); }
+  .hero-art { position: relative; aspect-ratio: 9 / 4; }
+}
+/* A phone held upright: the 9:16 picture, the text on its sky. --crop is how
+   much of the picture's height the screen cannot show; 60% of it comes off
+   the top. The trees start 31.75% down the picture (56.4vw), and the text
+   starts a seventh of the way down what is left of the sky. */
+@media (max-width: 719px) and (max-aspect-ratio: 3/5) {
+  .hero-banner {
+    --crop: max(0px, 177.78vw - (100svh - 72px));
+    display: block;
+    height: calc(177.78vw - var(--crop));
+  }
+  .hero-art { position: absolute; aspect-ratio: auto; }
+  .hero-art img { object-position: 50% 60%; }
+  .hero-text {
+    position: absolute;
+    top: calc((56.4vw - .6 * var(--crop)) * .14);
+    left: 50%;
+    margin: 0;
+    padding: 0;
+    translate: -50% 0;
+    color: #fff;
+    text-shadow: 0 1px 2px rgb(24 14 4 / .55), 0 3px 18px rgb(24 14 4 / .45), 0 0 46px rgb(24 14 4 / .3);
+  }
+  .hero h1 { font-size: 8vw; line-height: 1.2; }
+  .hero-sub { margin-top: .25em; font-size: max(14px, 4.1vw); }
+}
+
+/* Who homebot is for, in one breath: a self-adhesive label like the name
+   field's, stuck between the picture and the family, as wide as the title
+   under it ("Pick the robot..." is about 19.5em of its own size). */
+.pitch {
+  --label-w: calc(19.5 * clamp(2rem, 1.45rem + 2.3vw, 3.2rem));
+  position: relative;
+  isolation: isolate;
+  width: min(100%, var(--label-w));
+  margin: var(--s-7) auto 0;
+  padding: var(--s-5) clamp(var(--s-5), 4vw, var(--s-7));
+  color: var(--label-ink);
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+/* the label itself, over its lifted corner (::after), both under the text */
+.pitch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 12px;
+  background: linear-gradient(170deg, #fff 0%, var(--label) 45%, var(--label-shade) 100%);
+  box-shadow:
+    0 0 0 1px var(--label-edge),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 1px 1px rgb(22 34 50 / .1),
+    0 3px 8px -3px var(--lift);
+}
+.pitch::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  z-index: -2;
+  width: 45%;
+  height: 50%;
+  box-shadow: 4px 7px 9px var(--lift);
+  transform: rotate(3deg);
+}
+.pitch h2 {
+  margin-bottom: var(--s-4);
+  font-size: var(--t-sub);
+  line-height: 1.15;
+}
+.pitch p { margin: 0; }
+.pitch p + p { margin-top: var(--s-3); }
+.pitch code {
+  font-family: var(--mono);
+  font-size: .9em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: .7em 1.25em;
+  border-radius: 6px;
+  font-weight: 620;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.button-primary {
+  background: var(--mint);
+  color: var(--mint-ink);
+  box-shadow: inset 0 -2px 0 rgb(15 43 35 / .22), 0 6px 16px -8px rgb(15 43 35 / .5);
+}
+.button-primary:hover { background: #a3e6cf; }
+
+.note {
+  margin-top: var(--s-4);
+  max-width: 44ch;
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+}
+.note strong { color: var(--ink); font-weight: 650; }
+
+/* --------------------------------------------------------- make it yours */
+
+/* Pick a robot, name it, and the install line carries both. With choice.js
+   the cards are a slider: the picked robot is the card in front, the robots
+   on either side sit behind it and fade toward the edges, and the name field
+   sits at the bottom of the card in front. Without choice.js the cards are a
+   row that scrolls sideways, the radios stay disabled and the .js-only parts
+   stay hidden. */
+.make {
+  padding-top: var(--section);
+  scroll-margin-top: 16px;
+}
+.make > h2 { text-align: center; }
+.pick-intro {
+  max-width: 40rem;
+  margin: 0 auto;
+  font-size: var(--t-lead);
+  text-align: center;
+}
+.js-only[hidden] { display: none; }
+
+.pick-robots {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/* the cards: the robot above its story */
+.robots {
+  display: flex;
+  gap: 16px;
+  margin: var(--s-6) 0 0;
+  padding: 4px 2px var(--s-5);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+}
+.robots > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 min(300px, 80%);
+  overflow: hidden;
+  scroll-snap-align: center;
+  border-radius: 14px;
+  background: var(--card-bg);
+  box-shadow: 0 0 0 1px var(--rule), 0 18px 36px -28px rgb(42 28 16 / .55);
+  isolation: isolate;
+}
+/* the card's grain, over its colour and under everything on it */
+.robots > li::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--card-paper);
+  opacity: var(--card-paper-opacity);
+}
+.robots > li > input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.robot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+.robot-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: 50% 30%;
+  background: #a08a6c;
+}
+/* HAL and R2-D2 are 9:16 files: keep the eye and the dome in the frame */
+.robot[data-robot="hal-9000"] img { object-position: 50% 32%; }
+.robot[data-robot="r2-d2"] img { object-position: 50% 78%; }
+/* Closer means related: the name sits tight on its line (4px), the story is a
+   step off that (12px) and the quote a step further (16px). */
+.robot-text,
+.robot-about {
+  display: flex;
+  flex-direction: column;
+}
+.robot-text { gap: var(--s-1); padding: var(--s-4) var(--s-4) var(--s-4); }
+.robot-name {
+  font-family: var(--serif);
+  font-size: var(--t-title);
+  line-height: 1.15;
+}
+.robot-ref { color: var(--ink-soft); font-size: var(--t-small); }
+.robot-ref cite { font-style: italic; }
+.robot-story { margin-top: var(--s-3); font-size: var(--t-small); line-height: 1.45; }
+.robot-line {
+  font-family: var(--serif);
+  margin-top: var(--s-4);
+  font-size: var(--t-body);
+  line-height: 1.35;
+  quotes: "\201C" "\201D";
+}
+.robot-gloss {
+  margin-top: var(--s-1);
+  font-size: var(--t-small);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* name your new friend: the bottom of every card. The card in front holds the
+   real field; the others hold a copy of it (choice.js), with that robot's
+   name, which only a click on the card brings to life. */
+.pick-name {
+  padding: var(--s-4);
+  border-top: 1px dashed var(--rule);
+}
+.pick-name label {
+  display: block;
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.3;
+}
+.pick-row { display: flex; align-items: center; gap: var(--s-3); margin-top: var(--s-3); }
+
+/* The field is a self-adhesive label stuck on the card: white, soft corners,
+   a little sheen, and a shadow that deepens under its lifted right corner. */
+.sticker {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sticker::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  z-index: -1;
+  width: 45%;
+  height: 50%;
+  box-shadow: 4px 7px 9px var(--lift);
+  transform: rotate(3deg);
+}
+.pick-row input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: .5em .85em;
+  border: 0;
+  border-radius: 7px;
+  background: linear-gradient(170deg, #fff 0%, var(--label) 45%, var(--label-shade) 100%);
+  color: var(--label-ink);
+  font-family: var(--mono);
+  font-size: 1rem;
+  box-shadow:
+    0 0 0 1px var(--label-edge),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 1px 1px rgb(22 34 50 / .1),
+    0 3px 8px -3px var(--lift);
+}
+.pick-row input::placeholder { color: var(--label-ink); opacity: .45; }
+.pick-row input:focus-visible {
+  outline: none; /* no ring: the label's edge darkens and the caret blinks */
+  box-shadow:
+    0 0 0 1.5px var(--label-ink),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 1px 1px rgb(22 34 50 / .1),
+    0 3px 8px -3px var(--lift);
+}
+.pick-row input[aria-invalid="true"] {
+  box-shadow:
+    0 0 0 1.5px var(--bad),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 3px 8px -3px var(--lift);
+}
+
+/* Suggest is drawn on the card in pencil: a loop that overshoots where it
+   started, a second pass along the bottom, the word in a hand. Under the
+   pointer it turns to blue ballpoint, and nothing moves or fills in. */
+.pick-suggest {
+  position: relative;
+  flex: none;
+  min-width: 112px;
+  min-height: 48px;
+  padding: 0 20px 2px;
+  border: 0;
+  background: none;
+  color: var(--pencil);
+  font-family: var(--hand);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transform: rotate(-1.5deg);
+  transition: color .15s ease-out;
+}
+.pick-suggest .pen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.pick-suggest .pen path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.pick-suggest .pen path + path { stroke-width: 1.5; opacity: .7; }
+.pick-suggest:hover { color: var(--pen); }
+.pick-suggest:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 14px; }
+/* The message takes the hint's place while there is one. An empty message
+   stays rendered (with no height) so screen readers still hear it change. */
+.pick-msg {
+  margin-top: var(--s-2);
+  font-size: var(--t-small);
+  font-weight: 560;
+  color: var(--bad);
+}
+.pick-msg:empty { margin: 0; }
+.pick-msg:not(:empty) + .pick-hint { display: none; }
+.pick-hint {
+  margin-top: var(--s-2);
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+}
+
+/* live: the slider. choice.js sets data-pos on each card, from -2 to 2 with
+   0 in front. All eight share one grid cell, so the tallest sets the height
+   and nothing below jumps when the pick changes; the card in front fills the
+   cell and the others keep their own height. The stage runs the full width
+   of the window while the cards stay in the page column, so the side cards
+   are clipped by the window's edge, never the column's; 100cqw is the
+   column. */
+.pick.is-live { container-type: inline-size; }
+.pick.is-live .stage {
+  --spread: 66%; /* how far a side card sits from the middle */
+  --front: min(340px, 74%); /* the width of the card in front */
+  position: relative;
+  margin: var(--s-6) calc(50% - 50vw) 0;
+  padding: 8px calc(50vw - 50%) 28px;
+  overflow-x: clip; /* not hidden: focus must never scroll the stage */
+}
+.pick.is-live .robots {
+  display: grid;
+  justify-items: center;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  touch-action: pan-y;
+}
+@media (min-width: 640px) {
+  .pick.is-live .stage { --spread: 80%; }
+}
+.pick.is-live .robots > li {
+  --at: 0;
+  --scale: 1;
+  grid-area: 1 / 1;
+  align-self: center;
+  width: var(--front);
+  z-index: 3;
+  transform: translateX(calc(var(--at) * var(--spread))) scale(var(--scale));
+  box-shadow: 0 0 0 1px var(--rule), 0 34px 60px -30px rgb(42 28 16 / .75);
+}
+.pick.is-live .robots > li[data-pos="0"] { align-self: stretch; }
+.pick.is-live.is-ready .robots > li {
+  transition: transform .5s cubic-bezier(.2, .75, .25, 1), opacity .4s ease-out;
+}
+.pick.is-live .robots > li[data-pos="-1"],
+.pick.is-live .robots > li[data-pos="1"] {
+  --scale: .84;
+  z-index: 2;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+.pick.is-live .robots > li[data-pos="-1"] { --at: -1; }
+.pick.is-live .robots > li[data-pos="1"] { --at: 1; }
+.pick.is-live .robots > li[data-pos="-2"],
+.pick.is-live .robots > li[data-pos="2"] {
+  --scale: .7;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+.pick.is-live .robots > li[data-pos="-2"] { --at: -2; }
+.pick.is-live .robots > li[data-pos="2"] { --at: 2; }
+.pick.is-live .robot { cursor: pointer; user-select: none; }
+
+/* previous and next: big rounded chevrons, half see-through, over the side
+   cards; level with the middle of the picture on a phone, of the card on a
+   wide screen */
+.stage-nav {
+  position: absolute;
+  top: calc(8px + min(170px, 37vw - 12px));
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 96px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--chevron);
+  opacity: .4;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity .2s;
+}
+.stage-nav svg {
+  width: 36px;
+  height: 72px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.stage-nav:hover { opacity: .75; }
+.stage-nav:focus-visible { opacity: .75; outline: 3px solid var(--focus); outline-offset: 0; }
+.stage-prev { left: calc(50% - 50cqw); }
+.stage-next { right: calc(50% - 50cqw); }
+@media (min-width: 900px) {
+  .stage-nav { top: calc(50% - 10px); } /* the stage pads 8px above, 28px below */
+  /* beside the side cards when the window has room, at its edge when not */
+  .stage-prev { left: max(0px, 50% - var(--reach) - 64px); }
+  .stage-next { right: max(0px, 50% - var(--reach) - 64px); }
+}
+
+/* A wide screen turns each card on its side: the robot on the left, its
+   story on the right and, on the card in front, the name field under the
+   story. Every card stretches to the shared cell, so all eight are the same
+   size whatever their text. The label spans the card through a subgrid, so
+   the name field (the li's own child, outside the label) can take the empty
+   cell under the story. */
+@media (min-width: 900px) {
+  /* The side cards (scaled to .84, so .42 of the front's width either side
+     of their middle) end 64px inside the window, room for the arrows; they
+     tuck behind the card in front as the window narrows, from .62 of its
+     width down to .3, and only then run off the edge. */
+  .pick.is-live .stage {
+    --front: min(760px, 66cqw);
+    --spread: clamp(.3 * var(--front), 50vw - 64px - .42 * var(--front), .62 * var(--front));
+    --reach: calc(var(--spread) + .42 * var(--front)); /* the middle to a side card's outer edge */
+  }
+  .pick.is-live .robots > li {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    grid-template-rows: 1fr auto;
+    align-self: stretch;
+    /* 400px whenever the text fits, which it does from about 1200px wide;
+       on a narrower window, or in OpenDyslexic, all eight grow together
+       rather than cut the name field off */
+    min-height: 400px;
+  }
+  .pick.is-live .robot {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+  }
+  .pick.is-live .robot-art {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+  .pick.is-live .robot-art img {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  .pick.is-live .robot-text { grid-column: 2; grid-row: 1; padding: var(--s-5) var(--s-5) var(--s-3); }
+  .pick.is-live .pick-name { grid-column: 2; grid-row: 2; padding: var(--s-3) var(--s-5) var(--s-4); }
+}
+
+/* the install line, under the slider */
+.make-go {
+  max-width: 46rem;
+  margin: var(--s-5) auto 0;
+  text-align: center;
+}
+.install-label {
+  font-family: var(--serif);
+  font-size: var(--t-lead);
+  line-height: 1.3;
+}
+.install-when {
+  display: inline-block;
+  margin-left: .4em;
+  padding: .1em .55em;
+  border-radius: 99px;
+  background: var(--code-bg);
+  font-family: var(--sans);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: .02em;
+  vertical-align: .2em;
+}
+/* The command stays on one line: the terminal is as wide as the command
+   (it grows as a name is typed), centred on the column even when wider than
+   it, and scrolls sideways only when the window is narrower than the line. */
+.install .install-term {
+  position: relative;
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  margin-top: var(--s-3); /* beats .term's margin: 0 */
+  overflow-x: auto;
+  white-space: pre;
+  overflow-wrap: normal;
+  text-align: left;
+}
+.make-go .actions { justify-content: center; }
+.make-go .note { margin-inline: auto; }
+
+/* ------------------------------------------------------------ the sections */
+
+/* Every section opens the same way: the h2, a lead paragraph under it, and
+   the content, all on the left edge of the page column. */
+.section-intro {
+  margin-bottom: clamp(var(--s-6), 4vw, var(--s-7));
+}
+.section-intro h2,
+.make > h2,
+.comes h2,
+.never h2,
+.status h2 {
+  font-size: var(--t-h2);
+  line-height: 1.1;
+  letter-spacing: -.012em;
+  margin-bottom: var(--s-4);
+}
+.section-intro p,
+.never > p,
+.status > p:not(.actions),
+.comes-text p,
+.pick-intro { font-size: var(--t-lead); line-height: 1.5; }
+/* Where a line breaks is the writer's call: <br class="lb"> in the intros.
+   On a narrow screen the breaks go and the text wraps by itself. */
+@media (max-width: 719px) { br.lb { display: none; } }
+
+.more { margin-top: 1em; font-weight: 560; }
+
+.helps,
+.usual,
+.compare,
+.status,
+.never,
+.comes,
+.maker {
+  padding-top: var(--section);
+}
+
+/* it comes to you */
+.comes {
+  display: grid;
+  gap: var(--s-6);
+  scroll-margin-top: 16px;
+}
+.comes-text p { max-width: 34em; }
+.comes-text p + p { margin-top: var(--s-3); }
+.also { color: var(--ink-soft); }
+.also[hidden] { display: none; }
+@media (min-width: 900px) {
+  .comes {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+}
+
+/* Who is talking in the terminal: data-voice, set by choice.js. Neatpik
+   without the script. */
+[data-voice] [data-p] { display: none; }
+[data-voice="neatpik"] [data-p="neatpik"],
+[data-voice="rosie"] [data-p="rosie"],
+[data-voice="wall-e"] [data-p="wall-e"],
+[data-voice="marvin"] [data-p="marvin"],
+[data-voice="r2-d2"] [data-p="r2-d2"],
+[data-voice="johnny-5"] [data-p="johnny-5"],
+[data-voice="hal-9000"] [data-p="hal-9000"],
+[data-voice="miss-minute"] [data-p="miss-minute"] { display: inline; }
+
+/* Behind homebot: the maker. The same shape on every project; the note and
+   the kicker change. */
+.maker-kicker {
+  margin-bottom: var(--s-4);
+  font-family: var(--sans);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.maker-card {
+  display: grid;
+  gap: var(--s-5);
+  padding: clamp(var(--s-5), 4vw, var(--s-7));
+  border-radius: 14px;
+  background: var(--card-bg);
+  box-shadow: 0 0 0 1px var(--rule), 0 26px 52px -34px rgb(42 28 16 / .6);
+}
+.maker-who {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.maker-photo img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #a08a6c;
+}
+.maker-name {
+  font-family: var(--serif);
+  font-size: var(--t-title);
+  line-height: 1.15;
+}
+.maker-role { color: var(--ink-soft); font-size: var(--t-small); }
+/* The note, in the maker's own words, line breaks as written; its last line
+   is in the headings' serif, half again as big. */
+.maker-note {
+  padding-left: clamp(14px, 2vw, 22px);
+  border-left: 4px solid var(--mint);
+  line-height: 1.7;
+}
+.maker-note p + p { margin-top: var(--s-4); }
+.maker-end {
+  font-family: var(--serif);
+  font-size: 1.2em;
+  line-height: 1.2;
+}
+.maker-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.maker-site { font-weight: 620; }
+/* the two networks are their own marks, in the text colour, inside the same
+   outlined button they were as words; 44px square so a thumb finds it */
+.maker-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+  color: var(--ink);
+}
+.maker-icon svg { width: 24px; height: 24px; }
+.maker-icon:hover { background: var(--code-bg); }
+@media (min-width: 900px) {
+  .maker-card {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 15fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "who note" "links note";
+    column-gap: clamp(var(--s-7), 5vw, 4.5rem);
+    row-gap: var(--s-6);
+    align-items: start;
+  }
+  .maker-who { grid-area: who; flex-direction: column; align-items: flex-start; }
+  .maker-note { grid-area: note; }
+  .maker-links { grid-area: links; flex-wrap: nowrap; gap: var(--s-2); }
+  .maker-photo img { width: 96px; height: 96px; }
+}
+
+/* cards: the six helps and the three usual features */
+.cards {
+  display: grid;
+  gap: var(--s-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 640px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1040px) {
+  .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.help,
+.usual-item {
+  padding: var(--s-5);
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.help h3,
+.usual-item h3 {
+  font-size: var(--t-title);
+  line-height: 1.15;
+  margin-bottom: var(--s-3);
+}
+/* a subtitle belongs to its title: it pulls back up to 4px */
+.help-was {
+  margin: calc(-1 * var(--s-2)) 0 var(--s-3);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+.usual-item p + p { margin-top: var(--s-2); }
+
+/* what the helper never does */
+/* The one section turned inside out: light on the terminal's dark, a panel
+   of its own, because it is the list of what the helper will not do. */
+.never {
+  width: 100%;
+  margin-top: var(--section);
+  /* the panel runs edge to edge; its text keeps the page column's left edge */
+  padding: clamp(var(--s-6), 5vw, var(--s-8)) max(var(--gutter), calc(50% - var(--page) / 2));
+  border-radius: 0;
+  background: var(--term-bg);
+  color: var(--term-bright);
+}
+/* its text is a narrower column in the middle of the page, as the section
+   was before it became a panel; the same 8px and 16px steps in from its
+   heading as everywhere else, as padding so the centring stays */
+.never > * { width: min(100%, 46rem); margin-inline: auto; }
+.never > p { padding-left: var(--s-2); }
+.never ul {
+  display: grid;
+  gap: var(--s-3);
+  margin-block: var(--s-5) 0;
+  padding: 0 0 0 var(--s-4);
+  list-style: none;
+}
+.never li {
+  position: relative;
+  padding-left: 1.8em;
+}
+.never li::before {
+  content: "";
+  position: absolute;
+  left: .15em;
+  top: .62em;
+  width: .95em;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--term-urgent);
+  box-shadow: 0 0 0 .5px rgb(42 32 23 / .2);
+}
+
+/* The text of a section sits a step in from its heading: 8px for paragraphs,
+   16px for lists. Left out on purpose: the centred paragraphs (the pick
+   intro, the pitch, the install line), and a paragraph that is only a link
+   or a button. */
+.section-intro p,
+.status > p:not(.actions),
+.comes-text p:not(.more),
+.compare-more { margin-left: var(--s-2); }
+
+/* the comparison: seven tools, so a phone scrolls it sideways while the
+   row names stay put */
+.compare-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--rule); /* a border, not an inset shadow: the row names would paint over that */
+  border-radius: 12px;
+  background: var(--card-bg);
+}
+.compare-scroll:focus-visible { outline-offset: 2px; }
+/* an arrow all over the table, text included; links keep their hand */
+.compare-scroll { cursor: default; }
+.compare-scroll a { cursor: pointer; }
+/* A cell is a word; the reason is in .tip-detail. For a screen reader it is
+   plain text after the word. With a mouse (and room) it is a label that
+   unrolls above the cell on hover, in the name field's style. A phone gets
+   neither the label nor any mark on the word. */
+.compare td { position: relative; }
+.compare .tip-detail {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (hover: hover) and (min-width: 900px) {
+  .compare .tip {
+    text-decoration: underline dotted;
+    text-underline-offset: .25em;
+    text-decoration-color: var(--ink-soft);
+  }
+  .compare td:hover .tip-detail {
+    /* beside the word: an absolute box with no left or right sits where it
+       would have been inline, right after the word */
+    top: 50%;
+    translate: 0 -50%;
+    margin-left: .75em;
+    z-index: 3;
+    width: max-content;
+    max-width: 15rem;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    padding: .55em .8em;
+    border-radius: 7px;
+    background: linear-gradient(170deg, #fff 0%, var(--label) 45%, var(--label-shade) 100%);
+    color: var(--label-ink);
+    font-size: var(--t-small);
+    font-weight: 400;
+    line-height: 1.35;
+    box-shadow:
+      0 0 0 1px var(--label-edge),
+      inset 0 1px 0 rgb(255 255 255 / .9),
+      0 1px 1px rgb(22 34 50 / .1),
+      4px 8px 10px -4px var(--lift);
+    animation: unroll .26s cubic-bezier(.2, .8, .3, 1);
+  }
+  /* the last two columns have no room to their right: the label opens to the
+     left of the cell, unrolling from its right edge */
+  .compare td:nth-last-child(-n + 2):hover .tip-detail {
+    right: 100%;
+    left: auto;
+    margin: 0 .5em 0 0;
+    animation-name: unroll-left;
+  }
+  .compare td:hover .tip-detail .visually-hidden { display: none; }
+}
+@keyframes unroll {
+  from { clip-path: inset(0 100% 0 0 round 7px); }
+  to { clip-path: inset(0 0 0 0 round 7px); }
+}
+@keyframes unroll-left {
+  from { clip-path: inset(0 0 0 100% round 7px); }
+  to { clip-path: inset(0 0 0 0 round 7px); }
+}
+.compare table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: var(--t-small);
+}
+.compare th,
+.compare td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+.compare tbody:last-child tr:last-child th,
+.compare tbody:last-child tr:last-child td { border-bottom: 0; }
+.compare thead th {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: var(--t-body);
+}
+.compare tbody th,
+.compare thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--card-bg);
+  box-shadow: inset -1px 0 0 var(--rule);
+}
+.compare tbody th { width: 17%; font-weight: 560; }
+.compare td code { white-space: normal; }
+.compare .yes { font-weight: 700; color: var(--link-line); }
+.compare .no-home { color: var(--ink-soft); }
+.compare .group th {
+  position: static;
+  width: auto;
+  box-shadow: none;
+  padding-top: 20px;
+  font-family: var(--sans);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.compare .group th > span { position: sticky; left: 14px; }
+@media (max-width: 640px) {
+  .compare table { min-width: 640px; }
+  .compare tbody th { width: 118px; }
+}
+.compare-more { margin-top: var(--s-4); font-size: var(--t-small); color: var(--ink-soft); }
+
+/* where it stands */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------- terminals */
+
+.hb-icon {
+  display: inline-block;
+  min-width: 1.25em;
+  height: 1.25em;
+  line-height: 1.25;
+  text-align: center;
+  vertical-align: -.22em;
+  background: var(--bot-icon-image) center / contain no-repeat;
+}
+/* Parked: no element on the landing page uses .hb-icon now (the demo shows each
+   persona's own emoji). Kept as the hook for per-robot icon images. */
+.hb-icon::before { content: var(--bot-icon); }
+
+.term {
+  margin: 0;
+  padding: 18px 20px 20px;
+  border-radius: 10px;
+  background: var(--term-bg);
+  color: var(--term-ink);
+  box-shadow: 0 0 0 1px var(--term-edge), 0 20px 40px -26px rgb(10 14 18 / .7);
+  font-family: var(--mono);
+  font-size: clamp(.75rem, .7rem + .2vw, .84rem);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
+}
+.term code {
+  font: inherit;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  white-space: inherit;
+}
+.t-in { color: var(--term-bright); font-weight: 600; }
+.t-ps { color: var(--term-dim); font-weight: 400; margin-right: .1em; }
+.t-dim { color: var(--term-dim); }
+.t-urg { color: var(--term-urgent); font-weight: 700; }
+.t-fix { color: var(--term-fix); }
+.t-path { color: var(--term-path); }
+.t-step { color: var(--term-step); }
+.t-warn { color: var(--term-warn); }
+
+
+/* ------------------------------------------------------------------ footer */
+
+.footer {
+  margin-top: var(--section);
+  padding-block: var(--s-6) var(--s-7);
+  border-top: 1px solid var(--rule);
+}
+.footer-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+.footer-status strong { font-weight: 650; }
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 560;
+}
+.footer-small {
+  margin-top: var(--s-5);
+  max-width: 62ch;
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+}
+
+/* --------------------------------------------------------------- not found */
+
+.lost {
+  padding-block: clamp(32px, 6vw, 80px) clamp(64px, 10vw, 128px);
+  display: grid;
+  gap: 32px;
+  align-items: start;
+}
+.lost h1 {
+  font-size: clamp(2.4rem, 1.6rem + 3.4vw, 4.2rem);
+  line-height: 1.04;
+  letter-spacing: -.015em;
+  max-width: 14ch;
+}
+.lost-text p { font-size: 1.15rem; max-width: 34ch; margin-top: .6em; }
+.lost .term { max-width: 40rem; }
+.lost .term a {
+  color: var(--term-fix);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+}
+@media (min-width: 900px) {
+  .lost { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: center; }
+}
+
+/* ------------------------------------------------------------ preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .pick.is-live .robots > li[data-pos="0"] { outline: 3px solid CanvasText; }
+  .hero-text { color: CanvasText; }
+  .font-toggle-switch { forced-color-adjust: none; border-color: ButtonText; }
+  .font-toggle-switch::after { background: ButtonText; }
+  .font-toggle[aria-checked="true"] .font-toggle-switch { border-color: Highlight; background: Highlight; }
+  .font-toggle[aria-checked="true"] .font-toggle-switch::after { background: HighlightText; }
+}
+
+@media print {
+  body::before, body::after { display: none; }
+  body { background: #fff; }
+}

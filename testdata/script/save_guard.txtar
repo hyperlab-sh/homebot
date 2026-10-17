@@ -1,0 +1,151 @@
+[!linux] skip 'uses the linux layer'
+
+# homebot save through the real guard: the shim installed by installguard,
+# a real git commit, a stub gitleaks. Each refusal the guard prints is read
+# by save, worded as "Commit refused: ...", recorded as state.blocked, and
+# leaves HEAD where it was. A save that goes through clears blocked.
+chmod 755 bin/gitleaks
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+installguard
+exec git -C home/.home rev-parse HEAD
+cp stdout head-init
+
+# A plaintext file force-added past private/.gitignore: the guard refuses
+# the commit, save says so in its own words and records the reason.
+exec sh -c 'echo changed >> home/.home/autolink/common/zshrc'
+mkdir home/.home/private/common
+exec cp secret-file home/.home/private/common/token
+exec git -C home/.home add -f private/common/token
+# exit: 1
+! exec homebot save
+! stdout .
+cmpwork stderr plaintext.stderr
+exec git -C home/.home rev-parse HEAD
+cmp stdout head-init
+grep '^    "reason": "Commit refused: private/common/token is plaintext\. Only \*\.age files may be committed from private/\. Unstage it:\\n  git rm --cached private/common/token",$' xdg/state/homebot/state.json
+
+# Without the plaintext file the next save commits and clears blocked.
+rm home/.home/private/common/token
+# exit: 0
+exec homebot save
+cmp stdout committed.stdout
+! stderr .
+exec git -C home/.home rev-list --count HEAD
+stdout '^2$'
+exec git -C home/.home show --name-only --format= HEAD
+cmp stdout committed.files
+! grep blocked xdg/state/homebot/state.json
+exec git -C home/.home rev-parse HEAD
+cp stdout head-2
+
+# A plaintext file reached through a nested .gitignore with !*: save adds it
+# with the rest of private/. The .gitignore is refused too (only private/'s
+# own is allowed), and it comes first, so it is the reason; the plaintext
+# file is the detail. Both name the nested .gitignore as what lets them
+# through.
+exec sh -c 'echo again >> home/.home/autolink/common/zshrc'
+exec cp nested-gitignore home/.home/private/common/.gitignore
+exec cp secret-file home/.home/private/common/token
+# exit: 1
+! exec homebot save
+cmpwork stderr nested.stderr
+exec git -C home/.home rev-parse HEAD
+cmp stdout head-2
+grep '^    "reason": "Commit refused: private/common/\.gitignore is plaintext, and private/common/\.gitignore does not ignore it, so every save stages it again\. Only \*\.age files may be committed from private/: edit private/common/\.gitignore so it ignores the file, then unstage it:\\n  git rm --cached private/common/\.gitignore",$' xdg/state/homebot/state.json
+rm home/.home/private/common/token
+rm home/.home/private/common/.gitignore
+# exit: 0
+exec homebot save
+cmp stdout committed.stdout
+! grep blocked xdg/state/homebot/state.json
+exec git -C home/.home rev-parse HEAD
+cp stdout head-3
+
+# A gitleaks finding: the stub exits 99 with a finding, and the Finding and
+# File lines come through to the error and to blocked.reason.
+cp gitleaks-leak bin/gitleaks
+chmod 755 bin/gitleaks
+exec sh -c 'echo token >> home/.home/autolink/common/zshrc'
+# exit: 1
+! exec homebot save
+cmpwork stderr leak.stderr
+exec git -C home/.home rev-parse HEAD
+cmp stdout head-3
+grep '^    "reason": "Commit refused: gitleaks found something that looks like a secret\. Move it to private/ \(homebot pack --private <path>\) or unstage it\.\\n  Finding:     token = REDACTED\\n  File:        autolink/common/zshrc",$' xdg/state/homebot/state.json
+cp gitleaks-clean bin/gitleaks
+chmod 755 bin/gitleaks
+# exit: 0
+exec homebot save
+cmp stdout committed.stdout
+! grep blocked xdg/state/homebot/state.json
+exec git -C home/.home rev-parse HEAD
+cp stdout head-4
+
+# A file one byte over the limit: its size is 1.00 MB to one decimal, so the
+# message says 1.01 MB rather than "1.0 MB (limit 1 MB)".
+exec sh -c 'head -c 1048577 /dev/zero > home/.home/autolink/common/big.bin'
+# exit: 1
+! exec homebot save
+cmpwork stderr toobig.stderr
+exec git -C home/.home rev-parse HEAD
+cmp stdout head-4
+grep '^    "reason": "Commit refused: autolink/common/big\.bin is 1\.01 MB \(limit 1 MB\)\. Unstage it and add it to \.gitignore\.",$' xdg/state/homebot/state.json
+exec sh -c 'head -c 1048576 /dev/zero > home/.home/autolink/common/big.bin'
+# exit: 0
+exec homebot save
+cmp stdout committed.stdout
+! grep blocked xdg/state/homebot/state.json
+exec git -C home/.home rev-list --count HEAD
+stdout '^5$'
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- gitleaks-clean --
+#!/bin/sh
+exit 0
+-- gitleaks-leak --
+#!/bin/sh
+printf 'Finding:     token = REDACTED\nFile:        autolink/common/zshrc\n'
+exit 99
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+limits:
+  maxFileMB: 1
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.home/autolink/common/big.bin --
+small
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- nested-gitignore --
+!*
+-- secret-file --
+password=1
+-- committed.stdout --
+committed 1 file
+-- committed.files --
+autolink/common/zshrc
+-- plaintext.stderr --
+homebot: Commit refused: private/common/token is plaintext. Only *.age files may be committed from private/. Unstage it:
+  git rm --cached private/common/token
+-- nested.stderr --
+homebot: Commit refused: private/common/.gitignore is plaintext, and private/common/.gitignore does not ignore it, so every save stages it again. Only *.age files may be committed from private/: edit private/common/.gitignore so it ignores the file, then unstage it:
+  git rm --cached private/common/.gitignore
+  - private/common/token is plaintext, and private/common/.gitignore does not ignore it, so every save stages it again. Only *.age files may be committed from private/: edit private/common/.gitignore so it ignores the file, then unstage it:
+    git rm --cached private/common/token
+-- leak.stderr --
+homebot: Commit refused: gitleaks found something that looks like a secret. Move it to private/ (homebot pack --private <path>) or unstage it.
+  Finding:     token = REDACTED
+  File:        autolink/common/zshrc
+-- toobig.stderr --
+homebot: Commit refused: autolink/common/big.bin is 1.01 MB (limit 1 MB). Unstage it and add it to .gitignore.

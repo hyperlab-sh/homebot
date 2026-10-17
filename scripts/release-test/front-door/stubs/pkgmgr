@@ -1,0 +1,20 @@
+#!/bin/bash
+# Stub apt-get, dpkg, dnf, rpm, pacman and apk, told apart by the name they are
+# called by. "Build tools installed" is the file $STUB_STATE/tools; installing a
+# package named git puts the git stub on PATH.
+name=$(basename "$0")
+echo "$name $*" >>"${STUB_LOG:?}"
+state=${STUB_STATE:?}
+case "$name:${1:-}" in
+  dpkg:-s | rpm:-q | pacman:-Q | apk:info)
+    if [ -e "$state/tools" ]; then exit 0; fi
+    exit 1
+    ;;
+esac
+for a in "$@"; do
+  case $a in
+    build-essential | build-base | base-devel | development-tools | "Development Tools") : >"$state/tools" ;;
+    git) cp "${STUB_FIXTURES:?}/stubs/git" "$(dirname "$0")/git" ;;
+  esac
+done
+exit 0

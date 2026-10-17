@@ -1,0 +1,29 @@
+[!linux] skip 'recorded on linux'
+
+# --dry-run on a fresh layout lists the changes and touches nothing.
+# exit: 0
+exec homebot link --dry-run
+cmpwork stdout link-dry-run-fresh.stdout
+cmpwork stderr link-dry-run-fresh.stderr
+! exists home/.zshrc
+! exists home/.gitconfig
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.home/autolink/common/gitconfig --
+[user]
+-- home/.home/autolink/common/ssh-things/config --
+Host *
+-- home/.home/autolink/linux/profile --
+export P=1
+-- home/.home/autolink/macos/zprofile --
+export Z=1
+-- link-dry-run-fresh.stdout --
+  link    ~/.gitconfig
+  link    ~/.profile
+  link    ~/.ssh-things
+  link    ~/.zshrc
+0 already linked
+-- link-dry-run-fresh.stderr --

@@ -1,0 +1,15 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: triage.watch pattern
+# exit: 1
+! exec homebot
+cmpwork stdout config-bad-watch.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-bad-watch.stderr
+-- home/.home/homebot.yml --
+triage:
+  watch:
+    - ~/.config
+-- config-bad-watch.stdout --
+-- config-bad-watch.stderr --
+homebot: $WORK/home/.home/homebot.yml:3:7: triage.watch entries end in /* or /.* (got "~/.config")

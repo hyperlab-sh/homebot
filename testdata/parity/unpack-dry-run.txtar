@@ -1,0 +1,120 @@
+[!linux] skip 'recorded on linux'
+
+# Dry run: the steps are listed, none runs. Includes, on:, name:, variables and scalar arguments.
+# exit: 0
+exec homebot unpack --dry-run
+cmpwork stdout unpack-dry.stdout
+cmpwork stderr unpack-dry.stderr
+# exit: 0
+exec homebot unpack base --dry-run
+cmpwork stdout unpack-base.stdout
+# exit: 0
+exec homebot unpack workstation --dry-run --from 3
+cmpwork stdout unpack-from.stdout
+# exit: 1
+! exec homebot unpack --from 99 --dry-run
+cmpwork stderr unpack-from-range.stderr
+# exit: 1
+! exec homebot unpack --from x
+cmpwork stderr unpack-from-nan.stderr
+# exit: 1
+! exec homebot unpack missing --dry-run
+cmpwork stderr unpack-missing.stderr
+# exit: 1
+! exec homebot unpack old --dry-run
+cmpwork stderr unpack-old-yaml.stderr
+# exit: 1
+! exec homebot unpack loop-a --dry-run
+cmpwork stderr unpack-loop.stderr
+# exit: 1
+! exec homebot unpack bad-var --dry-run
+cmpwork stderr unpack-bad-var.stderr
+# exit: 1
+! exec homebot unpack bad-step --dry-run
+cmpwork stderr unpack-bad-step.stderr
+# exit: 0
+exec homebot
+cmpwork stdout inbox-never-unpacked.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/base.yml --
+description: Everything
+steps:
+  - brew: "{os}/Brewfile"
+  - run: echo base
+-- home/.home/manifests/profiles/workstation.yml --
+include: [base]
+steps:
+  - fonts: [JetBrainsMono, FiraCode]
+  - apt: linux/apt.txt
+    on: linux
+  - brew: macos/Brewfile
+    on: macos
+  - flatpak: 1.10
+    name: A named step
+  - run: echo {host}-{os}
+  - unlock
+-- home/.home/manifests/profiles/old.yaml --
+steps: []
+-- home/.home/manifests/profiles/loop-a.yml --
+include: [loop-b]
+-- home/.home/manifests/profiles/loop-b.yml --
+include: [loop-a]
+-- home/.home/manifests/profiles/bad-var.yml --
+steps:
+  - run: echo {nonsense}
+-- home/.home/manifests/profiles/bad-step.yml --
+steps:
+  - Not_An_Action: x
+-- unpack-dry.stdout --
+Would unpack workstation on testhost (linux): 7 steps
+[1/7] brew linux/Brewfile
+[2/7] run echo base
+[3/7] fonts JetBrainsMono, FiraCode
+[4/7] apt linux/apt.txt
+[5/7] A named step
+[6/7] run echo testhost-linux
+[7/7] unlock
+-- unpack-dry.stderr --
+-- unpack-base.stdout --
+Would unpack base on testhost (linux): 2 steps
+[1/2] brew linux/Brewfile
+[2/2] run echo base
+-- unpack-from.stdout --
+Would unpack workstation on testhost (linux): 7 steps
+[1/7] brew linux/Brewfile  (skipped)
+[2/7] run echo base  (skipped)
+[3/7] fonts JetBrainsMono, FiraCode
+[4/7] apt linux/apt.txt
+[5/7] A named step
+[6/7] run echo testhost-linux
+[7/7] unlock
+-- unpack-from-range.stderr --
+homebot: --from must be between 1 and 7
+-- unpack-from-nan.stderr --
+homebot: --from takes a step number
+-- unpack-missing.stderr --
+homebot: No profile named "missing" in $WORK/home/.home/manifests/profiles. Available: bad-step, bad-var, base, loop-a, loop-b, workstation
+-- unpack-old-yaml.stderr --
+homebot: Profiles end in .yml now: rename $WORK/home/.home/manifests/profiles/old.yaml to old.yml
+-- unpack-loop.stderr --
+homebot: Profiles include each other in a loop: loop-a -> loop-b -> loop-a
+-- unpack-bad-var.stderr --
+homebot: $WORK/home/.home/manifests/profiles/bad-var.yml step 1: unknown variable {nonsense} (available: {os}, {host}, {arch})
+-- unpack-bad-step.stderr --
+homebot: $WORK/home/.home/manifests/profiles/bad-step.yml step 1: "Not_An_Action" is not a valid action name
+-- inbox-never-unpacked.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

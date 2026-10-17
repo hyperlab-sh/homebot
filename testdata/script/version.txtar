@@ -1,0 +1,26 @@
+# version, --version and -v print the bare version, as the TypeScript build
+# did. A test binary has no version stamped into it, so it is dev.
+exec homebot version
+cmp stdout version.golden
+! stderr .
+
+exec homebot --version
+cmp stdout version.golden
+! stderr .
+
+exec homebot -v
+cmp stdout version.golden
+! stderr .
+
+# version takes no arguments.
+! exec homebot version extra
+! stdout .
+stderr '"extra"'
+
+# HOMEBOT_DEBUG shows which build is running.
+env HOMEBOT_DEBUG=1
+exec homebot version
+stderr 'build version=dev'
+
+-- version.golden --
+dev

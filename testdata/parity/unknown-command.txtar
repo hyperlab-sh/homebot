@@ -1,0 +1,11 @@
+
+# exit: 1
+! exec homebot frobnicate
+cmpwork stdout unknown-command.stdout
+cmpwork stderr unknown-command.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- unknown-command.stdout --
+-- unknown-command.stderr --
+homebot: Unknown command "frobnicate". See: homebot --help

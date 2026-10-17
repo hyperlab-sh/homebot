@@ -1,0 +1,15 @@
+[!linux] skip 'recorded on linux'
+
+# exit: 0
+exec homebot export
+cmpwork stdout export-none.stdout
+# exit: 1
+! exec homebot export anything
+cmpwork stderr export-none-named.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- export-none.stdout --
+No exports configured for this OS in homebot.yml.
+-- export-none-named.stderr --
+homebot: No export named anything for this OS. Exports here: none.

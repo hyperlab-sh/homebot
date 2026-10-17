@@ -1,0 +1,15 @@
+[!linux] skip 'recorded on linux'
+
+# exit: 0
+exec homebot cleanup
+cmpwork stdout cleanup-none.stdout
+# exit: 0
+exec homebot cleanup --list
+cmpwork stdout cleanup-none-list.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- cleanup-none.stdout --
+No backups to review.
+-- cleanup-none-list.stdout --
+No backups to review.

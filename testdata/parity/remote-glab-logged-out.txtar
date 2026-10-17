@@ -1,0 +1,22 @@
+[!linux] skip 'recorded on linux'
+
+# glab installed but not logged in: nothing to create with, so only the URL way is explained.
+chmod 755 bin/glab
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-glab-out.stdout
+-- bin/glab --
+#!/bin/sh
+exit 1
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-glab-out.stdout --
+Nothing is backed up yet: the repo has no remote.
+Use a repository you already have:
+  homebot remote <url>

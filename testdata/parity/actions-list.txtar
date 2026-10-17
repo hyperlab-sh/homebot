@@ -1,0 +1,39 @@
+[!linux] skip 'recorded on linux'
+
+# Internal and built-in actions, plus the custom ones in manifests/actions (which may override a built-in).
+# exit: 0
+exec homebot actions
+cmpwork stdout actions.stdout
+cmpwork stderr actions.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/actions/greet.sh --
+#!/bin/bash
+# Say hello.
+echo hello
+-- home/.home/manifests/actions/nosummary.sh --
+#!/bin/bash
+echo no comment above me
+-- home/.home/manifests/actions/brew.sh --
+#!/bin/bash
+# My own brew, overriding the built-in one.
+echo custom brew
+-- home/.home/manifests/actions/link.sh --
+#!/bin/bash
+# Cannot override an internal action.
+echo never
+-- home/.home/manifests/actions/notes.txt --
+not an action
+-- actions.stdout --
+  apt        builtin  Install apt packages listed one per line (# comments allowed).   - apt: linux/apt.txt
+  apt-repos  builtin  Add third-party apt repositories and their signing keys.   - apt-repos: linux/apt-repos
+  brew       custom   My own brew, overriding the built-in one.
+  flatpak    builtin  Install Flatpak apps from Flathub, one app ID per line.   - flatpak: linux/flatpak.txt
+  fonts      builtin  Install font folders from furniture/fonts.   - fonts: [JetBrainsMono, FiraCode]
+  greet      custom   Say hello.
+  link       internal Link autolink/ and private/ into $HOME.   - link   or   - link: [autolink]
+  nosummary  custom   
+  run        internal Run shell commands from manifests/.   - run: ./scripts/thing.sh
+  unlock     internal Decrypt private/ (asks for your passphrase once).   - unlock
+-- actions.stderr --

@@ -1,0 +1,459 @@
+cli.error.args_hint [hint]: See: {homebot}{command_space}{help} {command_space}: string, the command being run followed by a space, or empty for the inbox; {homebot}: string, the command word and space (fixed), {self} ; {help}: string, the help flag (fixed), --help
+cli.error.unknown_command [error]: Unknown command "{name}". See: {name}: string, what the user typed as the command
+cli.error.unknown_action [error]: No action named "{name}". See: {name}: string, the action name given to `homebot action`
+identity.warning.unknown [warning]: Git doesn't know who you are yet, and {bot} commits as you. {bot}: string, the persona's display name; homebot in the neutral voice
+identity.hint.set_once [hint]: Set it once:
+identity.prompt.name [prompt]: Your name:
+identity.prompt.email [prompt]: Your email:
+identity.status.skipped [hint]: Skipped. Set it later:
+identity.error.config_failed [error]: {git_config} {scope} {setting} {value} failed. {scope}: string, --global or '--file <path>'; {setting}: string, user.name or user.email; {value}: string, the value typed, shell-quoted; {git_config}: string, the git config command (fixed), git config
+identity.success.saved [success]: saved {name} <{email}> in {config} {name}: string, the name typed; {email}: string, the email typed; {config}: string, identity.where.global or the fact '~/.config/git/config'
+identity.hint.track [hint]: Track it so every machine gets it:
+git.error.failed [error]: {git} {args} failed. {args}: string, the git arguments, space-joined; {git}: string, the tool that failed (fixed), git
+next.success.nothing [success]: Nothing needs you.
+next.hint.no_fix [hint]: No automatic fix for this one; the detail above says what to change.
+next.hint.run_yourself [hint]: Run this yourself:
+unpack.error.from_nan [error]: {from_flag} takes a step number {from_flag}: string, the unpack start flag (fixed), --from
+unpack.error.no_profile [error]: Which profile? Pass one ({example}) or set {default_key} in {config_file}. {example}: string, an example unpack command (fixed), {self} unpack workstation; {default_key}: string, the default profile key (fixed), profiles.default; {config_file}: string, the config file (fixed), homebot.yml
+unpack.error.from_range [error]: {from_flag} must be between {first_step} and {n} {n}: int, number of steps in the profile; {from_flag}: string, the unpack start flag (fixed), --from; {first_step}: string, the first valid step (fixed), 1
+unpack.status.header_dry_run [status]: Would unpack {profile} on {host} ({os}): {n} steps {profile}: string, a profile name (a file in manifests/profiles/ without .yml); {host}: string, this machine's host name; {os}: string, linux or macos (the internal OS name, printed as is); {n}: int, number of steps
+unpack.status.header [status]: Unpacking {profile} on {host} ({os}): {n} steps {profile}: string, a profile name (a file in manifests/profiles/ without .yml); {host}: string, this machine's host name; {os}: string, linux or macos (the internal OS name, printed as is); {n}: int, number of steps
+unpack.error.step_failed [error]: Step {i} failed: {message} {i}: int, 1-based position of the current item or step; {message}: string, the internal action's error: action.link.error.*, action.unlock.*, action.run.error.exit, secrets.error.*
+unpack.hint.resume [hint]: Fix it, then resume:
+unpack.error.no_action [error]: Step {i}: no action named "{action}". See: {i}: int, 1-based position of the current item or step; {action}: string, an action name (link, unlock, run, or a script in homebot/actions/)
+unpack.error.step_exit [error]: Step {i} ({step}) exited with {code}. {i}: int, 1-based position of the current item or step; {step}: string, a step label: the step's name or '<action> <args, comma-joined>'; {code}: int, a process exit code
+unpack.success.done [success]: Unpacked {profile}. {profile}: string, a profile name (a file in manifests/profiles/ without .yml)
+action.link.error.unknown_tree [error]: {action} unknown tree "{tree}" (use {autolink} or {private}) {tree}: string, the argument given to the link step; {action}: string, the link action prefix (fixed), link:; {autolink}: string, the autolink tree (fixed), autolink; {private}: string, the private tree (fixed), private
+action.link.status.changed [status]: {action} {n} changed {n}: int, a count; {action}: string, the link action prefix (fixed), link:
+action.link.warning.in_way [warning]: , {n} in the way (see: {cmd}) {n}: int, a count; {cmd}: string, the command that shows what is in the way (fixed), {self} link
+action.link.error.layout [error]: {action} the repo breaks {n:a layout rule|# layout rules}:
+  {reasons} {n}: int, a count; {reasons}: string, one layout.* reason per line, each indented two spaces; {action}: string, the link action prefix (fixed), link:
+action.unlock.status.nothing [status]: {action} nothing to decrypt {action}: string, the unlock action prefix (fixed), unlock:
+action.unlock.status.decrypted [status]: {action} {n} decrypted {n}: int, a count; {action}: string, the unlock action prefix (fixed), unlock:
+action.unlock.warning.conflicts [warning]: , {n} conflicts (see: {self}{unlock}) {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {n}: int, a count; {unlock}: string, the unlock subcommand suffix (fixed),  unlock
+action.run.error.exit [error]: {action} "{command}" exited with {code} {command}: string, a command line, printed verbatim; {code}: int, a process exit code; {action}: string, the run action prefix (fixed), run:
+pack.error.no_args [error]: What should be packed? e.g.
+pack.success.packed [success]: packed {from} → {to} {from}: path, the packed path, ~-shortened; {to}: path, where it went, relative to the repo root
+pack.success.sealed_suffix [success]:  (sealed {n}) {n}: int, how many files under it were sealed
+pack.hint.commit [hint]: Commit it with:
+pack.error.outside_home [error]: Only things inside your home folder can be packed (got {path}). {path}: path, the absolute path given
+pack.error.parens [error]: "{name}" is wrapped in {marks}, which the repo uses to mark folders that must not be links, so it can't be tracked. {name}: string, the path segment that is wrapped in (); {marks}: string, the real-folder marker (fixed), ()
+pack.error.top_level [error]: Only dotfiles and {exceptions} can be tracked at the top of your home folder (got {home_prefix}{name}). {exceptions}: string, the names allowed without a dot, comma-joined (today: Library); {name}: string, the top-level name given; {home_prefix}: string, the home-relative path prefix (fixed), ~/
+pack.error.already_in_repo [error]: {repo_path} is already in the repo. Pack the new things inside it instead. {repo_path}: path, a path relative to the repo root (e.g. autolink/common/.zshrc)
+pack.error.plain_parent [error]: {repo_path} is a plain folder, so it can't hold a new folder that must stay real. Rename it to {open}{name}{close} in every layer first. {repo_path}: path, a path relative to the repo root (e.g. autolink/common/.zshrc); {name}: string, that folder's base name; {open}: string, the real-folder marker opening (fixed), (; {close}: string, the real-folder marker closing (fixed), )
+pack.error.unknown_layer [error]: Unknown layer "{layer}" (use {layers}). {layer}: string, the --layer value; {layers}: string, common, linux, macos (comma-joined)
+pack.error.is_repo [error]: {path} is (or contains) the home repo itself. {path}: path, a path, shortened to ~/... when under $HOME
+pack.error.missing [error]: {path} does not exist. {path}: path, a path, shortened to ~/... when under $HOME
+pack.error.managed [error]: {path} is already managed. {path}: path, a path, shortened to ~/... when under $HOME
+pack.error.symlink [error]: {path} is a symlink. Pack the real file it points to instead. {path}: path, a path, shortened to ~/... when under $HOME
+pack.error.inside_managed [error]: {path} is inside {dir}, which is already managed. It is in the repo already. {path}: path, a path, shortened to ~/... when under $HOME; {dir}: path, the managed folder, ~-shortened
+pack.error.no_keys [error]: Create keys before packing secrets:
+pack.error.link_failed [error]: Moved {path} into the repo but could not link it back. Link it with: {path}: path, a path, shortened to ~/... when under $HOME
+link.status.dry_run_ok [status]: {n} already linked {n}: int, a count
+link.status.moved_aside [status]: moved aside {path} {path}: path, a path, shortened to ~/... when under $HOME
+link.hint.compare [hint]: Compare and delete them when you have a minute:
+link.summary.base [status]: {n:# change|# changes}, {ok} already linked {n}: int, a count; {ok}: int, links already correct
+link.summary.locked [status]: , {n} locked ({self}{unlock}) {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {n}: int, a count; {unlock}: string, the unlock subcommand suffix (fixed),  unlock
+link.summary.blocked [warning]: , {n} blocked {n}: int, a count
+link.summary.invalid [error]: , {n:# layout error|# layout errors} in the repo {n}: int, a count
+link.hint.backup [hint]: To move what is in the way aside (renamed {backup_pattern}, nothing is deleted): {backup_pattern}: string, the backup filename pattern (fixed), *.homebot-backup-<time>
+layout.old_name [error]: "{raw}" is the old layout: rename it to "{new}" {raw}: string, the name as written in the repo (dot-...); {new}: string, the same without the 'dot-' prefix
+layout.empty_parens [error]: "{marks}" has no name inside {marks}: string, the empty real-folder marker (fixed), ()
+layout.double_parens [error]: "{raw}": wrap the name in one pair of {marks}, like "{open}{name}{close}" {raw}: string, the name as written; {name}: string, the name without extra parentheses; {marks}: string, the real-folder marker (fixed), (); {open}: string, the marker opening (fixed), (; {close}: string, the marker closing (fixed), )
+layout.top_dot [error]: "{raw}": top-level names get their dot from homebot; rename it to "{open}{name}{close}" {raw}: string, the name as written; {name}: string, the name without its leading dot; {open}: string, the marker opening (fixed), (; {close}: string, the marker closing (fixed), )
+layout.file_parens [error]: {marks} marks folders only: rename "{raw}" to "{name}" {raw}: string, the file name as written; {name}: string, the name without (); {marks}: string, the real-folder marker (fixed), ()
+layout.both_layers [error]: provided by both {providers}; keep it in one place {providers}: string, two or more repo paths joined with ' and ' (English conjunction built in code)
+layout.spelling [error]: spelled "{marked}" in {where_marked} but "{plain}" in {where_plain}; use one spelling everywhere {marked}: string, the (name) spelling; {where_marked}: string, the layers using it; {plain}: string, the plain spelling; {where_plain}: string, the layers using the other
+layout.inner_file_parens [error]: {path}: {marks} marks folders only: rename "{raw}" to "{name}" {path}: path, a path, shortened to ~/... when under $HOME; {raw}: string, the file name as written; {name}: string, the name without (); {marks}: string, the real-folder marker (fixed), ()
+layout.must_mark [error]: rename "{raw}" to "{open}{raw}{close}"{every_layer}: it holds {inner}, which must not be a link, so it can't be one either {raw}: string, the folder name as written; {every_layer}: string, layout.must_mark.every_layer when several layers provide it, else empty; {inner}: path, the (marked) folder inside, repo-relative; {open}: string, the marker opening (fixed), (; {close}: string, the marker closing (fixed), )
+conflict.symlink_outside [error]: is a symlink to {dest}, outside this repo {dest}: path, where the existing symlink points (absolute, not ~-shortened)
+conflict.file_vs_folder [error]: is a file, but the repo has a folder here
+conflict.folder_vs_file [error]: is a folder, but the repo has a file here
+conflict.different [error]: already exists with different content
+unlink.status.removed [status]: Removed {n:# link|# links}. To put them back: {n}: int, a count
+unlink.hint.helper [hint]: The background helper links them again within the hour, as {self}{link} would. To keep a file unlinked, take it out of the repo. {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {link}: string, the link subcommand suffix (fixed),  link
+cleanup.success.none [success]: No backups to review.
+cleanup.hint.terminal [hint]: Review them in a terminal:
+cleanup.status.summary [status]: Deleted {deleted}, used {used}, kept {kept}. {deleted}: int, backups deleted; {used}: int, backups copied into the repo; {kept}: int, backups left
+cleanup.status.summary_merged [status]: Deleted {deleted}, used {used}, kept {kept}; merged lines {merged:# time|# times}. {deleted}: int, backups deleted; {used}: int, backups copied into the repo; {kept}: int, backups left; {merged}: int, merges that took something
+cleanup.diff.only_copy [status]: Nothing is at {path} now; this backup is the only copy. {path}: path, a path, shortened to ~/... when under $HOME
+cleanup.diff.backup_is_link [status]: The backup is a link to {dest}. {dest}: path, where the backup symlink points (~-shortened), or cleanup.diff.gone
+cleanup.diff.kind_mismatch [status]: The backup is a {backup_kind}, but {path} is a {now_kind} now. {backup_kind}: string, cleanup.word.folder or cleanup.word.file; {path}: path, a path, shortened to ~/... when under $HOME; {now_kind}: string, cleanup.word.folder or cleanup.word.file
+cleanup.diff.same [status]: Identical to what is linked there now.
+cleanup.success.deleted [success]: deleted {path} {path}: path, a path, shortened to ~/... when under $HOME
+cleanup.error.use_not_repo [error]: {path} isn't a file in the repo, so the backup can't go there {path}: path, a path, shortened to ~/... when under $HOME
+cleanup.success.used [success]: copied into {repo_path} and deleted the backup; {self}{save} commits it {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {repo_path}: path, a path relative to the repo root (e.g. autolink/common/.zshrc); {save}: string, the save subcommand suffix (fixed),  save
+cleanup.error.scratch_git [error]: {git} {subcommand} in the merge scratch repo failed. {subcommand}: string, the git subcommand (init, config, add, commit, show); {git}: string, the failed tool (fixed), git
+cleanup.error.merge_not_repo [error]: {path} isn't a file in the repo, so there is nothing to merge into {path}: path, a path, shortened to ~/... when under $HOME
+cleanup.success.merged [success]: merged into {repo_path}; {self}{save} commits it {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {repo_path}: path, a path relative to the repo root (e.g. autolink/common/.zshrc); {save}: string, the save subcommand suffix (fixed),  save
+cleanup.status.nothing_taken [status]: Nothing taken from the backup.
+keys.status.creating [status]: Creating your secrets key. {bot} asks for a passphrase next. {bot}: string, the persona's display name; homebot in the neutral voice
+keys.hint.passphrase [hint]: Leave it empty and {bot} makes up a strong one and prints it. Save it in your password manager: without it, the secrets in this repo can't be recovered. {bot}: string, the persona's display name; homebot in the neutral voice
+keys.success.created [success]: Keys created. The public key:
+keys.hint.commit [hint]: Commit {identity} and {recipients}: {identity}: string, the encrypted identity path (fixed), private/identity.age; {recipients}: string, the recipients path (fixed), private/recipients.txt
+secrets.error.no_recipients [error]: No {recipients} yet. Create keys first: {recipients}: string, the recipients path (fixed), private/recipients.txt
+secrets.error.encrypt [error]: Could not encrypt {private}{name}. {name}: path, the secret's path under private/; {private}: string, the private directory prefix (fixed), private/
+secrets.error.no_identity [error]: No {identity} yet. Create keys first: {identity}: string, the encrypted identity path (fixed), private/identity.age
+secrets.error.passphrase [error]: Could not decrypt {identity} (wrong passphrase?) {identity}: string, the encrypted identity path (fixed), private/identity.age
+secrets.error.decrypt [error]: Could not decrypt {private}{name}{age}. {name}: path, the secret's path under private/; {private}: string, the private directory prefix (fixed), private/; {age}: string, the encrypted file suffix (fixed), .age
+secrets.error.keys_exist [error]: Keys already exist ({identity}, {recipients}). Delete both first to start over. {identity}: string, the encrypted identity path (fixed), private/identity.age; {recipients}: string, the recipients path (fixed), private/recipients.txt
+secrets.error.encrypt_key [error]: Encrypting the new key failed; nothing was saved.
+unlock.success.unlocked [success]: unlocked {n:# secret|# secrets} {n}: int, a count
+unlock.success.verified_suffix [success]: , verified {n} {n}: int, a count
+unlock.error.conflict [error]: conflict {private}{name}: changed here and in the repo {name}: path, the secret's path under private/; {private}: string, the private directory prefix (fixed), private/
+unlock.hint.ours [hint]: Keep this machine's versions:
+unlock.hint.theirs [hint]: Or take the repo's:
+unlock.status.linked [status]: linked {n:# secret|# secrets} {n}: int, a count
+lock.status.wiped [status]: Sealed {sealed}, removed {n:# plaintext file|# plaintext files}. {sealed}: int, how many secrets were sealed first; {n}: int, a count
+lock.warning.kept [warning]: kept {private}{name} (not safely sealed; resolve it first) {name}: path, the secret's path under private/; {private}: string, the private directory prefix (fixed), private/
+lock.success.sealed [success]: sealed {paths} {paths}: string, 'private/<name>' for each sealed secret, comma-joined
+lock.status.nothing [status]: Nothing to seal.
+triage.error.old_file [error]: homebot reads {decisions} now: rename {path} to {decisions} {path}: path, the old decisions.yaml path (absolute); {decisions}: string, the decisions file (fixed), decisions.yml
+triage.error.ignore_list [error]: {file}: {ignore} must be a list of paths {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {ignore}: string, the ignore config key (fixed), ignore
+triage.error.line_break [error]: {key} has a line break in its name, which a {gitignore} line can't hold. Nothing was written; rename it, or snooze it. {key}: string, the repo-relative name, quoted with its line breaks escaped; {gitignore}: string, the git ignore file (fixed), .gitignore
+triage.error.git_add [error]: {git_add} {key} failed. {key}: path, the repo-relative or ~-relative path a triage decision is about; {git_add}: string, the git add command (fixed), git add
+triage.success.staged [success]: staged {key} {key}: path, the repo-relative or ~-relative path a triage decision is about
+triage.success.packed [success]: packed {key} into {repo_path} {key}: path, the repo-relative or ~-relative path a triage decision is about; {repo_path}: path, a path relative to the repo root (e.g. autolink/common/.zshrc)
+triage.success.gitignored [success]: added /{key} to {gitignore} {key}: path, the repo-relative or ~-relative path a triage decision is about; {gitignore}: string, the git ignore file (fixed), .gitignore
+triage.success.ignored [success]: will never ask about {key} again {key}: path, the repo-relative or ~-relative path a triage decision is about
+triage.success.snoozed [success]: snoozed {key} for {duration} {key}: path, the repo-relative or ~-relative path a triage decision is about; {duration}: string, the fixed snooze duration (fixed), 7 days
+triage.success.none [success]: Nothing to sort. Everything has a decision.
+triage.status.header [status]: {n} things to decide. {n}: int, a count
+triage.hint.header_suffix [hint]:  Each answer is saved right away; {quit} stops. {quit}: string, the quit key (fixed), q
+triage.hint.pick [hint]:   pick one of the letters above
+inventory.profile.none [warning]: none chosen for this machine
+inventory.profile.value [status]: {profile} · {status} {profile}: string, a profile name (a file in manifests/profiles/ without .yml); {status}: string, inventory.profile.never or inventory.profile.unpacked (+ inventory.profile.changed)
+inventory.profile.never [status]: never unpacked here
+inventory.profile.unpacked [status]: unpacked {ago} {ago}: duration, a relative time from format.ago.* (e.g. 'just now', '4m ago', '3h ago', '2d ago')
+inventory.profile.changed [warning]: , changed since
+inventory.links.value [status]: {ok} ok, {to_fix} to fix, {blocked} blocked, {locked} locked {ok}: int, correct links; {to_fix}: int, links to create, replace, adopt, unfold or remove; {blocked}: int, targets in the way; {locked}: int, secrets not decrypted yet
+inventory.links.invalid [error]: , {n} layout errors {n}: int, a count
+inventory.secrets.no_keys [warning]: no keys yet ({self}{keys_init}) {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {keys_init}: string, the keys init command suffix (fixed),  keys init
+inventory.secrets.count [status]: {n} {state} {n}: int, a count; {state}: string, an internal secret state printed verbatim: new, locked, unverified, conflict, modified, upstream or sealed
+inventory.secrets.none [status]: none yet
+inventory.triage.value [status]: {to_sort} to sort, {ignored} ignored {to_sort}: int, triage candidates; {ignored}: int, entries in decisions.yml
+inventory.repo.value [status]: {branch}{upstream} · {ahead} ahead, {behind} behind, {uncommitted} uncommitted {branch}: string, the branch name, or inventory.repo.detached; {upstream}: string, inventory.repo.upstream, or one of the yellow remote notes; {ahead}: int, commits ahead; {behind}: int, commits behind; {uncommitted}: int, changed files
+inventory.repo.upstream [status]:  → {upstream} {upstream}: string, the upstream branch, e.g. origin/main
+inventory.repo.never_pushed [warning]:  (never pushed: {self}{remote}) {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {remote}: string, the remote subcommand suffix (fixed),  remote
+inventory.repo.no_remote [warning]:  (no remote: {self}{remote}) {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {remote}: string, the remote subcommand suffix (fixed),  remote
+inventory.repo.not_repo [error]: not a git repository
+inventory.exports.ok [status]: {name} {ago} {name}: string, export name; {ago}: duration, a relative time from format.ago.* (e.g. 'just now', '4m ago', '3h ago', '2d ago')
+inventory.exports.failing [error]: {name} failing {name}: string, export name
+inventory.exports.never [status]: {name} never {name}: string, export name
+inventory.exports.none [status]: none configured
+inventory.helper.installed [status]: installed · last ran {ago} {ago}: duration, a relative time from format.ago.* (e.g. 'just now', '4m ago', '3h ago', '2d ago')
+inventory.helper.missing [warning]: not installed ({self}{setup}) {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {setup}: string, the setup subcommand suffix (fixed),  setup
+save.success.sealed [success]: sealed {n:# secret|# secrets} {n}: int, a count
+save.success.committed [success]: committed {n:# file|# files} {n}: int, a count
+save.status.nothing [status]: Nothing new to commit.
+save.success.pulled [success]: pulled {n:# commit|# commits} {n}: int, a count
+save.success.pushed [success]: pushed {n:# commit|# commits} {n}: int, a count
+save.warning.waiting [warning]: The remote has new commits. Commit or discard the changes here, then save again.
+save.warning.unreachable [warning]: Couldn't reach the remote, so nothing was pushed. To see why:
+save.error.refused [error]: Commit refused: {reason} {reason}: string, the first guard.* problem (taken from the hook's '  - ' bullet), or git's first line, or save.error.refused_no_reason
+save.error.git_add [error]: {git_add} failed. {git_add}: string, the git add command (fixed), git add
+save.error.fast_forward [error]: Could not fast-forward to the remote.
+save.error.diverged [error]: This machine and the remote changed the same files. Resolve it by hand:
+  {git_prefix}{repo_abs}{rebase} {repo_abs}: path, the repo root, absolute (not ~-shortened, unlike every other command); {git_prefix}: string, the git command prefix (fixed), git -C ; {rebase}: string, the pull rebase suffix (fixed),  pull --rebase
+save.error.rebase_stuck [error]: This machine and the remote changed the same files, and git could not undo its rebase: {repo_abs} is still in the middle of one. Resolve the conflicts and run {continue_cmd}, or give up on it with:
+  {git_prefix}{repo_abs}{abort} {repo_abs}: path, the repo root, absolute, as in save.error.diverged; {continue_cmd}: string, the rebase continue command (fixed), git rebase --continue; {git_prefix}: string, the git command prefix (fixed), git -C ; {abort}: string, the rebase abort suffix (fixed),  rebase --abort
+save.error.push [error]: Push failed.
+remote.error.create [error]: {cli} couldn't create {name}. {cli}: string, gh or glab; {name}: string, the repository name
+remote.error.no_address [error]: {cli} created {name} but didn't say its address. Add it with: {cli}: string, gh or glab; {name}: string, the repository name
+remote.error.set_url [error]: Couldn't set the remote to {url}. {url}: string, the remote URL as git has it
+remote.success.remote [success]: remote {url} {url}: string, the remote URL as git has it
+remote.hint.rename [hint]: This repo has a remote named {names}, but {bot} pushes to the one named {origin}. Rename it: {names}: string, the existing remote names, comma-joined; {bot}: string, the persona's display name; homebot in the neutral voice; {origin}: string, the remote name (fixed), origin
+remote.heading.none [status]: Nothing is backed up yet: the repo has no remote.
+remote.hint.create_in_terminal [hint]: Run this in a terminal to create a private {forges} repository for it: {forges}: string, forge names joined with ' or ' in code ('GitHub or GitLab'): an English conjunction outside the catalog
+remote.hint.or_existing [hint]: Or use a repository you already have:
+remote.hint.existing [hint]: Use a repository you already have:
+remote.hint.login [hint]:   {cli} is installed but not logged in. To offer {forge} too: {cli}{auth_login} {cli}: string, gh or glab; {forge}: string, GitHub or GitLab; {auth_login}: string, the CLI login command suffix (fixed),  auth login
+remote.status.not_now [status]: Not now. When you're ready:
+remote.prompt.url [prompt]: URL:
+remote.hint.pick [hint]:   pick one of the letters above
+remote.prompt.name [prompt]: Name for the new private {forge} repository [{suggested}]: {forge}: string, GitHub or GitLab; {suggested}: string, the repo folder's name without its dot, or 'dotfiles'
+remote.error.bad_name [error]:   "{name}" won't do: {rule} {name}: string, the name typed; {rule}: string, the allowed repository name characters (fixed), letters, digits, ".", "-" and "_" only
+remote.success.created [success]: created {name}, a private {forge} repository {name}: string, the repository name; {forge}: string, GitHub or GitLab
+remote.hint.https [hint]: There's no ssh key in {ssh_dir}, so the remote uses {https}. To let git use {cli}'s login: {cli}: string, gh or glab; {ssh_dir}: string, the SSH key directory (fixed), ~/.ssh; {https}: string, the HTTPS transport (fixed), https
+remote.error.unreachable_login [error]: Can't reach the remote: git has no login for {https} here. {https}: string, the HTTPS transport (fixed), https
+remote.error.unreachable [error]: Can't reach the remote.
+remote.error.unreachable_ssh [error]: Can't reach it over ssh either.
+remote.hint.log_in [hint]: Log git in:
+remote.hint.or_ssh [hint]: Or add an ssh key to {ssh_dir} and switch to the ssh address: {ssh_dir}: string, the SSH key directory (fixed), ~/.ssh
+remote.hint.log_in_or_ssh [hint]: Log git in to that host, or add an ssh key to {ssh_dir} and switch to the ssh address: {ssh_dir}: string, the SSH key directory (fixed), ~/.ssh
+remote.hint.have_key [hint]: You have an ssh key, so the same repository can be reached over ssh:
+remote.hint.to_switch [hint]: To switch:
+remote.prompt.switch [prompt]: Switch to it? {choice} {choice}: string, the yes or no prompt keys (fixed), [Y/n]
+remote.status.kept_https [status]: Kept {https}. To switch later: {https}: string, the HTTPS transport (fixed), https
+remote.success.reachable [success]: reachable {url} {url}: string, the remote URL as git has it
+remote.hint.first_save [hint]: Nothing committed yet. This commits and pushes:
+remote.warning.waiting [warning]: The remote has new commits. Commit or discard the changes here, then:
+remote.success.pushed [success]: pushed the repo is backed up
+remote.status.up_to_date [status]: Already backed up: the remote has every commit.
+inbox.header.clear [success]: nothing needs you. Home is in order.
+inbox.header.count [inbox]: {n:# thing needs|# things need} you {n}: int, a count
+inbox.more [hint]:   ...and {n} more: {n}: int, a count
+inbox.done.heading [status]:   Done for you since you last looked:
+inbox.next_hint [hint]:   Do the first one now:
+inbox.nudge [nudge]: {bot}: {n:# thing needs|# things need} you{urgent}, run: {n}: int, a count; {urgent}: string, inbox.nudge.urgent or empty; {bot}: string, the persona's display name; homebot in the neutral voice
+inbox.notify.title [notification]: {bot} needs you {bot}: string, the persona's display name; homebot in the neutral voice
+inbox.notify.body [notification]: {title}{more}. Run: {title}: string, the first urgent item's title; {more}: string, inbox.notify.more or empty
+inbox.notify.more [notification]:  (+{n} more) {n}: int, a count
+inbox.unpack_preview [inbox]: It runs every step without asking; to see them first: {self}{preview} {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {preview}: string, the preview command suffix (fixed),  unpack --dry-run
+inbox.broken.title [inbox]: Could not check {check} {check}: string, internal check id printed verbatim: secrets, links, triage, git or profile
+inbox.no_identity.title [inbox]: Git doesn't know who you are
+inbox.no_identity.detail [inbox]: Commits by {self}{save} and the hourly autosave fail without a name and email. {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {save}: string, the save subcommand (fixed),  save
+inbox.no_signing_key.title [inbox]: Commits are signed with {key_path}, which this machine doesn't have {key_path}: path, the ssh signing key path, ~-shortened
+inbox.no_signing_key.detail [inbox]: Every commit fails until it's here. Restore it ({self}{unlock}), or stop signing on this machine only: {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {unlock}: string, the unlock subcommand (fixed),  unlock
+inbox.gitconfig_shadow.title [inbox]: {gitconfig} overrides the git config from the repo {gitconfig}: string, the global git config path (fixed), ~/.gitconfig
+inbox.gitconfig_shadow.detail [inbox]: Git reads it after {repo_config}, so its name, email or signing win. Move it aside; {self}{cleanup} then shows it, and anything this machine needs goes in {local_config}. {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {repo_config}: string, the repo git config path (fixed), ~/.config/git/config; {cleanup}: string, the cleanup subcommand (fixed),  cleanup; {local_config}: string, the machine-local git config path (fixed), ~/.config/git/config.local
+inbox.blocked.title [inbox]: A commit was refused
+inbox.tidy_failed.title [inbox]: Automatic {step_name} failed {ago} {step_name}: string, internal tidy step printed verbatim: guard, seal, export, autosave, sync or link; {ago}: duration, a relative time from format.ago.* (e.g. 'just now', '4m ago', '3h ago', '2d ago')
+inbox.no_repo.title [inbox]: {repo} is not a git repository {repo}: path, the home repo folder, shortened to ~/... (e.g. ~/.home)
+inbox.no_gitleaks.title [inbox]: {tool} is missing, so every commit is refused {tool}: string, the missing scanner (fixed), gitleaks
+inbox.no_guard.title [inbox]: The commit guard is not installed
+inbox.no_keys.title [inbox]: Secrets are not set up yet
+inbox.secret_conflict.title [inbox]: {n:# secret|# secrets} changed here and on another machine {n}: int, a count
+inbox.secret_locked.title [inbox]: {n:# secret is|# secrets are} still locked {n}: int, a count
+inbox.secret_upstream.title [inbox]: {n:# secret|# secrets} changed on another machine {n}: int, a count
+inbox.secret_unsealed.title [inbox]: {n:# secret|# secrets} not sealed yet {n}: int, a count
+inbox.link_invalid.title [inbox]: {n:# layout error|# layout errors} in the repo; those parts aren't linked {n}: int, a count
+inbox.link_conflict.title [inbox]: {n:# file is|# files are} in the way of links {n}: int, a count
+inbox.link_pending.title [inbox]: {n:# link|# links} to make or fix {n}: int, a count
+inbox.backups.title [inbox]: {n:# backup|# backups} that {self}{link} moved aside: compare, then delete or keep {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {n}: int, a count; {link}: string, the link subcommand (fixed),  link
+inbox.triage.title [inbox]: {n:# new thing|# new things} to sort: track, ignore or snooze {n}: int, a count
+inbox.no_remote.title [inbox]: Not backed up: the repo has no remote
+inbox.never_pushed.title [inbox]: Not backed up yet: nothing pushed to the remote
+inbox.unreachable.title [inbox]: Last reached the remote {ago} {ago}: duration, a relative time from format.ago.* (e.g. 'just now', '4m ago', '3h ago', '2d ago')
+inbox.diverged.title [inbox]: This machine and the remote both have new commits
+inbox.unpushed.title [inbox]: {n:# commit|# commits} not pushed {n}: int, a count
+inbox.behind.title [inbox]: {n:# new commit|# new commits} on the remote {n}: int, a count
+inbox.uncommitted.title [inbox]: {n:# uncommitted change|# uncommitted changes} {n}: int, a count
+inbox.no_profile.title [inbox]: No profile chosen for {host} {host}: string, this machine's host name
+inbox.no_profile.detail [inbox]: Set {default_key} or {hosts_key} in {config_file} {default_key}: string, the default profile config key (fixed), profiles.default; {hosts_key}: string, the per-host profile config key (fixed), profiles.hosts; {config_file}: string, the homebot config file (fixed), homebot.yml
+inbox.missing_profile.title [inbox]: Profile {profile} does not exist yet {profile}: string, a profile name (a file in manifests/profiles/ without .yml)
+inbox.missing_profile.detail [inbox]: Write the steps that set up this machine
+inbox.never_unpacked.title [inbox]: Profile {profile} was never unpacked here{last} {profile}: string, a profile name (a file in manifests/profiles/ without .yml); {last}: string, inbox.never_unpacked.last when another profile was unpacked, else empty
+inbox.never_unpacked.last [inbox]:  (last unpacked: {other}) {other}: string, the profile unpacked here before
+inbox.profile_changed.title [inbox]: Profile {profile} changed since the last unpack {profile}: string, a profile name (a file in manifests/profiles/ without .yml)
+inbox.export_failing.title [inbox]: Export {name} is failing {name}: string, export name
+inbox.no_helper.title [inbox]: The background helper is not installed
+inbox.no_helper.detail [inbox]: It seals, exports, links and reminds you every hour
+inbox.helper_stale.title [inbox]: The background helper last ran {ago} {ago}: duration, a relative time from format.ago.* (e.g. 'just now', '4m ago', '3h ago', '2d ago')
+export.status.none [status]: No exports configured for this OS in {config}. {config}: string, the config file (fixed), homebot.yml
+export.reason.not_installed [status]: {tool} is not installed {tool}: string, the name of an external program
+export.error.exit [error]: exited with {code}{stderr} {code}: int, a process exit code; {stderr}: string, ': ' plus the last 3 stderr lines joined with spaces, or empty
+export.error.empty_folder [error]: produced an empty folder; kept the previous {out} {out}: path, the output path, repo-relative
+export.error.empty_file [error]: produced an empty file; kept the previous {out} {out}: path, the output path, repo-relative
+export.error.out_is_folder [error]: wrote a file, but {out} is a folder; kept the folder. Remove it yourself, or give the export another {out_key} {out}: path, the output path, repo-relative; {out_key}: string, the export's output key (fixed), out
+export.error.out_is_file [error]: wrote a folder, but {out} is a file; kept the file. Remove it yourself, or give the export another {out_key} {out}: path, the output path, repo-relative; {out_key}: string, the export's output key (fixed), out
+export.error.kept_aside [error]: {error}
+The previous export is kept at {path}. {error}: string, what failed, as the system said it; {path}: path, where the previous export is now (absolute): old/<out's name> inside the export's work folder
+export.warning.left_behind [warning]: The temporary folder {path} could not be removed. It is safe to delete. {path}: path, the temporary folder (absolute)
+export.error.unknown [error]: No export named {names} for this OS. Exports here: {known}. {names}: string, the unknown names, comma-joined; {known}: string, the export names for this OS, comma-joined, or export.word.none
+tidy.status.locked [status]: Another tidy is running.
+tidy.status.nothing [status]: Nothing to tidy.
+tidy.status.inbox_count [status]: {n:# thing|# things} in the inbox. {n}: int, a count
+tidy.did.guard [status]: installed the commit guard
+tidy.did.sealed [status]: sealed {n:# secret|# secrets} {n}: int, a count
+tidy.did.exported [status]: refreshed {outs} {outs}: string, changed export output paths, comma-joined
+tidy.did.committed [status]: committed {n:# file|# files} {n}: int, a count
+tidy.did.pulled [status]: pulled {n:# commit|# commits} {n}: int, a count
+tidy.did.pushed [status]: pushed {n:# commit|# commits} {n}: int, a count
+tidy.did.linked [status]: fixed {n:# link|# links} {n}: int, a count
+setup.status.removed [status]: Background helper removed.
+setup.success.guard [success]: installed commit guard ({hook_key}) {hook_key}: string, the git hook path key (fixed), core.hooksPath
+setup.status.guard_present [status]: Commit guard already installed.
+setup.warning.no_repo [warning]: {root} is not a git repo yet; skipped the commit guard. {root}: path, the home repo folder, shortened to ~/...
+setup.success.helper [success]: installed {helper} {helper}: string, helper.description.systemd or helper.description.launchd
+setup.hint.zshrc [hint]: Add this to your {zshrc} so new terminals tell you when something needs you: {zshrc}: string, the zsh startup file (fixed), .zshrc
+helper.error.no_systemd [error]: No systemd user session here, so the hourly helper can't be installed.
+Run this yourself, or from cron:
+helper.error.systemctl [error]: {command}{args} failed. {args}: string, the systemctl arguments; {command}: string, the failed systemctl invocation prefix (fixed), systemctl --user
+helper.error.launchctl [error]: {command} failed. {command}: string, the failed launchctl invocation (fixed), launchctl bootstrap
+config.error.unknown_key [error]: {where}: unknown key "{key_name}" (expected {keys}) {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {key_name}: string, the unknown key; {keys}: string, allowed keys, comma-joined
+config.error.string_list [error]: {where}: expected a string or a list of strings {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'
+config.error.unknown_os [error]: {where}: unknown OS "{value}" (use {linux} or {macos}) {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {value}: string, the OS name given; {linux}: string, the supported Linux value (fixed), linux; {macos}: string, the supported macOS value (fixed), macos
+config.error.yaml [error]: {file}: invalid {yaml}: {parser_message} {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {parser_message}: string, Bun's YAML parser error (English, tool text); {yaml}: string, the config format (fixed), YAML
+config.error.not_mapping [error]: {file}: expected a mapping at the top level {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile)
+config.error.link_gone [error]: {file}: "{link}" is gone. Wrap a folder's name in {marks} in {autolink} to keep it a real folder, e.g. {example} {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {link}: string, the removed config key (fixed), link; {marks}: string, the real-folder marker (fixed), (); {autolink}: string, the managed link folder (fixed), autolink/; {example}: string, an example real-folder path (fixed), autolink/common/(claude)/settings.json
+config.error.profiles [error]: {file}: {profiles} must be a mapping {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {profiles}: string, the profiles config key (fixed), profiles
+config.error.profiles_default [error]: {file}: {default_key} must be a profile name {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {default_key}: string, the default profile config key (fixed), profiles.default
+config.error.profiles_hosts [error]: {file}: {hosts_key} must map host names to profile names {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {hosts_key}: string, the per-host profile config key (fixed), profiles.hosts
+config.error.triage [error]: {file}: {triage} must be a mapping {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {triage}: string, the triage config key (fixed), triage
+config.error.triage_watch [error]: {file}: {watch} entries end in {star} or {dot_star} (got "{value}") {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {value}: string, the watch entry given; {watch}: string, the watch config key (fixed), triage.watch; {star}: string, the folder glob suffix (fixed), /*; {dot_star}: string, the dotfile glob suffix (fixed), /.*
+config.error.autosave [error]: {file}: {autosave} must be a mapping {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {autosave}: string, the autosave config key (fixed), autosave
+config.error.autosave_commit [error]: {file}: {commit} must be {choices} {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {commit}: string, the autosave commit config key (fixed), autosave.commit; {choices}: string, the permitted autosave frequencies (fixed), off, hourly or daily
+config.error.autosave_push [error]: {file}: {push} must be {boolean} {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {push}: string, the autosave push config key (fixed), autosave.push; {boolean}: string, the permitted boolean values (fixed), true or false
+config.error.exports [error]: {file}: {exports} must be a list {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {exports}: string, the exports config key (fixed), exports
+config.error.export_mapping [error]: {where}: expected a mapping with {keys} {where}: string, '{file}: exports[{i}]'; {keys}: string, the required export config keys (fixed), name, out, run
+config.error.export_required [error]: {where}: {key_name} is required {where}: string, '{file}: exports[{i}]'; {key_name}: string, name, out or run
+config.error.export_profiles [error]: {where}.{profiles}: expected a list of profile names {where}: string, '{file}: exports[{i}]'; {profiles}: string, the export profiles config key (fixed), profiles
+config.error.export_duplicate [error]: {file}: {exports_open}{i}{exports_close}: duplicate export name "{name}" (give each one {profiles} that don't overlap) {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {i}: int, 1-based position of the current item or step; {name}: string, export name; {exports_open}: string, the export list key and opening bracket (fixed), exports[; {exports_close}: string, the export index closing bracket (fixed), ]; {profiles}: string, the export profiles key (fixed), profiles
+config.error.export_out_absolute [error]: {where}: {out_key} {out} of export "{name}" is an absolute path; give a path inside the repo, relative to it {where}: string, '{file}:{line}:{col}: exports[{i}]', or 'homebot.yml export {name}' when the check runs after {os}, {host} and {arch} are filled in; {out}: string, the out value as written, or as filled in; {name}: string, export name; {out_key}: string, the export output key (fixed), out
+config.error.export_out_outside [error]: {where}: {out_key} {out} of export "{name}" leads outside the repo {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {out_key}: string, the export output key (fixed), out
+config.error.export_out_root [error]: {where}: {out_key} {out} of export "{name}" is the repo itself; name a file or folder inside it {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {out_key}: string, the export output key (fixed), out
+config.error.export_out_git [error]: {where}: {out_key} {out} of export "{name}" is in {git_dir}, which belongs to git {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {out_key}: string, the export output key (fixed), out; {git_dir}: string, the git metadata directory (fixed), .git
+config.error.export_out_private [error]: {where}: {out_key} {out} of export "{name}" is in {private}, where your secrets are {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {out_key}: string, the export output key (fixed), out; {private}: string, the private secrets directory (fixed), private/
+config.error.export_out_managed [error]: {where}: {out_key} {out} of export "{name}" is {managed}, which homebot keeps for itself; put exports under {manifests} {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {managed}: path, the managed path, repo-relative, as homebot names it (lower case); {out_key}: string, the export output key (fixed), out; {manifests}: string, the manifests directory (fixed), manifests/
+config.error.export_out_managed_inside [error]: {where}: {out_key} {out} of export "{name}" is inside {managed}, which homebot keeps for itself; put exports under {manifests} {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {managed}: path, the managed path, repo-relative, as homebot names it (lower case); {out_key}: string, the export output key (fixed), out; {manifests}: string, the manifests directory (fixed), manifests/
+config.error.export_out_symlink [error]: {where}: {out_key} {out} of export "{name}" goes through a symlink to {target}, which is outside the repo, the repo itself, or a path homebot keeps for itself {where}: string, as in config.error.export_out_absolute; {out}: string, the out value as written, or as filled in; {name}: string, export name; {target}: path, the deepest folder of out that exists, with its symlinks resolved, absolute; {out_key}: string, the export output key (fixed), out
+config.error.limits [error]: {file}: {limits} must be a mapping {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {limits}: string, the limits config key (fixed), limits
+config.error.limits_max [error]: {file}: {max_file} must be a positive number {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {max_file}: string, the maximum file size config key (fixed), limits.maxFileMB
+config.error.old_name [error]: homebot reads {config_file} now: rename {path} to {config_file} {path}: path, the old homebot.yaml path (absolute); {config_file}: string, the homebot config file (fixed), homebot.yml
+manifest.error.old_extension [error]: Profiles end in {ext} now: rename {path} to {name}{ext} {path}: path, the old .yaml file (absolute); {name}: string, profile name; {ext}: string, the profile filename extension (fixed), .yml
+manifest.error.no_profile [error]: No profile named "{name}" in {dir}. {name}: string, profile asked for; {dir}: path, the profiles folder (absolute)
+manifest.error.no_profile.available [error]: No profile named "{name}" in {dir}. Available: {names} {name}: string, profile asked for; {dir}: path, the profiles folder (absolute); {names}: string, existing profile names, comma-joined
+manifest.error.unknown_variable [error]: {where}: unknown variable {braced_key} (available: {vars}) {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {braced_key}: string, the variable written in braces, e.g. {distro}; {vars}: string, the known variables written in braces, comma-joined: {os}, {host}, {arch}
+manifest.error.loop [error]: Profiles include each other in a loop: {chain} {chain}: string, profile names joined with ' -> '
+manifest.error.on [error]: {where}: {key} must be {oses}, or a list of them {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {key}: string, the OS selector key (fixed), "on"; {oses}: string, the supported OS values (fixed), linux, macos
+manifest.error.on_os [error]: {where}: unknown OS "{value}" in {key} (use {oses}) {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {value}: string, the OS name given; {key}: string, the OS selector key (fixed), "on"; {oses}: string, the supported OS values (fixed), linux or macos
+manifest.error.args [error]: {where}: arguments must be a value or a list of values {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'
+manifest.error.action_name [error]: {where}: "{name}" is not a valid action name {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {name}: string, the action name given
+manifest.error.step_shape [error]: {where}: expected {shape} {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {shape}: string, the step YAML syntax (fixed), "- action: arguments"
+manifest.error.one_action [error]: {where}: each step needs exactly one action, found {names} {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {names}: string, the action keys found, comma-joined
+manifest.error.one_action.none [error]: {where}: each step needs exactly one action, found none {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'
+manifest.error.name [error]: {where}: {key} must be text {where}: string, where in the file, e.g. 'homebot.yml: exports[0]' or 'manifests/profiles/x.yml step 3'; {key}: string, the profile name key (fixed), name
+manifest.error.yaml [error]: {file}: invalid {yaml}: {parser_message} {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {parser_message}: string, Bun's YAML parser error (English, tool text); {yaml}: string, the YAML format name (fixed), YAML
+manifest.error.not_mapping [error]: {file}: expected a mapping with {steps} {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {steps}: string, the steps YAML syntax (fixed), "steps:"
+manifest.error.unknown_key [error]: {file}: unknown key "{key_name}" (expected {keys}) {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {key_name}: string, the unknown key; {keys}: string, description, include, steps
+manifest.error.include [error]: {file}: {key} must be a profile name or a list of them {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {key}: string, the include profile key (fixed), include
+manifest.error.description [error]: {file}: {key} must be text {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {key}: string, the description key (fixed), description
+manifest.error.steps [error]: {file}: {key} must be a list {file}: path, path of the YAML file being read (homebot.yml, decisions.yml or a profile); {key}: string, the steps key (fixed), steps
+context.error.platform [error]: homebot supports {oses}, not {platform}. {platform}: string, process.platform (e.g. win32); {oses}: string, the supported OS values (fixed), linux and macos
+context.error.no_config [error]: No {config} found. Run {self} inside your home repo, or set {env}. {config}: string, the config file (fixed), homebot.yml; {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {env}: string, the root environment variable (fixed), HOMEBOT_ROOT
+context.hint.setup [hint]: New here? This clones your home repo or starts one:
+fsutil.error.bad_json [error]: {path} is not valid {format}. Fix or delete it (it is machine state, safe to delete). {path}: path, a path, shortened to ~/... when under $HOME; {format}: string, the JSON data format (fixed), JSON
+action.error.unavailable [error]: {name}: this action is not available in this build {name}: string, an internal action no package has registered yet (link, unlock)
+config.error.unknown_key_under [error]: {where}: unknown key "{key_name}" under {parent} (expected {keys}) {where}: string, the key's position: '<file>:<line>:<col>'; {key_name}: string, the unknown key; {parent}: string, the mapping the key is in: profiles, triage, autosave, limits or exports[{i}]; {keys}: string, allowed keys, comma-joined
+context.error.no_home [error]: {env} is not set. {env}: string, the home environment variable (fixed), HOME
+cli.error.version_args [error]: {version} takes no arguments, not "{argument}". See: {argument}: string, the first word after version, as typed; {version}: string, the version subcommand (fixed), version
+link.error.backup_exists [error]: Cannot move {target} aside: {backup} is already there. Try again in a second. {target}: path, what is in the way, ~-shortened; {backup}: path, the backup name it would get, ~-shortened
+link.status.interrupted [status]: Stopped; nothing else was moved or linked. Run {self}{link} again to finish. {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {link}: string, the link subcommand suffix (fixed),  link
+layout.inside_repo [error]: would be linked at {target}, inside the home repo; rename it {target}: path, where in $HOME the name maps to, ~-shortened
+layout.dot_parens [error]: "{raw}" names no folder: {dot_names} would link outside the folder it is in; rename it {raw}: string, the name as written, (.) or (..); {dot_names}: string, the two dot folder names (fixed), . and ..
+layout.outside_folder [error]: would be linked at {target}, outside the folder it is in; rename it {target}: path, where in $HOME (or above it) the name maps to, ~-shortened
+keys.prompt.passphrase [prompt]: Enter passphrase (leave empty to autogenerate a secure one):
+keys.prompt.confirm [prompt]: Confirm passphrase:
+keys.status.autogenerated [status]: using autogenerated passphrase "{passphrase}" {passphrase}: string, the passphrase homebot made up: ten words joined by hyphens
+keys.error.mismatch [error]: The passphrases didn't match; nothing was saved.
+unlock.prompt.passphrase [prompt]: Enter passphrase:
+secrets.error.no_terminal [error]: There is no terminal to ask for the passphrase on. Run this in a terminal.
+secrets.error.cancelled [error]: Stopped at the passphrase prompt; nothing changed.
+secrets.error.identity_unreadable [error]: {identity} is not a passphrase-encrypted age key. Restore it from the repo's history. {identity}: string, the encrypted identity path (fixed), private/identity.age
+secrets.error.empty_recipients [error]: {recipients} has no public key in it. Restore it from the repo's history. {recipients}: string, the recipients path (fixed), private/recipients.txt
+secrets.error.reserved [error]: Refusing to write over {path}: it is not a secret. {path}: path, the file relative to the repo, such as private/identity.age
+secrets.error.unsupported_ssh_key [error]: Line {line} of {recipients} holds a key age cannot encrypt to ({key_type}). Use an {ed25519} key, or an {rsa} key of at least {bits}; homebot never seals to fewer keys than the file lists. {line}: int, the line's number in private/recipients.txt, counting from 1; {key_type}: string, the key's type as the line names it, such as ecdsa-sha2-nistp256, sk-ssh-ed25519@openssh.com, ssh-dss, or ssh-rsa for a key under 2048 bits; {recipients}: string, the recipients path (fixed), private/recipients.txt; {ed25519}: string, the supported SSH key type (fixed), ssh-ed25519; {rsa}: string, the supported SSH key type (fixed), ssh-rsa; {bits}: string, the minimum RSA size (fixed), 2048 bits
+secrets.error.save_key [error]: Saving the new key to {path} failed; nothing was saved. {path}: path, private/identity.age or private/recipients.txt, relative to the repo
+secrets.error.save_gitignore [error]: Writing {path} failed, so nothing was set up: without it, git would take the plaintext secrets in {private}. {path}: path, private/.gitignore, relative to the repo; {private}: string, the private directory (fixed), private/
+pack.error.private_reserved [error]: {path} can't go into {private}: git would stage it as plaintext there. {readme}, {gitignore}, {gitkeep} and {recipients} files, {age_glob} files and {git_dir} folders are the repo's own; rename or remove it first. {path}: path, the first thing inside the packed path (or the path itself) with such a name, ~-shortened; {private}: string, the private secrets directory (fixed), private/; {readme}: string, the reserved readme file (fixed), README.md; {gitignore}: string, the reserved ignore file (fixed), .gitignore; {gitkeep}: string, the reserved placeholder file (fixed), .gitkeep; {recipients}: string, the recipients file (fixed), recipients.txt; {age_glob}: string, the encrypted file pattern (fixed), *.age; {git_dir}: string, the git metadata directory (fixed), .git
+pack.error.nested_repo [error]: {path} is a git repository of its own: the home repo would hold only a pointer to it, and its files would never reach the remote. Remove its {git_dir}, or leave it out of the home. {path}: path, the folder holding the nested .git, ~-shortened: the packed path or one inside it, or the repo path triage tried to stage; {git_dir}: string, the git metadata directory (fixed), .git
+pack.error.unreadable [error]: Can't read {path}, so homebot can't check it for a git repository of its own. Nothing was moved; make it readable, or leave it out of the home. {path}: path, the folder inside the packed path that could not be read, ~-shortened
+pack.error.layer_not_linked [error]: The {layer} layer is not linked on {os}, so a file packed there could not be linked back (use {layers}). {layer}: string, the --layer value; {os}: string, this machine's system (linux or macos); {layers}: string, the layers linked on this machine, comma-joined
+pack.error.source_not_removed [error]: Copied {path} into the repo as {repo_path}, but could not remove the original: {reason}
+Remove it, then link the copy with: {path}: path, the packed path, ~-shortened; {repo_path}: path, where the copy is, relative to the repo root; {reason}: string, what the system said
+pack.status.moved [status]: moved {from} → {to} {from}: path, the packed path, ~-shortened; {to}: path, where it is now, relative to the repo root
+setup.error.git_too_old [error]: Your git is {found}, and homebot needs {minimum} or newer: its commit guard relies on a git command that older versions lack, so every save would be refused. Update git, then run {command} again. {found}: string, the version git reports, such as 2.39.5; {minimum}: string, the oldest git homebot accepts, 2.40; {command}: string, the setup command (fixed), {self} setup
+setup.error.git_too_old_brew [error]: Your git is {found}, and homebot needs {minimum} or newer: its commit guard relies on a git command that older versions lack, so every save would be refused. Install a newer one with Homebrew, then run {setup} again:
+  {command} {found}: string, the version git reports, such as 2.39.5; {minimum}: string, the oldest git homebot accepts, 2.40; {setup}: string, the command to run again (fixed), {self} setup; {command}: string, the command that installs a newer git (fixed), brew install git
+setup.error.xdg_relative [error]: {name} is "{value}", which is not a full path, so the background helper can't use it. Set it to a full path, or unset it, then run {command} again. {name}: string, XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_STATE_HOME or XDG_CACHE_HOME; {value}: string, its value as set; {command}: string, the setup command (fixed), {self} setup
+setup.hint.xdg [hint]: The helper keeps the {xdg_glob} folders it was set up with. After changing {config_env}, {data_env}, {state_env} or {cache_env}, run {self}{setup} again. {self}: string, the command word: the name when one works on this machine, else homebot (filled by the renderer); {xdg_glob}: string, the XDG variable family (fixed), XDG_*; {config_env}: string, the config environment variable (fixed), XDG_CONFIG_HOME; {data_env}: string, the data environment variable (fixed), XDG_DATA_HOME; {state_env}: string, the state environment variable (fixed), XDG_STATE_HOME; {cache_env}: string, the cache environment variable (fixed), XDG_CACHE_HOME; {setup}: string, the setup subcommand suffix (fixed),  setup
+setup.hint.keys [hint]: Secrets aren't set up yet. To keep passwords and tokens in the repo, encrypted, create the keys:
+setup.prompt.install_tools [prompt]: Missing: {tools}. Install now with {command}? {yn} {tools}: string, the missing tools, comma-separated, such as gitleaks; {command}: string, the install command, such as brew install gitleaks; {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.error.tools_missing [error]: Missing: {tools}. The commit guard needs it to check every commit. Install it, then run {setup} again:
+  {command} {tools}: string, the missing tools, comma-separated, such as gitleaks; {setup}: string, the command to run again (fixed), {self} setup; {command}: string, the install command, such as brew install gitleaks
+setup.error.install_failed [error]: {command} failed. Install {tools} yourself, then run {setup} again. {command}: string, the install command that failed, such as brew install gitleaks; {tools}: string, the missing tools, comma-separated; {setup}: string, the command to run again (fixed), {self} setup
+setup.error.home_taken [error]: {path} is there but holds no {config}, so it isn't a home repo and setup won't touch it. Move it aside, or set {env} to another folder, then run {setup} again:
+  {command} {path}: path, where setup would put the home repo: ~/.home, or $HOMEBOT_ROOT; {config}: string, the file that marks a home repo (fixed), homebot.yml; {env}: string, the variable that points homebot at its repo (fixed), HOMEBOT_ROOT; {setup}: string, the command to run again (fixed), {self} setup; {command}: string, the command that moves it aside: mv ~/.home ~/.home.old
+setup.error.no_terminal [error]: No home repo yet, and setup starts or clones one only in a terminal. Run it in one:
+  {setup}
+Or clone yours by hand:
+  {clone} {path} {setup}: string, the command to run in a terminal (fixed), {self} setup; {clone}: string, the clone command, the URL left to fill in (fixed), git clone <url>; {path}: path, where the home repo goes: ~/.home, or $HOMEBOT_ROOT
+setup.status.no_repo [status]: No home repo yet.
+setup.prompt.url [prompt]: URL of your home repo, or {example} on GitHub: {example}: string, the short form setup takes for a GitHub repository (fixed), owner/repo
+setup.status.cloning [status]: Cloning {url} into {path}... {url}: string, the address git clones from; {path}: path, where the home repo goes: ~/.home, or $HOMEBOT_ROOT
+setup.warning.clone_failed [warning]: Couldn't clone {url}. {url}: string, the address git could not clone
+setup.error.clone_failed [error]: Couldn't clone {url}. Check the address and that you can reach it, then run {setup} again. {url}: string, the address git could not clone; {setup}: string, the command to run again (fixed), {self} setup
+setup.error.clone_auth_gh [error]: git couldn't sign in to GitHub to clone {url}. Sign in with the GitHub CLI, which sets git up to use that login, then run {setup} again:
+  {command} {url}: string, the address git could not clone; {setup}: string, the command to run again (fixed), {self} setup; {command}: string, the command that signs in to GitHub and sets git up for it (fixed), gh auth login
+setup.error.clone_auth_key [error]: git couldn't sign in to {host} to clone {url}. Add an ssh key to your account there, then run {setup} again. {url}: string, the address git could not clone; {host}: string, the server of that address, such as github.com; {setup}: string, the command to run again (fixed), {self} setup
+setup.error.root_relative [error]: {env} is "{value}", which is not a full path, so homebot would find the repo only from this folder. Set it to a full path, or unset it, then run {setup} again. {env}: string, the variable that points homebot at its repo (fixed), HOMEBOT_ROOT; {value}: string, its value as set; {setup}: string, the command to run again (fixed), {self} setup
+setup.error.not_a_home_repo [error]: {url} has no {config}, so it isn't a home repo. It is in {path} now: move it aside, then run {setup} again. {url}: string, the address setup cloned; {config}: string, the file that marks a home repo (fixed), homebot.yml; {path}: path, where it was cloned: ~/.home, or $HOMEBOT_ROOT; {setup}: string, the command to run again (fixed), {self} setup
+setup.success.created [success]: created {path}, a new home repo with a {profile} profile {path}: path, the new home repo: ~/.home, or $HOMEBOT_ROOT; {profile}: string, the profile a new repo starts with (fixed), base
+setup.prompt.keys [prompt]: Keep passwords and tokens in the repo, encrypted? This creates your keys. {yn} {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.warning.no_profile [warning]: No profile for this machine ({host}) yet, so nothing was unpacked. Name one in {config} under {hosts} or {default}, then: {host}: string, this machine's short host name; {config}: string, the file that names the profiles (fixed), homebot.yml; {hosts}: string, the key that gives a profile per host (fixed), profiles.hosts; {default}: string, the key that gives the profile of every other host (fixed), profiles.default
+setup.prompt.unpack [prompt]: Run {n:this step|these # steps}? {yn} {n}: int, how many steps the profile has; {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.prompt.backup [prompt]: {n:# file is|# files are} in the way of links. Move them aside (nothing is deleted) and link? {yn} {n}: int, how many links are blocked by real files; {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.prompt.zshrc [prompt]: Add it to {file} now? {yn} {file}: path, the .zshrc setup appends to: ~/.zshrc, or $ZDOTDIR/.zshrc; {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.success.zshrc [success]: added the startup line to {file} {file}: path, the .zshrc setup appended to
+setup.status.zshrc_in_repo [status]: That file links into your home repo, so {path} changed there. {path}: string, the repo file the .zshrc links to, relative to the repo
+setup.status.zshrc_linked [status]: {file} is a link to {target}, and setup writes only through a link to a file in your home repo. Add the line there yourself. {file}: path, the .zshrc setup would append to: ~/.zshrc, or $ZDOTDIR/.zshrc; {target}: path, where the link points: its resolved file, or for a dangling link the path it names
+setup.status.zsh_only [status]: Your shell is {shell}. The startup line and the prompt count are {zsh}-only for now. {shell}: string, the login shell's name, from $SHELL, such as bash; {zsh}: string, the one shell the integration supports (fixed), zsh
+setup.prompt.triage [prompt]: {n:# thing|# things} in your home could be tracked. Sort them now, one key each? {yn} {n}: int, how many things triage would ask about; {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.prompt.save [prompt]: Commit and push now? {yn} {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+setup.prompt.save_local [prompt]: Commit now? {yn} {yn}: string, the answers, Enter meaning yes (fixed), [Y/n]
+tidy.error.lock [error]: Could not lock {path}: {reason}. tidy takes a file lock so two runs never overlap, and the filesystem holding the state directory does not support it. Point {env} at a local disk. {path}: string, the tidy.lock file; {reason}: string, what the system said, such as function not implemented; {env}: string, the state environment variable (fixed), XDG_STATE_HOME
+tidy.error.autosave_no_guard [error]: skipped, because the commit guard could not be installed this run (see the guard step)
+inbox.helper_no_linger.title [inbox]: The background helper stops when you log out
+inbox.helper_no_linger.detail [inbox]: systemd ends your timers with your last session; with lingering on it keeps them running
+config.error.persona [error]: {where}: {key} must be a string: {allowed} {where}: string, where in the file: '<file>:<line>:<col>'; {key}: string, the persona config key (fixed), persona; {allowed}: string, the allowed persona values (fixed), none or a lowercase id of at most 32 letters, digits and hyphens, starting with a letter
+config.error.persona_syntax [error]: {where}: {key} "{value}" must be {allowed} {where}: string, where in the file: '<file>:<line>:<col>'; {value}: string, the invalid persona id with unsafe control characters removed; {key}: string, the persona config key (fixed), persona; {allowed}: string, the allowed persona values (fixed), none or a lowercase id of at most 32 letters, digits and hyphens, starting with a letter
+persona.success.selected [success]: {id} is selected. {id}: string, selected persona id
+persona.success.greeting [success]: {bot} is ready. {bot}: string, the speaker name
+persona.success.created [success]: Created persona file: {path} {path}: path, new persona file
+config.error.name [error]: {where}: {name_key} must be a word, the command you call your homebot by, such as {example} {where}: string, where in the file: '<file>:<line>:<col>'; {name_key}: string, the name config key (fixed), name; {example}: string, an example command name (fixed), zork
+config.error.name_syntax [error]: {where}: {name_key} "{value}" must be {rule} {where}: string, where in the file: '<file>:<line>:<col>'; {value}: string, the name as written; {name_key}: string, the name config key (fixed), name; {rule}: string, the command name syntax (fixed), 2 to 32 lowercase letters, digits and hyphens, starting with a letter
+name.status.configured [status]: Configured name: {name} {name}: string, name in homebot.yml
+name.status.effective [status]: Effective name here: {name} {name}: string, command name available on this machine
+name.why.link_broken [status]: The recorded link at {path} is missing or points elsewhere. {path}: path, the recorded name link
+name.why.not_on_path [status]: The name's link is not on this process's PATH.
+name.why.shadowed [status]: Another program at {path} comes before the name's link on PATH. {path}: path, the program that shadows the name
+name.why.bad_record [status]: The machine's name record at {path} cannot be read. {path}: path, the machine name record
+name.why.no_record [status]: This machine has not recorded that name yet.
+name.why.config_off [status]: The machine still has a name link, but homebot.yml has no name.
+name.why.recorded_other [status]: This machine still uses {recorded}; run homebot name {configured} to finish the change. {recorded}: string, the working name in this machine's record; {configured}: string, the different name in homebot.yml
+name.status.set [success]: Name set to {name}. {name}: string, the new command name
+name.status.off [success]: Name turned off; homebot works as before.
+name.status.old_stops [warning]: The old name {name} stops working; no forwarding link is left. {name}: string, the old command name
+name.warning.in_work_tree [warning]: Your ~/.local/bin is inside a git work tree; another tool could commit this link.
+name.hint.path [hint]: Add ~/.local/bin to your PATH to type {name}; homebot works now. {name}: string, the new command name
+name.error.refused [error]: Cannot use {name}: {reason} ({path}) {name}: string, the proposed name; {reason}: string, why the name is refused; {path}: path, the blocking path, if any
+name.error.refused_no_path [error]: Cannot use {name}: {reason} {name}: string, the proposed name; {reason}: string, why the name is refused
+name.reason.syntax [error]: use 2 to 32 lowercase letters, digits and hyphens, starting with a letter
+name.reason.reserved [error]: homebot uses it as a command
+name.reason.shell [error]: the shell uses that word
+name.reason.tool [error]: homebot runs a program by that name
+name.reason.on_path [error]: a program with that name is on PATH
+name.reason.in_repo [error]: the home repo already places that name in ~/.local/bin
+name.reason.foreign [error]: a foreign file already has that name; it was left untouched
+name.reason.synced_bin [error]: another tool manages ~/.local/bin
+name.reason.temp_blocked [error]: the temporary link is occupied; your current link was kept
+name.reason.no_homebot [error]: there is no stable homebot binary to link to
+tidy.did.named [status]: kept this machine's name link in sync
+tidy.did.name_off [status]: removed this machine's name link
+inbox.name_blocked.title [inbox]: The name {name} is blocked on this machine {name}: string, the configured name
+inbox.name_shadowed_ours.title [inbox]: The name {name} shadows another program {name}: string, the working name
+inbox.name_shadowed_other.title [inbox]: Another program shadows the name {name} {name}: string, the configured name
+inbox.name_shadowed.detail [inbox]: The other program is at {path}. {path}: path, the program with the same command name
+inbox.name_no_bin.title [inbox]: The name {name} needs a bin directory here {name}: string, the configured name
+inbox.name_helper_path.title [inbox]: The helper cannot use the name {name} yet {name}: string, the configured name
+setup.error.name_syntax [error]: {flag} {name} must be {rule} {name}: string, the invalid --name value; {flag}: string, the name option (fixed), --name; {rule}: string, the valid command name syntax (fixed), 2 to 32 lowercase letters, digits and hyphens, starting with a letter
+setup.error.persona_syntax [error]: {flag} {persona} must {rule} {persona}: string, the invalid --persona value; {flag}: string, the persona option (fixed), --persona; {rule}: string, the valid persona name syntax (fixed), start with a lowercase letter and contain only lowercase letters, digits and hyphens (at most 32 characters)
+setup.error.remove_flags [error]: {remove_flag} cannot be combined with {name_flag} or {persona_flag} {remove_flag}: string, the remove option (fixed), --remove; {name_flag}: string, the name option (fixed), --name; {persona_flag}: string, the persona option (fixed), --persona
+setup.status.persona [status]: Persona in this repo: {persona} {persona}: string, the selected persona id
+setup.status.repo_name [status]: This repo calls your homebot {name}. {name}: string, the name stored in homebot.yml
+setup.status.repo_name_wins [status]: This repo calls it {repo}; {name_flag} {flag} was ignored without a terminal. {repo}: string, the name stored in homebot.yml; {flag}: string, the differing --name value; {name_flag}: string, the name option (fixed), --name
+setup.prompt.change_name [prompt]: This repo calls it {repo} on every machine. Change the shared name to {flag}? {choice} {repo}: string, the name stored in homebot.yml; {flag}: string, the differing --name value; {choice}: string, the yes or no prompt keys (fixed), [y/N]
+setup.prompt.name [prompt]: Give your homebot a command name? For example {example} ({enter} keeps homebot): {example}: string, an example command name (fixed), zork; {enter}: string, the Enter key (fixed), Enter
+setup.warning.name_invalid [warning]: {name} must be {rule}. Try another name. {name}: string, the invalid answer to the setup name question; {rule}: string, the valid command name syntax (fixed), 2 to 32 lowercase letters, digits and hyphens, starting with a letter
+setup.warning.name_blocked [warning]: {name} cannot be used as a command here: {reason}. Homebot will keep working. {name}: string, the blocked name; {reason}: string, the reason from the machine's name check
+setup.prompt.name_path [prompt]: Put {bin} on your {path_env} in {file} so the name works? {choice} {file}: path, the startup file selected for this shell; {bin}: string, the user bin directory (fixed), ~/.local/bin; {path_env}: string, the PATH environment variable (fixed), PATH; {choice}: string, the yes or no prompt keys (fixed), [Y/n]
+setup.hint.name_path [hint]: Add {bin} to your {path_env} in {file} to type {name}; homebot works now. {file}: path, the startup file selected for this shell; {name}: string, the configured name; {bin}: string, the user bin directory (fixed), ~/.local/bin; {path_env}: string, the PATH environment variable (fixed), PATH
+setup.warning.path_link [warning]: Cannot safely edit {file} (link target: {target}). Add {bin} to your {path_env} yourself. {file}: path, the startup file selected for this shell; {target}: path, where its symlink resolves; {bin}: string, the user bin directory (fixed), ~/.local/bin; {path_env}: string, the PATH environment variable (fixed), PATH
+setup.status.path_added [status]: Added {bin} to {file}. {file}: path, the startup file that received the PATH line; {bin}: string, the user bin directory (fixed), ~/.local/bin
+setup.status.changed_here [status]: Changed on this machine:
+setup.status.name_link [status]:   name link: {bin}{name} points to {binary} {name}: string, the configured name; {bin}: string, the user bin directory with separator (fixed), ~/.local/bin/; {binary}: string, the stable binary name (fixed), homebot
+setup.status.path_line [status]:   added the {path_env} startup line {path_env}: string, the PATH environment variable (fixed), PATH
+setup.status.name_blocked [status]:   no name link for {name} was made here {name}: string, the shared name blocked on this machine
+setup.status.name_uncommitted [status]: The new name is in {config} but stays uncommitted with your other work; your next save carries it. {config}: string, the config file (fixed), homebot.yml
+setup.status.open_shell [status]: From now on, type {name}. Open a new terminal first; on some Linux systems, log out and back in. {name}: string, the working command name

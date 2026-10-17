@@ -1,0 +1,54 @@
+[!linux] skip 'recorded on linux'
+
+# Invalid (name) uses: a marked file, a doubled pair, and a plain folder that holds a marked one.
+# (At most one rejected name per folder: the order of those follows the OS's directory order.)
+# exit: 1
+! exec homebot link
+cmpwork stdout layout-invalid-nesting-link.stdout
+cmpwork stderr layout-invalid-nesting-link.stderr
+# exit: 0
+exec homebot link --dry-run
+cmpwork stdout layout-invalid-nesting-dry.stdout
+# exit: 0
+exec homebot
+cmpwork stdout layout-invalid-nesting-inbox.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/(file) --
+x
+-- home/.home/autolink/common/outer/(inner)/a --
+a
+-- home/.home/autolink/common/fine --
+ok
+-- home/.home/autolink/linux/((double))/a --
+a
+-- layout-invalid-nesting-link.stdout --
+  link    ~/.fine
+  invalid autolink/common/(file)  () marks folders only: rename "(file)" to ".file"
+  invalid autolink/linux/((double))  "((double))": wrap the name in one pair of (), like "(double)"
+  invalid autolink/common/outer  rename "outer" to "(outer)": it holds autolink/common/outer/(inner), which must not be a link, so it can't be one either
+1 change, 0 already linked, 3 layout errors in the repo
+-- layout-invalid-nesting-link.stderr --
+-- layout-invalid-nesting-dry.stdout --
+  invalid autolink/common/(file)  () marks folders only: rename "(file)" to ".file"
+  invalid autolink/linux/((double))  "((double))": wrap the name in one pair of (), like "(double)"
+  invalid autolink/common/outer  rename "outer" to "(outer)": it holds autolink/common/outer/(inner), which must not be a link, so it can't be one either
+1 already linked
+-- layout-invalid-nesting-inbox.stdout --
+homebot · testhost · 5 things need you (2 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  ! 3 layout errors in the repo; those parts aren't linked
+       () marks folders only: rename "(file)" to ".file"; "((double))": wrap the
+       name in one pair of (), like "(double)"
+       → homebot link --dry-run
+  3  • Secrets are not set up yet
+       → homebot keys init
+  4  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

@@ -1,0 +1,47 @@
+[!linux] skip 'recorded on linux'
+
+# cleanup after link --backup. The parity script link-backup holds the
+# TypeScript's words for the same steps.
+
+exec homebot cleanup
+cmp stdout none.stdout
+
+exec homebot link --backup
+stdout 'homebot cleanup'
+
+# --list only lists.
+exec homebot cleanup --list
+cmp stdout list.stdout
+! stderr .
+
+# Without a terminal nothing is asked: the backups are listed with how to
+# review them, and stay.
+exec homebot cleanup
+cmp stdout notty.stdout
+! stderr .
+exists home/.zshrc.homebot-backup-20260101-000000
+exists home/.gitconfig.homebot-backup-20260101-000000
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1
+-- home/.home/autolink/common/gitconfig --
+[user]
+	name = Repo
+-- home/.zshrc --
+export MINE=1
+-- home/.gitconfig --
+[user]
+	name = Mine
+-- none.stdout --
+No backups to review.
+-- list.stdout --
+  ~/.gitconfig.homebot-backup-20260101-000000
+  ~/.zshrc.homebot-backup-20260101-000000
+-- notty.stdout --
+  ~/.gitconfig.homebot-backup-20260101-000000
+  ~/.zshrc.homebot-backup-20260101-000000
+Review them in a terminal:
+  homebot cleanup

@@ -1,0 +1,21 @@
+# unlink takes no options. An unknown one is an error, not something to
+# ignore: unlink --dry-run removes nothing. The TypeScript ignored unknown
+# options, so its unlink --dry-run removed every link (a deliberate
+# difference).
+exec homebot link
+exec test -L home/.zshrc
+
+! exec homebot unlink --dry-run
+stderr .
+exec test -L home/.zshrc
+grep 'zshrc' xdg/state/homebot/links.json
+
+# A word after unlink is still no error, as in the TypeScript.
+exec homebot unlink extra
+! exists home/.zshrc
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1

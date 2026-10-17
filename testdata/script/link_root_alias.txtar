@@ -1,0 +1,65 @@
+[!linux] skip 'uses the linux layer'
+
+# ~/.home is a symlink to the folder the repo really is in. homebot finds
+# the repo as ~/.home when run from outside it, and by its real path when
+# run from inside it (the working directory has its symlinks resolved, as
+# process.cwd() did for the TypeScript). A link made through one path is
+# still homebot's through the other: already linked, never "in the way",
+# so link --backup moves nothing aside. New links keep the path homebot
+# was given.
+mkdir code/home
+cp src/homebot.yml code/home/homebot.yml
+mkdir code/home/autolink/common
+cp src/zshrc code/home/autolink/common/zshrc
+cp src/gitconfig code/home/autolink/common/gitconfig
+symlink home/.home -> ../code/home
+
+# (The files above are kept under src/: a homebot.yml in $WORK itself would
+# make $WORK the repo.)
+
+# Linked through ~/.home.
+exec homebot link
+cmp stdout first.stdout
+exec readlink home/.zshrc
+stdout '/home/\.home/autolink/common/zshrc$'
+
+# Through the real path: nothing to do, nothing moved aside.
+cd home/.home
+exec homebot link --backup
+cmp stdout $WORK/same.stdout
+! exists $WORK/home/.zshrc.homebot-backup-20260101-000000
+exec readlink $WORK/home/.zshrc
+stdout '/home/\.home/autolink/common/zshrc$'
+
+# unlink through the real path still knows them as its own.
+exec homebot unlink
+! exists $WORK/home/.zshrc
+! exists $WORK/home/.gitconfig
+
+# The other way round: linked through the real path...
+exec homebot link
+cmp stdout $WORK/first.stdout
+exec readlink $WORK/home/.zshrc
+stdout '/code/home/autolink/common/zshrc$'
+
+# ...and already linked through ~/.home.
+cd $WORK
+exec homebot link --backup
+cmp stdout same.stdout
+! exists home/.gitconfig.homebot-backup-20260101-000000
+exec readlink home/.gitconfig
+stdout '/code/home/autolink/common/gitconfig$'
+
+-- src/homebot.yml --
+profiles:
+  default: workstation
+-- src/zshrc --
+export REPO=1
+-- src/gitconfig --
+[user]
+-- first.stdout --
+  link    ~/.gitconfig
+  link    ~/.zshrc
+2 changes, 0 already linked
+-- same.stdout --
+0 changes, 2 already linked

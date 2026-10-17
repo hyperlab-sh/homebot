@@ -1,0 +1,35 @@
+[!linux] skip 'recorded on linux'
+
+# The only remote is not called origin: the message says how to rename it.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git -C home/.home remote add upstream $WORK/remote.git
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-other-name.stdout
+# exit: 0
+exec homebot
+cmpwork stdout inbox-other-name.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-other-name.stdout --
+This repo has a remote named upstream, but homebot pushes to the one named origin. Rename it:
+  git -C ~/.home remote rename upstream origin
+-- inbox-other-name.stdout --
+homebot · testhost · 7 things need you (2 urgent)
+
+  1  ! gitleaks is missing, so every commit is refused
+       → brew install gitleaks
+  2  ! The commit guard is not installed
+       → homebot setup
+  3  • Secrets are not set up yet
+       → homebot keys init
+  4  • 1 link to make or fix
+       → homebot link
+  5  • Not backed up yet: nothing pushed to the remote
+       → homebot remote
+  ...and 2 more: homebot --all

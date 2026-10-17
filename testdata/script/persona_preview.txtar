@@ -1,0 +1,39 @@
+exec homebot persona preview tester --event save.success.committed --all-variants
+stdout 'Saved 3 files'
+stdout 'Filed 3 files'
+! stderr .
+
+exec homebot persona preview tester
+stdout 'light theme'
+stdout 'dark theme'
+stdout 'needs'
+
+# A slot the inbox fills with another message shows that message, as the nudge
+# and the notification are shown without --event: not the generic <urgent>.
+exec homebot persona preview tester --event inbox.nudge
+stdout 'needs? you \(1 urgent\), run: homebot'
+stdout '3 things need you'
+! stdout '<'
+exec homebot persona preview tester --event inbox.notify.body
+stdout 'A key needs attention \(\+2 more\)\. Run: homebot'
+! stdout '<'
+
+! exec homebot persona preview tester --event guard.plaintext
+stderr 'No voiced message id'
+
+# A persona that does not exist says so, not "Invalid header".
+! exec homebot persona preview nosuch
+stderr 'No persona named nosuch'
+! stdout 'Invalid header'
+! stderr 'Invalid header'
+
+# tester extends none: the preview mechanics under test do not depend on
+# Neatpik's wording, so the catalog's words fill in what tester does not say.
+-- xdg/config/homebot/personas/tester.toml --
+schema = 1
+id = "tester"
+name = "Tester"
+emoji = "🧪"
+extends = "none"
+[lines]
+"save.success.committed" = ["Saved {n:# file|# files}", "Filed {n:# file|# files}"]

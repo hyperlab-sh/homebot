@@ -1,0 +1,87 @@
+[!linux] skip 'recorded on linux'
+
+# The hook subcommand directly: silent when the staged files are fine, listing every problem when not.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot hook pre-commit
+cmpwork stdout hook-ok.stdout
+cmpwork stderr hook-ok.stderr
+mkdir home/.home/private/common
+exec cp secret-file home/.home/private/common/plain
+exec git -C home/.home add -f private/common/plain
+exec sh -c 'head -c 1100000 /dev/zero > home/.home/big.bin'
+exec git -C home/.home add big.bin
+# exit: 1
+! exec homebot hook pre-commit
+cmpwork stdout hook-refused.stdout
+# deliberate: decision D2: where the rounded size equals the limit, the TypeScript said "just over 1 MB (limit 1 MB)"; Go shows the size with two decimals, "1.05 MB (limit 1 MB)"
+cmpwork stderr hook-refused.stderr
+# exit: 0
+exec homebot
+cmpwork stdout inbox-refused.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+limits:
+  maxFileMB: 1
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- secret-file --
+password=1
+-- hook-ok.stdout --
+-- hook-ok.stderr --
+-- hook-refused.stdout --
+-- hook-refused.stderr --
+homebot refused this commit:
+  - private/common/plain is plaintext. Only *.age files may be committed from private/. Unstage it:
+    git rm --cached private/common/plain
+  - big.bin is 1.05 MB (limit 1 MB). Unstage it and add it to .gitignore.
+-- inbox-refused.stdout --
+homebot · testhost · 6 things need you (2 urgent)
+
+  1  ! A commit was refused
+       private/common/plain is plaintext. Only *.age files may be committed from
+       private/. Unstage it:
+       → homebot save
+  2  ! The commit guard is not installed
+       → homebot setup
+  3  • 2 links to make or fix
+       → homebot link
+  4  • 3 uncommitted changes
+       → homebot save
+  5  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  ...and 1 more: homebot --all
+
+  Do the first one now: homebot next

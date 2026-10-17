@@ -1,0 +1,28 @@
+[!linux] skip 'recorded on linux'
+
+# gh is installed and logged in: the explanation offers to create a private GitHub repository.
+chmod 755 bin/gh
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+# exit: 0
+exec homebot remote
+cmpwork stdout remote-gh.stdout
+cmpwork stderr remote-gh.stderr
+-- bin/gh --
+#!/bin/sh
+[ "$1" = auth ] && exit 0
+echo "gh stub: unexpected $*" >&2
+exit 2
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- remote-gh.stdout --
+Nothing is backed up yet: the repo has no remote.
+Run this in a terminal to create a private GitHub repository for it:
+  homebot remote
+Or use a repository you already have:
+  homebot remote <url>
+-- remote-gh.stderr --

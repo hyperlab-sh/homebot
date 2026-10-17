@@ -1,0 +1,41 @@
+
+# exit: 0
+exec homebot -h
+# deliberate: guided setup: the setup summary describes the guided run; the TypeScript's setup only installed the guard and helper
+# deliberate: persona command adds its help overview row
+cmpwork stdout help-overview-short.stdout
+cmpwork stderr help-overview-short.stderr
+-- help-overview-short.stdout --
+homebot: Attention-Deficit Home Discipline
+
+  homebot [--all]                   what needs you (the inbox)
+  homebot next                      do the first thing in the inbox
+
+Moving in
+  homebot unpack [profile]          install and link everything a profile lists
+  homebot pack <path>...            move something from $HOME into the repo, link it back
+  homebot link                      make every link, show what's in the way
+  homebot unlink                    remove every link homebot made (files stay in the repo)
+  homebot cleanup                   go through what link --backup moved aside
+
+Secrets
+  homebot keys init                 create the key pair (asks for a passphrase)
+  homebot unlock                    decrypt private/ (asks for the passphrase)
+  homebot lock                      encrypt changed secrets
+
+Keeping order
+  homebot triage                    decide about new things: track, ignore or snooze
+  homebot inventory                 what's managed and what isn't
+  homebot remote [url]              set up where the repo is backed up
+  homebot save                      commit, pull and push
+  homebot export [name...]          snapshot installed packages into manifests/
+  homebot tidy                      run the background chores now
+  homebot setup                     set up this machine, from nothing to an empty inbox
+  homebot actions                   list the actions profiles can use
+  homebot action <name> [args...]   run one action by hand
+  homebot shell zsh                 print the shell integration
+  homebot name [word]               show, change or turn off your homebot's command name
+  homebot persona [command]         list and manage personas
+
+Details, options and examples for any command: homebot <command> --help
+-- help-overview-short.stderr --

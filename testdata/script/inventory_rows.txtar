@@ -1,0 +1,82 @@
+[!linux] skip 'uses the linux layer'
+
+# inventory on a repo with keys, exports and an unpacked profile, then
+# through the repo's states. inventory-fresh (parity) covers a home that is
+# not a repo; inventory-ready also needs setup.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec homebot unpack
+exec homebot export
+exec homebot inventory
+cmp stdout ready.stdout
+! stderr .
+
+# A profile changed since it was unpacked.
+exec sh -c 'echo "  - run: true" >> home/.home/manifests/profiles/workstation.yml'
+exec homebot inventory
+stdout '^  Profile   workstation · unpacked just now, changed since$'
+stdout ', 1 uncommitted$'
+exec git -C home/.home commit -qam more
+
+# The repo row tells no remote from a remote never pushed to (the
+# TypeScript's help-remote test, with git push for homebot remote).
+exec homebot inventory
+stdout '^  Repo      main \(no remote: homebot remote\) · 0 ahead, 0 behind, 0 uncommitted$'
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec homebot inventory
+stdout '^  Repo      main \(never pushed: homebot remote\) · 0 ahead, 0 behind, 0 uncommitted$'
+exec git -C home/.home push -q -u origin main
+exec homebot inventory
+stdout '^  Repo      main → origin/main · 0 ahead, 0 behind, 0 uncommitted$'
+exec git -C home/.home commit -q --allow-empty -m local
+exec homebot inventory
+stdout '^  Repo      main → origin/main · 1 ahead, 0 behind, 0 uncommitted$'
+exec git -C home/.home checkout -q --detach
+exec homebot inventory
+stdout '^  Repo      detached \(never pushed: homebot remote\) · 0 ahead, 0 behind, 0 uncommitted$'
+
+# inventory changes nothing and decides nothing.
+exec git -C home/.home status --porcelain
+cmp stdout status.want
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+exports:
+  - name: list
+    out: manifests/list.txt
+    run: echo item
+  - name: bad
+    out: manifests/bad.txt
+    run: exit 1
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: never decrypted
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- ready.stdout --
+homebot inventory · testhost (linux) · ~/.home
+  Profile   workstation · unpacked just now
+  Links     1 ok, 0 to fix, 0 blocked, 0 locked
+  Secrets   none yet
+  Triage    1 to sort, 0 ignored
+  Repo      main (no remote: homebot remote) · 0 ahead, 0 behind, 0 uncommitted
+  Exports   list just now, bad failing
+  Helper    not installed (homebot setup)
+-- status.want --
+?? manifests/list.txt

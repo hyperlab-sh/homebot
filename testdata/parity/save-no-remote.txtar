@@ -1,0 +1,53 @@
+[!linux] skip 'recorded on linux'
+# save runs the commit guard itself (D14), which needs a gitleaks it can run.
+chmod 755 bin/gitleaks
+
+# A repo without a remote: commit only, and the inbox says it is not backed up.
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec sh -c 'echo more >> home/.home/autolink/common/zshrc'
+# exit: 0
+exec homebot save
+cmpwork stdout save-no-remote.stdout
+cmpwork stderr save-no-remote.stderr
+# exit: 0
+exec homebot save
+cmpwork stdout save-no-remote-again.stdout
+exec git -C home/.home log --format=%s
+cmpwork stdout log.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- save-no-remote.stdout --
+committed 1 file
+-- save-no-remote.stderr --
+-- save-no-remote-again.stdout --
+Nothing new to commit.
+-- log.stdout --
+chore(home): save changes from testhost
+init

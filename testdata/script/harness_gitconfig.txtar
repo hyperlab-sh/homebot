@@ -1,0 +1,8 @@
+# A gitconfig in the script's archive replaces the sandbox's.
+[!exec:git] skip 'git is not installed'
+exec git config --global user.name
+stdout '^Archive User$'
+
+-- gitconfig --
+[user]
+	name = Archive User

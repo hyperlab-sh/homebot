@@ -1,0 +1,178 @@
+{
+  "hal-9000": {
+    "schema": 1,
+    "id": "hal-9000",
+    "name": "HAL 9000",
+    "emoji": "🔴",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#743C46",
+        "Dark": "#E8AAB5"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "johnny-5": {
+    "schema": 1,
+    "id": "johnny-5",
+    "name": "Johnny 5",
+    "emoji": "🤖",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#674C30",
+        "Dark": "#E0C096"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "marvin": {
+    "schema": 1,
+    "id": "marvin",
+    "name": "Marvin",
+    "emoji": "☔",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#4A5A78",
+        "Dark": "#A3B3CF"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "miss-minute": {
+    "schema": 1,
+    "id": "miss-minute",
+    "name": "Miss Minute",
+    "emoji": "⏰",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#684C73",
+        "Dark": "#D5B4E0"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "neatpik": {
+    "schema": 1,
+    "id": "neatpik",
+    "name": "Neatpik",
+    "emoji": "🧹",
+    "extends": "none",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#31466B",
+        "Dark": "#AFC4E9"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "r2-d2": {
+    "schema": 1,
+    "id": "r2-d2",
+    "name": "R2-D2",
+    "emoji": "📡",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#305B72",
+        "Dark": "#A1D7F0"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "rosie": {
+    "schema": 1,
+    "id": "rosie",
+    "name": "Rosie",
+    "emoji": "🧽",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#375666",
+        "Dark": "#A9D5E6"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  },
+  "wall-e": {
+    "schema": 1,
+    "id": "wall-e",
+    "name": "WALL-E",
+    "emoji": "🌱",
+    "extends": "neatpik",
+    "lang": "en",
+    "colors": {
+      "Accent": {
+        "Light": "#42633A",
+        "Dark": "#AFE69C"
+      },
+      "OK": {
+        "Light": "#245D38",
+        "Dark": "#9DE0AF"
+      },
+      "Muted": {
+        "Light": "#5E6470",
+        "Dark": "#B0B6C0"
+      }
+    }
+  }
+}

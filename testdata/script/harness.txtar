@@ -1,0 +1,60 @@
+# Every script runs in the sandbox environment of plan 8.3.
+exec sh -c 'printf "%s\n" "$HOME" "$XDG_CONFIG_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$GIT_CONFIG_GLOBAL" "$GIT_CONFIG_NOSYSTEM" "$GIT_AUTHOR_DATE" "$GIT_COMMITTER_DATE" "$HOMEBOT_TEST_NOW" "$HOMEBOT_TEST_SEED" "$HOMEBOT_TEST_HOST" "$NO_COLOR" "$TZ" "$LANG" "$LC_ALL" "${ZDOTDIR-unset}"'
+cmpwork stdout env.golden
+exists $WORK/home
+exists $WORK/bin
+exists $WORK/gitconfig
+
+# PATH is $WORK/bin, testscript's bin dir with homebot in it, then /usr/bin:/bin.
+exec sh -c 'case "$PATH" in "$WORK/bin:"*":/usr/bin:/bin") echo ok;; esac'
+stdout '^ok$'
+exec sh -c 'command -v homebot'
+stdout '/homebot$'
+! stdout '^\$WORK'
+
+# git sees only the sandbox's global config.
+[exec:git] exec git config --global user.name
+[exec:git] stdout '^Test User$'
+[exec:git] exec git config --global init.defaultBranch
+[exec:git] stdout '^main$'
+
+# cmpwork replaces every $WORK in the actual text and reads the golden as it is.
+exec sh -c 'echo "$WORK/a and $WORK/b" >&2'
+cmpwork stderr twice.golden
+exec sh -c 'printf "%s uses \$EDITOR\n" "$WORK" > out.txt'
+cmpwork out.txt editor.golden
+
+# homebot runs as a test binary, so the test hooks apply to it: a bad clock
+# value is rejected, and a dir outside the temp dir trips the guard.
+env HOMEBOT_TEST_NOW=soon
+! exec homebot version
+stderr 'HOMEBOT_TEST_NOW is not a number of milliseconds: "soon"'
+env HOMEBOT_TEST_NOW=1767225600000
+env XDG_STATE_HOME=/nonexistent/state
+! exec homebot version
+stderr 'outside the temp dir'
+env XDG_STATE_HOME=$WORK/xdg/state
+exec homebot version
+
+-- env.golden --
+$WORK/home
+$WORK/xdg/config
+$WORK/xdg/state
+$WORK/xdg/cache
+$WORK/xdg/data
+$WORK/gitconfig
+1
+2026-01-01T00:00:00Z
+2026-01-01T00:00:00Z
+1767225600000
+1
+testhost
+1
+UTC
+C.UTF-8
+C.UTF-8
+unset
+-- twice.golden --
+$WORK/a and $WORK/b
+-- editor.golden --
+$WORK uses $EDITOR

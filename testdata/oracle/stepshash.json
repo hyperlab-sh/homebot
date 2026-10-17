@@ -1,0 +1,665 @@
+[
+  {
+    "name": "no steps",
+    "steps": [],
+    "hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+    "name": "action without arguments",
+    "steps": [
+      [
+        "unlock",
+        []
+      ]
+    ],
+    "hash": "387d994e473aff294f60c3395988a65deeb9749487e28e211e5d571ce95b37f4"
+  },
+  {
+    "name": "ascii",
+    "steps": [
+      [
+        "brew",
+        [
+          "linux/Brewfile"
+        ]
+      ],
+      [
+        "fonts",
+        [
+          "JetBrainsMono",
+          "FiraCode"
+        ]
+      ]
+    ],
+    "hash": "be22f8f3a190be2e241b8d88010d065c56174dae82c85e7310a61ab6be41770b"
+  },
+  {
+    "name": "several actions in order",
+    "steps": [
+      [
+        "link",
+        []
+      ],
+      [
+        "unlock",
+        []
+      ],
+      [
+        "run",
+        [
+          "echo done"
+        ]
+      ]
+    ],
+    "hash": "9c4650e54f8d65f0fdd3bb8dec858a5db4fb64569d5a9da81611d464cc146a15"
+  },
+  {
+    "name": "empty argument",
+    "steps": [
+      [
+        "run",
+        [
+          ""
+        ]
+      ]
+    ],
+    "hash": "3df5f9b0df70316f3b16a3f43bf0fe61ed48677e0ff35d780d3fb81fbb8f2f11"
+  },
+  {
+    "name": "empty arguments among others",
+    "steps": [
+      [
+        "x",
+        [
+          "",
+          "a",
+          ""
+        ]
+      ]
+    ],
+    "hash": "bde31be8c0c5c81355987de86df3ad2f909eadb275805d6378bfabd04528a65f"
+  },
+  {
+    "name": "html characters <>&",
+    "steps": [
+      [
+        "run",
+        [
+          "a < b && c > d"
+        ]
+      ]
+    ],
+    "hash": "b46b222007a872f6019e2aa548fb8dff47d8595457c870e9737d55329a4e6e19"
+  },
+  {
+    "name": "html characters inside an action's arguments",
+    "steps": [
+      [
+        "run",
+        [
+          "<script>alert(1)</script>",
+          "&amp;",
+          "x&y"
+        ]
+      ]
+    ],
+    "hash": "1844e315866d8b7f105261086afc30a46e8da44469cf34f046f47ca054eca410"
+  },
+  {
+    "name": "U+2028 line separator",
+    "steps": [
+      [
+        "run",
+        [
+          "a\u2028b"
+        ]
+      ]
+    ],
+    "hash": "c773380e532b11d4595ec988c052ed502cce1a0479190155a29fc8cf1b6d57f4"
+  },
+  {
+    "name": "U+2029 paragraph separator",
+    "steps": [
+      [
+        "run",
+        [
+          "a\u2029b"
+        ]
+      ]
+    ],
+    "hash": "224561ecc73995c05e15bc5e04e54ee7c3d990081568e27b0b0387ab80061932"
+  },
+  {
+    "name": "both separators and html",
+    "steps": [
+      [
+        "run",
+        [
+          "\u2028<\u2029>&"
+        ]
+      ]
+    ],
+    "hash": "f35240bd5a22bdaab69416738988611fe6529654ff3274375f8aced67ba742cd"
+  },
+  {
+    "name": "double quotes",
+    "steps": [
+      [
+        "run",
+        [
+          "say \"hi\""
+        ]
+      ]
+    ],
+    "hash": "c53f732ed8fd336c92e1937b68049883d3c6dccde0dd8ba2b4fb373a24951f45"
+  },
+  {
+    "name": "single quotes",
+    "steps": [
+      [
+        "run",
+        [
+          "it's"
+        ]
+      ]
+    ],
+    "hash": "c349ddcda77ecddbc368773895575a9fbc18a01949e797ea742f645c4cf9ee7c"
+  },
+  {
+    "name": "backslashes",
+    "steps": [
+      [
+        "run",
+        [
+          "C:\\path\\to",
+          "\\",
+          "\\\\",
+          "a\\nb"
+        ]
+      ]
+    ],
+    "hash": "0c093304143b35019243f71dca6a4e1dbc2d3dde085106e9da909ab336742ea9"
+  },
+  {
+    "name": "backslash before quote",
+    "steps": [
+      [
+        "run",
+        [
+          "\\\"",
+          "\"\\"
+        ]
+      ]
+    ],
+    "hash": "aa28850444881693484e32f5440f4902c067be6c942c5fe7b835d2c56fd28b48"
+  },
+  {
+    "name": "slash",
+    "steps": [
+      [
+        "run",
+        [
+          "a/b",
+          "</tag>"
+        ]
+      ]
+    ],
+    "hash": "493621056ac1151d706fb80673a58e0b6cdd127bf381f4d0dee3ad3941f42a55"
+  },
+  {
+    "name": "newline, tab and carriage return",
+    "steps": [
+      [
+        "run",
+        [
+          "line1\nline2",
+          "a\tb",
+          "a\r\nb"
+        ]
+      ]
+    ],
+    "hash": "52a8803e387fc1b2694182d6a5dec67c2533f721a49a3efe6b25eba293052cd2"
+  },
+  {
+    "name": "backspace and form feed",
+    "steps": [
+      [
+        "run",
+        [
+          "a\bb",
+          "a\fb"
+        ]
+      ]
+    ],
+    "hash": "acc681ef0680bc2ff6dfc4049aac0125f44c817f5896ee493f5a4fccb2638b4a"
+  },
+  {
+    "name": "every control character U+0000 to U+001F",
+    "steps": [
+      [
+        "run",
+        [
+          "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
+        ]
+      ]
+    ],
+    "hash": "ad5d2abd3b5665b682fe6ca1a3204d56d42a5bf325e06660e6b14d56978d109f"
+  },
+  {
+    "name": "each control character on its own",
+    "steps": [
+      [
+        "run",
+        [
+          "\u0000",
+          "\u0001",
+          "\u0002",
+          "\u0003",
+          "\u0004",
+          "\u0005",
+          "\u0006",
+          "\u0007",
+          "\b",
+          "\t",
+          "\n",
+          "\u000b",
+          "\f",
+          "\r",
+          "\u000e",
+          "\u000f",
+          "\u0010",
+          "\u0011",
+          "\u0012",
+          "\u0013",
+          "\u0014",
+          "\u0015",
+          "\u0016",
+          "\u0017",
+          "\u0018",
+          "\u0019",
+          "\u001a",
+          "\u001b",
+          "\u001c",
+          "\u001d",
+          "\u001e",
+          "\u001f"
+        ]
+      ]
+    ],
+    "hash": "6f8401d775ef6a5a8e1629d990ca7e5b487a8857b1d9ac428248795f4b0593e9"
+  },
+  {
+    "name": "DEL and C1 controls",
+    "steps": [
+      [
+        "run",
+        [
+          "",
+          "",
+          ""
+        ]
+      ]
+    ],
+    "hash": "e950af4488a0bb0d7aa7e512dc6ef87a88e66ae3f18ee393c0478c39a38d40a2"
+  },
+  {
+    "name": "non-breaking space and BOM",
+    "steps": [
+      [
+        "run",
+        [
+          "a b",
+          "﻿x"
+        ]
+      ]
+    ],
+    "hash": "076ef83222f58518298172988072cb693182797124038ccd6b1e03e5916eb512"
+  },
+  {
+    "name": "latin-1 and accents",
+    "steps": [
+      [
+        "run",
+        [
+          "café",
+          "naïve",
+          "ß"
+        ]
+      ]
+    ],
+    "hash": "8127adb0cfc27de11700a099e3ea848b3e69a6532513069be5e0ee733be4c87f"
+  },
+  {
+    "name": "cjk",
+    "steps": [
+      [
+        "run",
+        [
+          "日本語",
+          "中文",
+          "한국어"
+        ]
+      ]
+    ],
+    "hash": "ce03987bc4b8613dd6fbb53f156b77a087ff9285cd949241adeb2369211169ee"
+  },
+  {
+    "name": "emoji",
+    "steps": [
+      [
+        "run",
+        [
+          "🚚",
+          "👩‍💻",
+          "🇧🇷",
+          "❤️"
+        ]
+      ]
+    ],
+    "hash": "d5cd232cb7db72d517a13d31f9bbcbac7f72914c80e61580ddfdfc4fd47fb692"
+  },
+  {
+    "name": "astral characters next to separators",
+    "steps": [
+      [
+        "run",
+        [
+          "𝄞\u2028𝄞"
+        ]
+      ]
+    ],
+    "hash": "037a317befc9280f2db5c0110f3d341383c16377b9219123b43cdef304ea4a4e"
+  },
+  {
+    "name": "unicode action name",
+    "steps": [
+      [
+        "acção",
+        [
+          "x"
+        ]
+      ]
+    ],
+    "hash": "37af951cb7c6fe9b76932a08dd174ecff7964929099a465f1f38387d83f074e8"
+  },
+  {
+    "name": "long argument",
+    "steps": [
+      [
+        "run",
+        [
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        ]
+      ]
+    ],
+    "hash": "e0487ea36ef9ddfa1a37825446b76e74bf031c756c696349929cdf68faf1d890"
+  },
+  {
+    "name": "many arguments",
+    "steps": [
+      [
+        "fonts",
+        [
+          "font-0",
+          "font-1",
+          "font-2",
+          "font-3",
+          "font-4",
+          "font-5",
+          "font-6",
+          "font-7",
+          "font-8",
+          "font-9",
+          "font-10",
+          "font-11",
+          "font-12",
+          "font-13",
+          "font-14",
+          "font-15",
+          "font-16",
+          "font-17",
+          "font-18",
+          "font-19",
+          "font-20",
+          "font-21",
+          "font-22",
+          "font-23",
+          "font-24",
+          "font-25",
+          "font-26",
+          "font-27",
+          "font-28",
+          "font-29",
+          "font-30",
+          "font-31",
+          "font-32",
+          "font-33",
+          "font-34",
+          "font-35",
+          "font-36",
+          "font-37",
+          "font-38",
+          "font-39",
+          "font-40",
+          "font-41",
+          "font-42",
+          "font-43",
+          "font-44",
+          "font-45",
+          "font-46",
+          "font-47",
+          "font-48",
+          "font-49",
+          "font-50",
+          "font-51",
+          "font-52",
+          "font-53",
+          "font-54",
+          "font-55",
+          "font-56",
+          "font-57",
+          "font-58",
+          "font-59",
+          "font-60",
+          "font-61",
+          "font-62",
+          "font-63",
+          "font-64",
+          "font-65",
+          "font-66",
+          "font-67",
+          "font-68",
+          "font-69",
+          "font-70",
+          "font-71",
+          "font-72",
+          "font-73",
+          "font-74",
+          "font-75",
+          "font-76",
+          "font-77",
+          "font-78",
+          "font-79",
+          "font-80",
+          "font-81",
+          "font-82",
+          "font-83",
+          "font-84",
+          "font-85",
+          "font-86",
+          "font-87",
+          "font-88",
+          "font-89",
+          "font-90",
+          "font-91",
+          "font-92",
+          "font-93",
+          "font-94",
+          "font-95",
+          "font-96",
+          "font-97",
+          "font-98",
+          "font-99",
+          "font-100",
+          "font-101",
+          "font-102",
+          "font-103",
+          "font-104",
+          "font-105",
+          "font-106",
+          "font-107",
+          "font-108",
+          "font-109",
+          "font-110",
+          "font-111",
+          "font-112",
+          "font-113",
+          "font-114",
+          "font-115",
+          "font-116",
+          "font-117",
+          "font-118",
+          "font-119",
+          "font-120",
+          "font-121",
+          "font-122",
+          "font-123",
+          "font-124",
+          "font-125",
+          "font-126",
+          "font-127",
+          "font-128",
+          "font-129",
+          "font-130",
+          "font-131",
+          "font-132",
+          "font-133",
+          "font-134",
+          "font-135",
+          "font-136",
+          "font-137",
+          "font-138",
+          "font-139",
+          "font-140",
+          "font-141",
+          "font-142",
+          "font-143",
+          "font-144",
+          "font-145",
+          "font-146",
+          "font-147",
+          "font-148",
+          "font-149",
+          "font-150",
+          "font-151",
+          "font-152",
+          "font-153",
+          "font-154",
+          "font-155",
+          "font-156",
+          "font-157",
+          "font-158",
+          "font-159",
+          "font-160",
+          "font-161",
+          "font-162",
+          "font-163",
+          "font-164",
+          "font-165",
+          "font-166",
+          "font-167",
+          "font-168",
+          "font-169",
+          "font-170",
+          "font-171",
+          "font-172",
+          "font-173",
+          "font-174",
+          "font-175",
+          "font-176",
+          "font-177",
+          "font-178",
+          "font-179",
+          "font-180",
+          "font-181",
+          "font-182",
+          "font-183",
+          "font-184",
+          "font-185",
+          "font-186",
+          "font-187",
+          "font-188",
+          "font-189",
+          "font-190",
+          "font-191",
+          "font-192",
+          "font-193",
+          "font-194",
+          "font-195",
+          "font-196",
+          "font-197",
+          "font-198",
+          "font-199"
+        ]
+      ]
+    ],
+    "hash": "f02458531f8374b704ab498c6a7e5f8d3a839ff2034b970f38c78cebe77dc261"
+  },
+  {
+    "name": "numbers written as text",
+    "steps": [
+      [
+        "x",
+        [
+          "1.1",
+          "1e3",
+          "0x1F",
+          "true",
+          "null"
+        ]
+      ]
+    ],
+    "hash": "a746f2061b7f3033d752189e4ff3d3077786e8323255836054b94b56574cdd7f"
+  },
+  {
+    "name": "same step twice",
+    "steps": [
+      [
+        "brew",
+        [
+          "a"
+        ]
+      ],
+      [
+        "brew",
+        [
+          "a"
+        ]
+      ]
+    ],
+    "hash": "ecd3628eed3f42b65984854523a3c39bf6e88161f131524673433598973da033"
+  },
+  {
+    "name": "mixed everything",
+    "steps": [
+      [
+        "run",
+        [
+          "echo \"a<b>&c\" \\ \u2028 🚚 \t"
+        ]
+      ],
+      [
+        "unlock",
+        []
+      ],
+      [
+        "x",
+        [
+          "",
+          "é"
+        ]
+      ]
+    ],
+    "hash": "a8c497271edce188a5f3fde747cdc7140ac667e450dfb6710412db701830fbb8"
+  }
+]

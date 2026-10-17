@@ -1,0 +1,78 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - errorlint
+    - forbidigo
+    - misspell
+    - nolintlint
+    - unconvert
+    - unparam
+  settings:
+    forbidigo:
+      analyze-types: true
+      forbid:
+        # Styled text is fitted to the terminal only by ui's writers.
+        - pattern: '^app\.Context\.(Stdout|Stderr)$'
+          pkg: '^github\.com/hyperlab-sh/homebot/internal/app$'
+          msg: "print with ui.Println or ui.Eprintln, or write to ui.Out or ui.Err: they fit styles to the terminal (see internal/ui)"
+        # cobra's writers and Print methods fall back to os.Stdout and
+        # os.Stderr on a command the root has not set them for.
+        - pattern: '^cobra\.Command\.(OutOrStdout|OutOrStderr|ErrOrStderr|Print|Println|Printf|PrintErr|PrintErrln|PrintErrf)$'
+          pkg: '^github\.com/spf13/cobra$'
+          msg: "print with ui.Println or ui.Eprintln, or write to ui.Out or ui.Err: cobra's writers and Print methods are for its own help and usage"
+        # msg.Speak says a message without asking the Context for its
+        # persona. Only the voice and fail.Say's Context-free errors use it.
+        - pattern: '^msg\.Speak$'
+          pkg: '^github\.com/hyperlab-sh/homebot/internal/msg$'
+          msg: "say a message with voice.Render or voice.Plain, which speak in the Context's voice; code without a Context returns fail.Say(text)"
+        # msg.Build makes a Text from an id that is data. Code that knows
+        # its message calls the typed accessor, so the compiler checks the
+        # values and TestEveryCatalogEntryHasACaller sees the caller.
+        - pattern: '^msg\.Build$'
+          pkg: '^github\.com/hyperlab-sh/homebot/internal/msg$'
+          msg: "call the message's typed accessor (msg.InboxHeaderCount(n)); msg.Build is for the persona preview and tests"
+        # persona.Override swaps the voice for a test.
+        - pattern: '^persona\.Override$'
+          pkg: '^github\.com/hyperlab-sh/homebot/internal/persona$'
+          msg: "persona.Override is a test seam; production code resolves the persona through the Context"
+    staticcheck:
+      checks:
+        - all
+        # golangci-lint's defaults:
+        - -ST1000
+        - -ST1003
+        - -ST1016
+        - -ST1020
+        - -ST1021
+        - -ST1022
+        # homebot's errors are messages for people: capital letter, full stop.
+        - -ST1005
+
+  exclusions:
+    rules:
+      # ui builds the writers from the streams.
+      - path: '^internal/ui/'
+        linters: [forbidigo]
+        text: 'they fit styles to the terminal'
+      - path: '_test\.go$'
+        linters: [forbidigo]
+      # The voice renders with msg.Speak, and fail.Say's errors read neutrally
+      # until the CLI says them in the Context's voice.
+      - path: '^internal/(voice|fail)/'
+        linters: [forbidigo]
+        text: 'msg\.Speak'
+      # The persona preview renders any entry the user names (--event).
+      - path: '^internal/cli/order_persona_preview\.go$'
+        linters: [forbidigo]
+        text: 'msg\.Build'
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/hyperlab-sh/homebot

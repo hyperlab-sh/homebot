@@ -1,0 +1,61 @@
+[!linux] skip 'uses the linux layer'
+
+# The inbox lists what homebot did on its own since the person last looked,
+# leaving out what failed, and only once: looking moves lastSeen to now.
+# Words after inbox are ignored.
+exec homebot
+cmpwork stdout first.stdout
+! stderr .
+exec homebot inbox extra words
+cmpwork stdout second.stdout
+! stderr .
+
+# refresh prints nothing and writes the cache files the shell reads.
+rm xdg/cache/homebot/nudge
+exec homebot refresh
+! stdout .
+! stderr .
+cmp xdg/cache/homebot/count count.golden
+cmp xdg/cache/homebot/nudge nudge.golden
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- xdg/state/homebot/journal.jsonl --
+{"at":1767225500000,"msg":"sealed 2 secrets"}
+{"at":1767225500001,"msg":"export brew failed","error":true}
+{"at":1767225500002,"msg":"linked 3 files"}
+-- first.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+
+  Done for you since you last looked:
+    sealed 2 secrets
+    linked 3 files
+-- second.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- count.golden --
+4!
+-- nudge.golden --
+🚚 homebot: 4 things need you (1 urgent), run: homebot

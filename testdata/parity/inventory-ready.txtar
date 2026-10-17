@@ -1,0 +1,76 @@
+[!linux] skip 'recorded on linux'
+
+# Inventory on a repo with keys, a remote, a helper, exports and an unpacked profile.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot setup
+# exit: 0
+exec homebot unpack
+# exit: 0
+exec homebot export
+# exit: 0
+exec homebot inventory
+cmpwork stdout inventory-ready.stdout
+exec sh -c 'echo "  - run: true" >> home/.home/manifests/profiles/workstation.yml'
+# exit: 0
+exec homebot inventory
+cmpwork stdout inventory-changed.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+exports:
+  - name: list
+    out: manifests/list.txt
+    run: echo item
+  - name: bad
+    out: manifests/bad.txt
+    run: exit 1
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- inventory-ready.stdout --
+homebot inventory · testhost (linux) · ~/.home
+  Profile   workstation · unpacked just now
+  Links     1 ok, 0 to fix, 0 blocked, 0 locked
+  Secrets   none yet
+  Triage    1 to sort, 0 ignored
+  Repo      main → origin/main · 0 ahead, 0 behind, 0 uncommitted
+  Exports   list just now, bad failing
+  Helper    installed · last ran never
+-- inventory-changed.stdout --
+homebot inventory · testhost (linux) · ~/.home
+  Profile   workstation · unpacked just now, changed since
+  Links     1 ok, 0 to fix, 0 blocked, 0 locked
+  Secrets   none yet
+  Triage    1 to sort, 0 ignored
+  Repo      main → origin/main · 0 ahead, 0 behind, 1 uncommitted
+  Exports   list just now, bad failing
+  Helper    installed · last ran never

@@ -1,0 +1,38 @@
+[!linux] skip 'recorded on linux'
+
+# The command was given {out} and never wrote it: the error names the file.
+# exit: 0
+exec homebot export
+cmpwork stdout export-not-written.stdout
+cmpwork stderr export-not-written.stderr
+! exists home/.home/manifests/never.txt
+# exit: 0
+exec homebot
+cmpwork stdout export-not-written-inbox.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+exports:
+  - name: never
+    out: manifests/never.txt
+    run: echo ignoring the output file {out} > /dev/null
+-- export-not-written.stdout --
+failed    never: the command did not write manifests/never.txt, the file given to it as {out}
+-- export-not-written.stderr --
+-- export-not-written-inbox.stdout --
+homebot · testhost · 5 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • Export never is failing
+       the command did not write manifests/never.txt, the file given to it as
+       {out}
+       → homebot export never
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

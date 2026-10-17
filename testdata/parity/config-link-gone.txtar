@@ -1,0 +1,14 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: the removed link key
+# exit: 1
+! exec homebot
+cmpwork stdout config-link-gone.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-link-gone.stderr
+-- home/.home/homebot.yml --
+link:
+  - .config/foo
+-- config-link-gone.stdout --
+-- config-link-gone.stderr --
+homebot: $WORK/home/.home/homebot.yml:1:1: "link" is gone. Wrap a folder's name in () in autolink/ to keep it a real folder, e.g. autolink/common/(claude)/settings.json

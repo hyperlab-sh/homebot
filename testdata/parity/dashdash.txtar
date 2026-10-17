@@ -1,0 +1,39 @@
+[!linux] skip 'recorded on linux'
+
+# Nothing after -- counts as an option or as a request for help.
+# exit: 0
+exec homebot link --dry-run -- --help
+cmpwork stdout link-dashdash.stdout
+cmpwork stderr link-dashdash.stderr
+# exit: 0
+exec homebot -- --help
+# deliberate: bun drops a leading -- before src/cli.ts sees it, so the recording shows the overview; Go, like the TypeScript's compiled build, receives the -- and runs the inbox (output recorded from bun src/cli.ts -- -- --help)
+cmpwork stdout bare-dashdash.stdout
+cmpwork stderr bare-dashdash.stderr
+# exit: 1
+! exec homebot pack -- --help
+cmpwork stdout pack-dashdash.stdout
+cmpwork stderr pack-dashdash.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- link-dashdash.stdout --
+0 already linked
+-- link-dashdash.stderr --
+-- bare-dashdash.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- bare-dashdash.stderr --
+-- pack-dashdash.stdout --
+-- pack-dashdash.stderr --
+homebot: $WORK/--help does not exist.

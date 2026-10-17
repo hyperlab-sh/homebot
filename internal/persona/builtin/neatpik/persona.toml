@@ -1,0 +1,65 @@
+schema = 1
+id = "neatpik"
+name = "Neatpik"
+emoji = "🧹"
+tagline = "A tidy home, one step at a time"
+extends = "none"
+lang = "en"
+
+[colors]
+accent = { light = "#31466B", dark = "#AFC4E9" }
+ok = { light = "#245D38", dark = "#9DE0AF" }
+muted = { light = "#5E6470", dark = "#B0B6C0" }
+
+[lines]
+"action.unlock.status.nothing" = ["{action} nothing to decrypt", "{action} nothing to decrypt right now", "{action} nothing waiting to be decrypted"]
+"cleanup.status.nothing_taken" = ["Nothing taken from the backup.", "Nothing was taken from the backup.", "The backup stays as it is; nothing was taken."]
+"cleanup.success.deleted" = ["deleted {path}", "deleted the backup {path}", "deleted {path}, as asked"]
+"cleanup.success.merged" = ["merged into {repo_path}; {self}{save} commits it", "merged the backup into {repo_path}; {self}{save} commits it", "merged into {repo_path}. {self}{save} commits it"]
+"cleanup.success.none" = ["No backups to review.", "No backups are waiting for review.", "Nothing to review: no backups here."]
+"cleanup.success.used" = ["copied into {repo_path} and deleted the backup; {self}{save} commits it", "copied the backup into {repo_path} and deleted it; {self}{save} commits it", "{repo_path} now holds the copy and the backup is deleted; {self}{save} commits it"]
+"identity.success.saved" = ["saved {name} <{email}> in {config}", "saved {name} <{email}> to {config}", "{config} now has {name} <{email}>"]
+"inbox.header.clear" = ["nothing needs you. Home is in order.", "nothing needs you. All is in order.", "nothing needs you right now. Home is in order."]
+"inbox.header.count" = ["{n:# thing needs|# things need} you", "{n:# thing is|# things are} waiting for you", "{n:# thing needs|# things need} your attention"]
+"inbox.notify.body" = ["{title}{more}. Run:", "{title}{more}. To see it, run:", "{title}{more}. To deal with it, run:"]
+"inbox.notify.title" = ["{bot} needs you", "{bot} has something for you", "{bot} needs a moment of your time"]
+"inbox.nudge" = ["{bot}: {n:# thing needs|# things need} you{urgent}, run:", "{bot}: {n:# thing is|# things are} waiting{urgent}, run:", "{bot}: {n:# thing needs|# things need} your attention{urgent}, run:"]
+"inventory.exports.none" = ["none configured", "none set up", "no exports configured"]
+"inventory.profile.none" = ["none chosen for this machine", "no profile chosen for this machine", "none chosen here yet"]
+"inventory.secrets.none" = ["none yet", "no secrets yet", "none so far"]
+"keys.success.created" = ["Keys created. The public key:", "Your keys are created. The public key:", "Keys created. Here is the public key:"]
+"lock.status.nothing" = ["Nothing to seal.", "Nothing needs sealing.", "Nothing to seal right now."]
+"lock.success.sealed" = ["sealed {paths}", "sealed {paths} for you", "{paths} sealed"]
+"name.status.off" = ["Name turned off; homebot works as before.", "Name turned off. homebot works as before.", "The name is off; homebot works as before."]
+"name.status.set" = ["Name set to {name}.", "The name is now {name}.", "Name set: {name}."]
+"next.success.nothing" = ["Nothing needs you.", "Nothing needs you right now.", "All clear; nothing needs you."]
+"pack.success.packed" = ["packed {from} → {to}", "packed {from} → {to}, all in place", "moved into the repo: {from} → {to}"]
+"pack.success.sealed_suffix" = [" (sealed {n})", " (and sealed {n})", " ({n} sealed)"]
+"persona.success.created" = ["Created persona file: {path}", "Persona file created: {path}", "Created a persona file at {path}"]
+"persona.success.greeting" = ["{bot} is ready.", "{bot} is ready when you are.", "{bot} here, ready to go."]
+"persona.success.selected" = ["{id} is selected.", "{id} is the persona now.", "Selected {id}."]
+"remote.heading.none" = ["Nothing is backed up yet: the repo has no remote.", "Nothing is backed up yet, because the repo has no remote.", "The repo has no remote, so nothing is backed up yet."]
+"remote.success.created" = ["created {name}, a private {forge} repository", "created the private {forge} repository {name}", "{name} is created as a private {forge} repository"]
+"remote.success.pushed" = ["pushed; the repo is backed up", "pushed. The repo is backed up", "pushed the repo; it is backed up"]
+"remote.success.reachable" = ["reachable {url}", "reachable at {url}", "reached {url}"]
+"remote.success.remote" = ["remote {url}", "remote set to {url}", "remote is {url}"]
+"save.status.nothing" = ["Nothing new to commit.", "Nothing new to commit right now.", "No new changes to commit."]
+"save.success.committed" = ["committed {n:# file|# files}", "{n:# file|# files} committed", "committed {n:# file|# files} for you"]
+"save.success.pulled" = ["pulled {n:# commit|# commits}", "pulled {n:# commit|# commits} from the remote", "{n:# commit|# commits} pulled"]
+"save.success.pushed" = ["pushed {n:# commit|# commits}", "pushed {n:# commit|# commits} to the remote", "{n:# commit|# commits} pushed"]
+"save.success.sealed" = ["sealed {n:# secret|# secrets}", "{n:# secret|# secrets} sealed", "sealed {n:# secret|# secrets} for you"]
+"setup.status.no_repo" = ["No home repo yet.", "There is no home repo yet.", "No home repo here yet."]
+"setup.success.created" = ["created {path}, a new home repo with a {profile} profile", "created a new home repo at {path} with a {profile} profile", "{path} is a new home repo with a {profile} profile"]
+"setup.success.guard" = ["installed commit guard ({hook_key})", "installed the commit guard ({hook_key})", "commit guard installed ({hook_key})"]
+"setup.success.helper" = ["installed {helper}", "installed {helper} for you", "{helper} is installed"]
+"setup.success.zshrc" = ["added the startup line to {file}", "added the startup line to {file} for you", "{file} now has the startup line"]
+"tidy.status.nothing" = ["Nothing to tidy.", "Nothing to tidy right now.", "All tidy; nothing to do."]
+"triage.success.gitignored" = ["added /{key} to {gitignore}", "{gitignore} now lists /{key}", "put /{key} in {gitignore}"]
+"triage.success.ignored" = ["will never ask about {key} again", "won't ask about {key} again", "{key} is settled; no more questions about it"]
+"triage.success.none" = ["Nothing to sort. Everything has a decision.", "Nothing to sort; everything has a decision.", "Everything has a decision, so there is nothing to sort."]
+"triage.success.packed" = ["packed {key} into {repo_path}", "{key} is packed into {repo_path}", "packed {key}; it lives in {repo_path} now"]
+"triage.success.snoozed" = ["snoozed {key} for {duration}", "{key} is snoozed for {duration}", "snoozed {key}; it comes back in {duration}"]
+"triage.success.staged" = ["staged {key}", "{key} is staged", "staged {key} for the next commit"]
+"unlock.success.unlocked" = ["unlocked {n:# secret|# secrets}", "{n:# secret|# secrets} unlocked", "unlocked {n:# secret|# secrets} for you"]
+"unlock.success.verified_suffix" = [", verified {n}", ", {n} verified", ", and verified {n}"]
+"unpack.success.done" = ["Unpacked {profile}.", "{profile} is unpacked.", "Unpacked {profile}, all done."]

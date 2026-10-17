@@ -1,0 +1,111 @@
+exec homebot persona list
+stdout 'neatpik  Neatpik  \[built-in\]'
+! stderr .
+
+exec homebot persona
+stdout 'neatpik  Neatpik  \[built-in\]'
+
+exec homebot persona list
+stdout 'tester  Tester  \[user\]'
+stdout 'broken  \[unusable\]'
+
+# A persona with a refused line is marked like a broken file: validate and use
+# refuse it too, so list must not show it as a good choice.
+stdout 'refused  \[unusable\]'
+! stdout 'refused  Refused'
+
+# A persona is judged with the files it extends, as use and validate judge it:
+# a parent that is broken, has an unknown key, closes a cycle, or makes the
+# chain five files long leaves the persona unusable. The row says which file
+# the reason is in when it is not the persona's own.
+stdout 'heir  \[unusable\]  personas/broken.toml: Invalid emoji: "emoji"'
+! stdout 'heir  Heir'
+stdout 'kin  \[unusable\]  personas/stray.toml: Unknown field: "mystery"'
+! stdout 'kin  Kin'
+stdout 'stray  \[unusable\]  Unknown field: "mystery"'
+stdout 'ca  \[unusable\]  personas/cb.toml: Extends cycle: "ca" is already earlier in the chain'
+stdout 'cb  \[unusable\]  personas/ca.toml: Extends cycle: "cb" is already earlier in the chain'
+! stdout 'ca  Ca'
+stdout 'tall-1  \[unusable\]  personas/tall-4.toml: Extends chain too long: "tall-5" would be a fifth file'
+! stdout 'tall-1  Tall 1'
+# Four files fit, and the whole list is still there.
+stdout 'tall-2  Tall 2  \[user\]'
+stdout 'tall-5  Tall 5  \[user\]'
+
+# A persona with no tagline ends its row on the source, not on spaces.
+stdout '^  bare  Bare  \[user\]$'
+stdout '^  tester  Tester  \[user\]  A careful helper$'
+! stdout ' $'
+! stderr .
+
+-- xdg/config/homebot/personas/tester.toml --
+schema = 1
+id = "tester"
+name = "Tester"
+emoji = "🧪"
+tagline = "A careful helper"
+extends = "neatpik"
+-- xdg/config/homebot/personas/broken.toml --
+schema = 1
+name = "Broken"
+-- xdg/config/homebot/personas/refused.toml --
+schema = 1
+id = "refused"
+name = "Refused"
+emoji = "🧪"
+extends = "neatpik"
+[lines]
+"save.success.committed" = ["No count here"]
+-- xdg/config/homebot/personas/bare.toml --
+schema = 1
+name = "Bare"
+emoji = "🧪"
+-- xdg/config/homebot/personas/heir.toml --
+schema = 1
+name = "Heir"
+emoji = "🧪"
+extends = "broken"
+-- xdg/config/homebot/personas/stray.toml --
+schema = 1
+name = "Stray"
+emoji = "🧪"
+mystery = 1
+-- xdg/config/homebot/personas/kin.toml --
+schema = 1
+name = "Kin"
+emoji = "🧪"
+extends = "stray"
+-- xdg/config/homebot/personas/ca.toml --
+schema = 1
+name = "Ca"
+emoji = "🧪"
+extends = "cb"
+-- xdg/config/homebot/personas/cb.toml --
+schema = 1
+name = "Cb"
+emoji = "🧪"
+extends = "ca"
+-- xdg/config/homebot/personas/tall-1.toml --
+schema = 1
+name = "Tall 1"
+emoji = "🧪"
+extends = "tall-2"
+-- xdg/config/homebot/personas/tall-2.toml --
+schema = 1
+name = "Tall 2"
+emoji = "🧪"
+extends = "tall-3"
+-- xdg/config/homebot/personas/tall-3.toml --
+schema = 1
+name = "Tall 3"
+emoji = "🧪"
+extends = "tall-4"
+-- xdg/config/homebot/personas/tall-4.toml --
+schema = 1
+name = "Tall 4"
+emoji = "🧪"
+extends = "tall-5"
+-- xdg/config/homebot/personas/tall-5.toml --
+schema = 1
+name = "Tall 5"
+emoji = "🧪"

@@ -1,0 +1,273 @@
+/* homebot.sh docs: docmd's default theme, recoloured to match the homepage
+   (sepia album paper, Neatpik's mint, Young Serif headings).
+   Loaded through theme.customCss in docmd.config.json. The fonts live with the
+   homepage, at the site root, so this only works when served under homebot.sh
+   (or `bun run preview`); `docmd dev` falls back to the system fonts. */
+
+@font-face {
+  font-family: "Young Serif";
+  src: url(/assets/fonts/young-serif/young-serif-latin-400-normal.woff2) format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libre Franklin";
+  src: url(/assets/fonts/libre-franklin/libre-franklin-latin-wght-normal.woff2) format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libre Franklin";
+  src: url(/assets/fonts/libre-franklin/libre-franklin-latin-wght-italic.woff2) format("woff2-variations");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* OpenDyslexic (the homepage's cut-down files): the menubar's font switch,
+   and all sans-serif text once the reader turns it on. font.js, shared with
+   the homepage, adds the switch and keeps the choice (<html data-font>). */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url(/assets/fonts/opendyslexic/opendyslexic3-latin1-400-normal.woff2) format("woff2");
+  size-adjust: 86%;
+  ascent-override: 142.6%;
+  descent-override: 55.6%;
+  line-gap-override: 0%;
+  font-weight: 100 599;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2014, U+2018-201D, U+2022, U+2026, U+20AC, U+2122;
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url(/assets/fonts/opendyslexic/opendyslexic3-latin1-700-normal.woff2) format("woff2");
+  size-adjust: 88%;
+  ascent-override: 142.6%;
+  descent-override: 55.6%;
+  line-gap-override: 0%;
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2014, U+2018-201D, U+2022, U+2026, U+20AC, U+2122;
+}
+
+:root {
+  --hb-serif: "Young Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --hb-dyslexic: "OpenDyslexic", "Comic Sans MS", "Trebuchet MS", sans-serif;
+
+  --bg-color: #f5efe1;
+  --text-color: #2e241b;
+  --text-muted: #6a5845;
+  --text-heading: #2a2017;
+  /* 4.5:1 or more on every tint it sits on, the active sidebar row (#c9e0c9) included */
+  --link-color: #226651;
+  --link-color-hover: #1d5947;
+  --border-color: #e2d6bc;
+  --border-color-hover: #d0c09f;
+  --header-bg: rgb(245 239 225 / .88);
+  --header-border: #e2d6bc;
+  --sidebar-bg: #ede3cd;
+  --sidebar-text: #3f3226;
+  --sidebar-link-active-bg: rgb(143 220 194 / .38);
+  --sidebar-link-active-text: #10241e;
+  --sidebar-group-bg: rgb(42 32 23 / .045);
+  --code-bg: #ece3d0;
+  --code-text: #2a2017;
+  --font-family-sans: "Libre Franklin", "Franklin Gothic", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --glow-color: rgb(143 220 194 / .22);
+  --glow-color-strong: rgb(143 220 194 / .36);
+  --halo-soft: 0 0 0 4px rgb(42 122 98 / .16);
+  --scrollbar-thumb: #d6c7a8;
+
+  --menubar-bg: #ddcba6;
+  --menubar-border: #cbb68e;
+  --menubar-text: #2a2017;
+  --menubar-link-hover-bg: rgb(42 32 23 / .08);
+}
+
+:root[data-theme="dark"] {
+  --bg-color: #1a1511;
+  --text-color: #ddd3bf;
+  --text-muted: #a8987f;
+  --text-heading: #ece2cc;
+  --link-color: #8fdcc2;
+  --link-color-hover: #b5ebd8;
+  --border-color: #33291f;
+  --border-color-hover: #45382b;
+  --header-bg: rgb(26 21 17 / .85);
+  --header-border: #33291f;
+  --sidebar-bg: #201a15;
+  --sidebar-text: #cfc4ae;
+  --sidebar-link-active-bg: rgb(143 220 194 / .14);
+  --sidebar-link-active-text: #ffffff;
+  --sidebar-group-bg: rgb(236 226 204 / .04);
+  --code-bg: #241d17;
+  --code-text: #ece3d0;
+  --glow-color: rgb(143 220 194 / .14);
+  --glow-color-strong: rgb(143 220 194 / .24);
+  --halo-soft: 0 0 0 4px rgb(143 220 194 / .18);
+  --scrollbar-thumb: #33291f;
+
+  --menubar-bg: #241d17;
+  --menubar-border: #33291f;
+  --menubar-text: #ece2cc;
+  --menubar-link-hover-bg: rgb(236 226 204 / .08);
+}
+
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.sidebar-header h1,
+.menubar-brand-text {
+  font-family: var(--hb-serif);
+  font-weight: 400;
+  font-variant-numeric: lining-nums; /* Young Serif's figures are old-style by default */
+}
+.main-content h1 { letter-spacing: -.012em; }
+.main-content h2 { letter-spacing: -.006em; }
+
+.menubar-brand-text { font-size: 1.15rem; }
+/* docmd hides the brand text on phones (it expects a logo next to it); here the
+   text is the only content of the link back to the homepage, so keep it. */
+.docmd-menubar .menubar-brand-text { display: inline; }
+
+.hb-choice { display: flex; align-items: center; gap: .65rem; flex-wrap: wrap; font-size: .78rem; }
+.hb-choice label { display: inline-flex; align-items: center; gap: .25rem; }
+.hb-choice select, .hb-choice input { max-width: 7.5rem; padding: .25rem; color: var(--text-color); background: var(--bg-color); border: 1px solid var(--border-color); border-radius: .25rem; }
+.hb-choice-error { color: #a33225; }
+.hb-also { padding: .45rem .7rem; border-left: 3px solid var(--link-color); background: var(--code-bg); }
+
+a:focus-visible,
+button:focus-visible,
+[role="tab"]:focus-visible,
+.main-content pre:focus-visible,
+.main-content .table-wrapper:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+/* callouts in the album's colours: info is sepia, tip is Neatpik's mint */
+.callout-info { --callout-color: #9a7445; }
+.callout-success,
+.callout-tip { --callout-color: #2a9c78; }
+.callout-warning { --callout-color: #c98a1e; }
+.callout-danger { --callout-color: #b8452f; }
+:root[data-theme="dark"] .callout-info { --callout-color: #c9a46c; }
+:root[data-theme="dark"] .callout-success,
+:root[data-theme="dark"] .callout-tip { --callout-color: #8fdcc2; }
+
+/* Links inside running text are underlined: by colour alone they are too close
+   to the text around them (WCAG 1.4.1). */
+.main-content :is(p, li, td, th, dd, blockquote) a:not(.docmd-button) {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: .22em;
+}
+.main-content :is(p, li, td, th, dd, blockquote) a:not(.docmd-button):hover { text-decoration-thickness: 2.5px; }
+
+/* "Previous" and "Next" above the page links: docmd fades them to 0.8, which
+   drops them under 4.5:1. */
+.next-page small,
+.prev-page small { opacity: 1; }
+
+/* Code colours, pinned per theme. docmd ships One Light and One Dark as two
+   stylesheets and only swaps them when the theme button is pressed, so a page
+   that loads in dark mode keeps One Light. These rules hold whichever sheet is
+   on. The light ones are One Light darkened to 4.5:1 on the code background
+   (it is drawn for white); both themes' comments use the muted text colour. */
+:root:not([data-theme="dark"]) :is(.hljs-comment, .hljs-quote) { color: var(--text-muted); }
+:root:not([data-theme="dark"]) :is(.hljs-doctag, .hljs-formula, .hljs-keyword, .hljs-deletion, .hljs-name, .hljs-section, .hljs-selector-tag, .hljs-subst, .hljs-operator, .hljs-punctuation) { color: #a626a4; }
+:root:not([data-theme="dark"]) .hljs-literal { color: #016894; }
+:root:not([data-theme="dark"]) :is(.hljs-addition, .hljs-attribute, .hljs-meta .hljs-string, .hljs-regexp, .hljs-string) { color: #376f37; }
+:root:not([data-theme="dark"]) :is(.hljs-attr, .hljs-number, .hljs-selector-attr, .hljs-selector-class, .hljs-selector-pseudo, .hljs-template-variable, .hljs-type, .hljs-variable) { color: #845a01; }
+:root:not([data-theme="dark"]) :is(.hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-symbol, .hljs-title) { color: #325ebd; }
+:root:not([data-theme="dark"]) :is(.hljs-built_in, .hljs-class .hljs-title, .hljs-title.class_) { color: #855b01; }
+:root[data-theme="dark"] :is(.hljs-comment, .hljs-quote) { color: var(--text-muted); }
+:root[data-theme="dark"] :is(.hljs-doctag, .hljs-formula, .hljs-keyword, .hljs-deletion, .hljs-name, .hljs-section, .hljs-selector-tag, .hljs-subst, .hljs-operator, .hljs-punctuation) { color: #c678dd; }
+:root[data-theme="dark"] .hljs-literal { color: #56b6c2; }
+:root[data-theme="dark"] :is(.hljs-addition, .hljs-attribute, .hljs-meta .hljs-string, .hljs-regexp, .hljs-string) { color: #98c379; }
+:root[data-theme="dark"] :is(.hljs-attr, .hljs-number, .hljs-selector-attr, .hljs-selector-class, .hljs-selector-pseudo, .hljs-template-variable, .hljs-type, .hljs-variable) { color: #d19a66; }
+:root[data-theme="dark"] :is(.hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-symbol, .hljs-title) { color: #61aeee; }
+:root[data-theme="dark"] :is(.hljs-built_in, .hljs-class .hljs-title, .hljs-title.class_) { color: #e6c07b; }
+
+@media (max-width: 768px) {
+  /* On phones docmd turns the fixed menubar into a sticky one but keeps the
+     padding that made room for it, which leaves an empty band at the top. */
+  body.has-menubar-top { padding-top: 0; }
+}
+
+/* The font switch in the menubar (font.js): a switch whose knob slides right,
+   on mint, while it is on, and its name. */
+:root[data-font="dyslexic"] { --font-family-sans: var(--hb-dyslexic); }
+.font-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  min-height: 36px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-family: "Libre Franklin", "Franklin Gothic", "Helvetica Neue", Arial, system-ui, sans-serif;
+  font-size: .8125rem;
+  cursor: pointer;
+}
+.font-toggle-switch {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 20px;
+  border: 1.5px solid var(--text-muted);
+  border-radius: 999px;
+  transition: background-color .15s, border-color .15s;
+}
+.font-toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: translate .15s, background-color .15s;
+}
+.font-toggle:hover .font-toggle-switch { border-color: var(--text-color); }
+.font-toggle:hover .font-toggle-switch::after { background: var(--text-color); }
+.font-toggle[aria-checked="true"] .font-toggle-switch {
+  border-color: #0f2b23;
+  background: #8fdcc2;
+}
+.font-toggle[aria-checked="true"] .font-toggle-switch::after {
+  translate: 14px 0;
+  background: #0f2b23;
+}
+@media (prefers-reduced-motion: reduce) {
+  .font-toggle-switch,
+  .font-toggle-switch::after { transition: none; }
+}
+@media (forced-colors: active) {
+  .font-toggle-switch { forced-color-adjust: none; border-color: ButtonText; }
+  .font-toggle-switch::after { background: ButtonText; }
+  .font-toggle[aria-checked="true"] .font-toggle-switch { border-color: Highlight; background: Highlight; }
+  .font-toggle[aria-checked="true"] .font-toggle-switch::after { background: HighlightText; }
+}
+@media (max-width: 479px) {
+  .font-toggle { gap: .3em; padding-inline: 0; }
+  .font-toggle-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* The narrowest phones, in OpenDyslexic, have no room for the switch and
+   "Meet the family" (the homepage's own menu has it). */
+@media (max-width: 399px) {
+  .menubar-right .menubar-link:not(.font-toggle) { display: none; }
+}

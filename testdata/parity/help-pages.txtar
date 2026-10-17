@@ -1,0 +1,402 @@
+
+# homebot help <command> for every command; each page must equal <command> --help.
+# exit: 0
+exec homebot help inbox
+cmpwork stdout help-inbox.stdout
+cmpwork stderr help-inbox.stderr
+# exit: 0
+exec homebot help next
+cmpwork stdout help-next.stdout
+cmpwork stderr help-next.stderr
+# exit: 0
+exec homebot help unpack
+cmpwork stdout help-unpack.stdout
+cmpwork stderr help-unpack.stderr
+# exit: 0
+exec homebot help pack
+cmpwork stdout help-pack.stdout
+cmpwork stderr help-pack.stderr
+# exit: 0
+exec homebot help link
+cmpwork stdout help-link.stdout
+cmpwork stderr help-link.stderr
+# exit: 0
+exec homebot help unlink
+# deliberate: final review home M4: the unlink help says the background helper (tidy) links the files again within the hour and how to keep one unlinked; the TypeScript said only that homebot link brings them back
+cmpwork stdout help-unlink.stdout
+cmpwork stderr help-unlink.stderr
+# exit: 0
+exec homebot help cleanup
+cmpwork stdout help-cleanup.stdout
+cmpwork stderr help-cleanup.stderr
+# exit: 0
+exec homebot help keys
+cmpwork stdout help-keys.stdout
+cmpwork stderr help-keys.stderr
+# exit: 0
+exec homebot help unlock
+cmpwork stdout help-unlock.stdout
+cmpwork stderr help-unlock.stderr
+# exit: 0
+exec homebot help lock
+cmpwork stdout help-lock.stdout
+cmpwork stderr help-lock.stderr
+# exit: 0
+exec homebot help triage
+cmpwork stdout help-triage.stdout
+cmpwork stderr help-triage.stderr
+# exit: 0
+exec homebot help inventory
+cmpwork stdout help-inventory.stdout
+cmpwork stderr help-inventory.stderr
+# exit: 0
+exec homebot help remote
+cmpwork stdout help-remote.stdout
+cmpwork stderr help-remote.stderr
+# exit: 0
+exec homebot help save
+cmpwork stdout help-save.stdout
+cmpwork stderr help-save.stderr
+# exit: 0
+exec homebot help export
+cmpwork stdout help-export.stdout
+cmpwork stderr help-export.stderr
+# exit: 0
+exec homebot help tidy
+cmpwork stdout help-tidy.stdout
+cmpwork stderr help-tidy.stderr
+# exit: 0
+exec homebot help setup
+# deliberate: guided setup: the setup page describes the guided run (tools, clone or new repo, guard, helper, shell line, remote, commit); the TypeScript's setup only installed the guard and helper
+# deliberate: setup --persona is judged like persona use, so its help says persona, not robot id: choose the persona for this home repo
+cmpwork stdout help-setup.stdout
+cmpwork stderr help-setup.stderr
+# exit: 0
+exec homebot help actions
+cmpwork stdout help-actions.stdout
+cmpwork stderr help-actions.stderr
+# exit: 0
+exec homebot help action
+cmpwork stdout help-action.stdout
+cmpwork stderr help-action.stderr
+# exit: 0
+exec homebot help shell
+# deliberate: the shell help page loads the integration with eval "$(homebot shell zsh)", as setup prints, not the TypeScript's `source ~/.home/homebot/shell/homebot.zsh`
+cmpwork stdout help-shell.stdout
+cmpwork stderr help-shell.stderr
+# exit: 0
+exec homebot help name
+cmpwork stdout help-name.stdout
+cmpwork stderr help-name.stderr
+# exit: 0
+exec homebot help refresh
+cmpwork stdout help-refresh.stdout
+cmpwork stderr help-refresh.stderr
+# exit: 0
+exec homebot help hook
+cmpwork stdout help-hook.stdout
+cmpwork stderr help-hook.stderr
+-- help-inbox.stdout --
+Usage: homebot [--all]
+
+Lists what needs you, most urgent first, each with the command that fixes it,
+and what the background helper did since you last looked. `homebot inbox` is
+the same command.
+
+Options:
+  --all        show every item, not only the first five
+  -h, --help   this page
+-- help-inbox.stderr --
+-- help-next.stdout --
+Usage: homebot next
+
+Runs the fix for the first inbox item, the command shown next to it. When the
+fix is a shell command homebot shouldn't run for you, it prints it instead.
+
+Options:
+  -h, --help   this page
+-- help-next.stderr --
+-- help-unpack.stdout --
+Usage: homebot unpack [profile]
+
+Runs a profile's steps in order, without asking first: package installs
+(brew, apt, flatpak...), links, secrets and `run:` commands. Each step is
+printed as it starts. Without a name it uses this machine's profile from
+homebot.yml (profiles.hosts, else profiles.default).
+
+Preview the steps with --dry-run. A step that fails stops the run and prints
+the --from that resumes after you fix it. Steps that are already done (a
+package that is installed, a link that exists) do nothing the second time.
+
+Options:
+  --dry-run    list the steps without running any
+  --from N     start at step N, skipping the ones before
+  -h, --help   this page
+
+Examples:
+  homebot unpack --dry-run         what this machine's profile would do
+  homebot unpack server --from 4   resume the server profile at step 4
+-- help-unpack.stderr --
+-- help-pack.stdout --
+Usage: homebot pack <path>...
+
+Moves a file or folder from $HOME into the repo and puts a link in its place,
+so it is tracked from then on. It goes to autolink/common unless --layer says
+otherwise. With --private it is sealed under private/ (encrypted with age)
+instead. Commit it with homebot save.
+
+Options:
+  --layer common|linux|macos   the layer to put it in (default: common)
+  --private                    a secret: seal it under private/
+  -h, --help                   this page
+
+Examples:
+  homebot pack ~/.config/zed                 track Zed's settings on every machine
+  homebot pack --layer linux ~/.config/foo   track it on Linux only
+  homebot pack --private ~/.ssh/id_ed25519   track a key, encrypted
+-- help-pack.stderr --
+-- help-link.stdout --
+Usage: homebot link
+
+Links everything under autolink/ (and unlocked secrets under private/) into
+$HOME. It never overwrites anything: what is in the way is listed as blocked.
+A file identical to the repo's copy is replaced by the link, since nothing is
+lost.
+
+--backup moves the blockers aside first, renamed <name>.homebot-backup-<time>,
+and then links. homebot cleanup goes through those backups later.
+
+Options:
+  --dry-run    show what would change, change nothing
+  --backup     move what is in the way aside, then link
+  -h, --help   this page
+-- help-link.stderr --
+-- help-unlink.stdout --
+Usage: homebot unlink
+
+Removes every link homebot made. The files stay in the repo, so the links
+come back with the next homebot link, and within the hour from the background
+helper (homebot tidy). To keep a file unlinked, take it out of the repo.
+
+Options:
+  -h, --help   this page
+-- help-unlink.stderr --
+-- help-cleanup.stdout --
+Usage: homebot cleanup
+
+Goes through the backups homebot link --backup left
+(<name>.homebot-backup-<time>) one at a time. Each shows how it differs from
+what is linked there now (beside the choices, when fzf is installed), and you
+pick:
+
+  delete   remove the backup; what is linked there now stays
+  keep     leave it; homebot asks again next time
+  use      copy the backup over the repo file, then remove it
+  merge    take some of the backup's lines into the repo file
+
+merge opens lazygit when it is installed. The backup's lines are the green
+ones: space takes the line under the cursor, shift+arrows select several, d
+drops them, q finishes. Without lazygit it is git add -p: y takes a block, n
+skips it, s splits it smaller, e edits it. What you took is written to the
+repo file, and the same backup comes back with what is left, so you can
+delete it.
+
+Options:
+  --list       only list the backups
+  -h, --help   this page
+-- help-cleanup.stderr --
+-- help-keys.stdout --
+Usage: homebot keys init
+
+Creates the age key pair that seals private/. It asks for a passphrase, then
+writes private/identity.age (the key, encrypted with that passphrase) and
+private/recipients.txt (the public key). Run it once ever; other machines get
+the key with the repo and run homebot unlock.
+
+Options:
+  -h, --help   this page
+-- help-keys.stderr --
+-- help-unlock.stdout --
+Usage: homebot unlock
+
+Decrypts the secrets in private/ and links them into $HOME. A secret that
+changed both here and in the repo is left alone and listed as a conflict.
+
+Options:
+  --theirs     for conflicts, take the repo's version
+  -h, --help   this page
+-- help-unlock.stderr --
+-- help-lock.stdout --
+Usage: homebot lock
+
+Seals the secrets in private/ that changed since they were last sealed. The
+background helper does this on its own before each autosave.
+
+Options:
+  --ours       for conflicts, keep this machine's version
+  --wipe       also delete the decrypted copies (keeps any that aren't safely sealed)
+  -h, --help   this page
+-- help-lock.stderr --
+-- help-triage.stdout --
+Usage: homebot triage
+
+Asks once about each new thing in the watched folders (~/.config/*, ~/.*) and
+each untracked file in the repo. Each answer is saved right away:
+
+  t        track it everywhere (moves it into autolink/common, links it back)
+  o        track it on this OS only
+  i        ignore it for good (written to decisions.yml)
+  s        snooze it for 7 days (this machine only)
+  enter    next
+  q        stop
+
+Options:
+  -h, --help   this page
+-- help-triage.stderr --
+-- help-inventory.stdout --
+Usage: homebot inventory
+
+One screen: this machine's profile and whether it changed since the last
+unpack, links, secrets, things to triage, the repo and its remote, package
+exports and the background helper.
+
+Options:
+  -h, --help   this page
+-- help-inventory.stderr --
+-- help-remote.stdout --
+Usage: homebot remote [url]
+
+Without a remote, offers to create a private repository with gh (GitHub) or
+glab (GitLab), when one is installed and logged in, or takes a URL you paste.
+Then it pushes. With a URL, makes that the remote (origin).
+
+With a remote already set, checks that it can be reached. When an https
+remote fails for lack of a login and you have an ssh key, it offers the ssh
+address of the same repository.
+
+Options:
+  -h, --help   this page
+
+Examples:
+  homebot remote                               check the remote, or set one up
+  homebot remote git@github.com:you/home.git   use this one
+-- help-remote.stderr --
+-- help-save.stdout --
+Usage: homebot save
+
+Seals changed secrets, commits the changes to tracked files and package
+snapshots, then pulls (rebasing local commits) and pushes. New files aren't
+committed: triage decides about them first. The background helper does the
+same on its own (autosave in homebot.yml).
+
+Options:
+  -m, --message TEXT   the commit message (default: one listing the files)
+  --no-push            commit and pull, but don't push
+  -h, --help           this page
+-- help-save.stderr --
+-- help-export.stdout --
+Usage: homebot export [name...]
+
+Writes what is installed (Brewfile, apt and flatpak lists, vendor apt
+repositories...) into manifests/, as configured under exports in homebot.yml.
+Without names it runs every export for this OS. The background helper runs
+them about once a day.
+
+Options:
+  -h, --help   this page
+
+Examples:
+  homebot export apt apt-repos   after installing a package from a new apt repository
+-- help-export.stderr --
+-- help-tidy.stdout --
+Usage: homebot tidy
+
+Runs what the background helper runs on its timer: installs the commit guard
+if it's missing, seals secrets, refreshes package exports that are due,
+autosaves and syncs (when homebot.yml turns autosave on), fixes links that
+are safe to fix, and refreshes the inbox.
+
+Options:
+  --notify     show a desktop notification when something needs you
+  --quiet      print nothing
+  -h, --help   this page
+-- help-tidy.stderr --
+-- help-setup.stdout --
+Usage: homebot setup
+
+Takes you from nothing to an empty inbox, one question at a time. It checks
+for git and gitleaks, clones your home repo or starts a new one in ~/.home,
+installs the commit guard and the background helper (a systemd user timer on
+Linux, a launchd agent on macOS), and offers to load the shell integration,
+back the repo up and commit. Steps already done are skipped, so running it
+again is safe. Without a terminal it asks nothing, creates no repo, and says
+what is left.
+
+Options:
+  --remove       uninstall the background helper
+  --name WORD    choose a command name for your homebot
+  --persona ID   choose the persona for this home repo
+  -h, --help     this page
+-- help-setup.stderr --
+-- help-actions.stdout --
+Usage: homebot actions
+
+Lists the actions profile steps can use: the built-in ones (link, unlock,
+run) and the scripts in homebot/actions/.
+
+Options:
+  -h, --help   this page
+-- help-actions.stderr --
+-- help-action.stdout --
+Usage: homebot action <name> [args...]
+
+Runs one action with the environment a profile step gets. Everything after
+the name goes to the action, so `homebot action <name> --help` reaches the
+action; this page is `homebot action --help`.
+
+Options:
+  -h, --help   this page
+
+Examples:
+  homebot action apt-repos linux/apt-repos   add the vendor apt repositories
+-- help-action.stderr --
+-- help-shell.stdout --
+Usage: homebot shell zsh
+
+Prints the zsh integration: the prompt line that says when something needs
+you, refreshed in the background. Load it from .zshrc:
+
+  eval "$(homebot shell zsh)"
+
+Options:
+  -h, --help   this page
+-- help-shell.stderr --
+-- help-name.stdout --
+Usage: homebot name [word]
+
+Shows the name in homebot.yml and the name that works here. Give a word
+to make it a command on this machine, or use --off to remove a link homebot
+made. A name may need a new shell before it works.
+
+Options:
+  --off        remove the name and a link homebot made
+  -h, --help   this page
+-- help-name.stderr --
+-- help-refresh.stdout --
+Usage: homebot refresh
+
+Recomputes the inbox cache the shell prompt reads. Most commands do this on
+their own when they finish.
+
+Options:
+  -h, --help   this page
+-- help-refresh.stderr --
+-- help-hook.stdout --
+Usage: homebot hook pre-commit
+
+The check git runs before each commit in the repo (installed by homebot
+setup). It refuses plaintext under private/ and anything gitleaks flags.
+
+Options:
+  -h, --help   this page
+-- help-hook.stderr --

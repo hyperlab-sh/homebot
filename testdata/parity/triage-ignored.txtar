@@ -1,0 +1,56 @@
+[!linux] skip 'recorded on linux'
+
+# Things listed in decisions.yml are ignored or snoozed; the rest is a candidate. Watch patterns come from homebot.yml.
+# exit: 0
+exec homebot inventory
+cmpwork stdout inventory.stdout
+# exit: 0
+exec homebot
+cmpwork stdout inbox.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+triage:
+  watch:
+    - ~/.config/*
+    - ~/.*
+    - ~/projects/*
+-- home/.home/decisions.yml --
+ignore:
+  - ~/.bashrc
+  - ~/.config/noisy
+-- home/.bashrc --
+mine
+-- home/.zshrc --
+mine
+-- home/.config/noisy/a --
+x
+-- home/.config/wanted/b --
+x
+-- home/projects/p1/readme --
+x
+-- inventory.stdout --
+homebot inventory · testhost (linux) · ~/.home
+  Profile   workstation · never unpacked here
+  Links     0 ok, 0 to fix, 0 blocked, 0 locked
+  Secrets   no keys yet (homebot keys init)
+  Triage    3 to sort, 2 ignored
+  Repo      not a git repository
+  Exports   none configured
+  Helper    not installed (homebot setup)
+-- inbox.stdout --
+homebot · testhost · 5 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 3 new things to sort: track, ignore or snooze
+       ~/.config/wanted, ~/.zshrc, ~/projects/p1
+       → homebot triage
+  4  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

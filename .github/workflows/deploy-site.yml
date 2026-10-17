@@ -1,0 +1,89 @@
+name: Deploy site
+
+# Moves the `site` branch (homebot.sh deploys from it) to a ref of your choice:
+# the latest final release by default, or any commit on main or a release tag.
+# A final release moves `site` forward by itself (release.yml); this is the way
+# to roll it back or to publish a docs fix between releases. Manual only.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: >-
+          Tag, branch or commit to deploy. Empty means the latest final release
+          tag (vX.Y.Z, no -rc). Must be on main or be a release tag.
+        required: false
+        default: ''
+        type: string
+
+permissions: {}
+
+# Shared with the release workflow's site job so the two never move `site` at once.
+concurrency: {group: site-branch, cancel-in-progress: false}
+
+jobs:
+  deploy:
+    # Never on a fork, and only from main: this prevents accidental runs from
+    # another branch. It is not a security control, since a run from another
+    # branch uses that branch's YAML, guard included; only writers can dispatch
+    # at all. No `environment`: `release` is restricted to v* tags, which a
+    # manual run from main is not.
+    if: ${{ github.repository == 'hyperlab-sh/homebot' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        # The one place the token must persist: git push below uses it.
+        with: {persist-credentials: true, fetch-depth: 0}
+      - name: Move site
+        shell: bash
+        env:
+          INPUT_REF: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          final='^v[0-9]+\.[0-9]+\.[0-9]+$'
+          release_tag='^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$'
+          ref=$INPUT_REF
+          if [[ -z $ref ]]; then
+            # By tag name, not `gh release view`: it does not depend on how
+            # GoReleaser flagged the release, and the pattern is the one the
+            # release workflow enforces.
+            ref=$(git tag --list 'v*' --sort=-v:refname | grep -E "$final" | head -n 1 || true)
+            [[ -n $ref ]] || { echo "::error::no final release tag exists; pass a ref"; exit 1; }
+          fi
+          # Branches live under origin/ in this clone: try the ref as given, then as a remote branch.
+          new=
+          for cand in "$ref" "refs/remotes/origin/$ref"; do
+            if new=$(git rev-parse --verify --quiet --end-of-options "$cand^{commit}"); then break; fi
+            new=
+          done
+          [[ -n $new ]] || { echo "::error::'$ref' does not resolve to a commit"; exit 1; }
+          # Allowed: a commit on main, or one a release tag points at.
+          ok=
+          if git merge-base --is-ancestor "$new" refs/remotes/origin/main; then ok="on main"; fi
+          if [[ -z $ok ]] && git tag --points-at "$new" | grep -Eq "$release_tag"; then ok="release tag"; fi
+          [[ -n $ok ]] || { echo "::error::$new ($ref) is neither on main nor a release tag; refusing"; exit 1; }
+          # Lease on what we saw just now: a concurrent move makes the push fail.
+          rc=0
+          git ls-remote --exit-code --heads origin refs/heads/site >/dev/null || rc=$?
+          case $rc in
+            0)
+              git fetch --no-tags origin +refs/heads/site:refs/remotes/origin/site
+              old=$(git rev-parse --verify refs/remotes/origin/site)
+              ;;
+            2) old= ;;
+            *) echo "::error::cannot read site from origin (ls-remote exit $rc)"; exit 1 ;;
+          esac
+          git push "--force-with-lease=refs/heads/site:$old" origin "$new:refs/heads/site"
+          if [[ -z $old ]]; then kind="created"
+          elif [[ $old == "$new" ]]; then kind="unchanged"
+          elif git merge-base --is-ancestor "$old" "$new"; then kind="fast-forward"
+          else kind="rewound or moved sideways"; fi
+          {
+            echo "### site: $kind"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| ref | \`$ref\` ($ok) |"
+            echo "| old | \`${old:-(none)}\` |"
+            echo "| new | \`$new\` |"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,1071 @@
+[
+  {
+    "yaml": "1",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "yaml": "0",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "yaml": "-0",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "yaml": "+0",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "yaml": "+1",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "yaml": "-1",
+    "args": [
+      "-1"
+    ]
+  },
+  {
+    "yaml": "01",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "yaml": "007",
+    "args": [
+      "7"
+    ]
+  },
+  {
+    "yaml": "00",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "yaml": "1.0",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "yaml": "1.10",
+    "args": [
+      "1.1"
+    ]
+  },
+  {
+    "yaml": "1.100",
+    "args": [
+      "1.1"
+    ]
+  },
+  {
+    "yaml": "1.5",
+    "args": [
+      "1.5"
+    ]
+  },
+  {
+    "yaml": "0.1",
+    "args": [
+      "0.1"
+    ]
+  },
+  {
+    "yaml": "0.30000000000000004",
+    "args": [
+      "0.30000000000000004"
+    ]
+  },
+  {
+    "yaml": ".5",
+    "args": [
+      "0.5"
+    ]
+  },
+  {
+    "yaml": "-.5",
+    "args": [
+      "-0.5"
+    ]
+  },
+  {
+    "yaml": "5.",
+    "args": [
+      "5"
+    ]
+  },
+  {
+    "yaml": "0.",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "yaml": ".0",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "yaml": "1.0e+2",
+    "args": [
+      "100"
+    ]
+  },
+  {
+    "yaml": "123456789.123456789",
+    "args": [
+      "123456789.12345679"
+    ]
+  },
+  {
+    "yaml": "0.0000001",
+    "args": [
+      "1e-7"
+    ]
+  },
+  {
+    "yaml": "0.000001",
+    "args": [
+      "0.000001"
+    ]
+  },
+  {
+    "yaml": "1234567890123456789012",
+    "args": [
+      "1.2345678901234568e+21"
+    ]
+  },
+  {
+    "yaml": "9007199254740991",
+    "args": [
+      "9007199254740991"
+    ]
+  },
+  {
+    "yaml": "9007199254740992",
+    "args": [
+      "9007199254740992"
+    ]
+  },
+  {
+    "yaml": "9007199254740993",
+    "args": [
+      "9007199254740992"
+    ]
+  },
+  {
+    "yaml": "-9007199254740993",
+    "args": [
+      "-9007199254740992"
+    ]
+  },
+  {
+    "yaml": "18446744073709551615",
+    "args": [
+      "18446744073709552000"
+    ]
+  },
+  {
+    "yaml": "18446744073709551616",
+    "args": [
+      "18446744073709552000"
+    ]
+  },
+  {
+    "yaml": "123456789012345678901234567890",
+    "args": [
+      "1.2345678901234568e+29"
+    ]
+  },
+  {
+    "yaml": "1_000",
+    "args": [
+      "1_000"
+    ]
+  },
+  {
+    "yaml": "1,000",
+    "args": [
+      "1,000"
+    ]
+  },
+  {
+    "yaml": "1 000",
+    "args": [
+      "1 000"
+    ]
+  },
+  {
+    "yaml": "1e3",
+    "args": [
+      "1000"
+    ]
+  },
+  {
+    "yaml": "1E3",
+    "args": [
+      "1000"
+    ]
+  },
+  {
+    "yaml": "1e+3",
+    "args": [
+      "1000"
+    ]
+  },
+  {
+    "yaml": "1e-3",
+    "args": [
+      "0.001"
+    ]
+  },
+  {
+    "yaml": "1e-7",
+    "args": [
+      "1e-7"
+    ]
+  },
+  {
+    "yaml": "1e21",
+    "args": [
+      "1e+21"
+    ]
+  },
+  {
+    "yaml": "1e22",
+    "args": [
+      "1e+22"
+    ]
+  },
+  {
+    "yaml": "1e100",
+    "args": [
+      "1e+100"
+    ]
+  },
+  {
+    "yaml": "1e308",
+    "args": [
+      "1e+308"
+    ]
+  },
+  {
+    "yaml": "1e309",
+    "args": [
+      "Infinity"
+    ]
+  },
+  {
+    "yaml": "-1e309",
+    "args": [
+      "-Infinity"
+    ]
+  },
+  {
+    "yaml": "1.5e3",
+    "args": [
+      "1500"
+    ]
+  },
+  {
+    "yaml": "1.5E-3",
+    "args": [
+      "0.0015"
+    ]
+  },
+  {
+    "yaml": "0.1e1",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "yaml": "12e03",
+    "args": [
+      "12000"
+    ]
+  },
+  {
+    "yaml": "1e",
+    "args": [
+      "1e"
+    ]
+  },
+  {
+    "yaml": "e1",
+    "args": [
+      "e1"
+    ]
+  },
+  {
+    "yaml": "1ee3",
+    "args": [
+      "1ee3"
+    ]
+  },
+  {
+    "yaml": "0x1F",
+    "args": [
+      "31"
+    ]
+  },
+  {
+    "yaml": "0X1F",
+    "args": [
+      "0X1F"
+    ]
+  },
+  {
+    "yaml": "0xff",
+    "args": [
+      "255"
+    ]
+  },
+  {
+    "yaml": "0xFF",
+    "args": [
+      "255"
+    ]
+  },
+  {
+    "yaml": "-0x1F",
+    "args": [
+      "-31"
+    ]
+  },
+  {
+    "yaml": "+0x1F",
+    "args": [
+      "31"
+    ]
+  },
+  {
+    "yaml": "0x",
+    "args": [
+      "0x"
+    ]
+  },
+  {
+    "yaml": "0o17",
+    "args": [
+      "15"
+    ]
+  },
+  {
+    "yaml": "0O17",
+    "args": [
+      "0O17"
+    ]
+  },
+  {
+    "yaml": "0o7",
+    "args": [
+      "7"
+    ]
+  },
+  {
+    "yaml": "0o8",
+    "args": [
+      "0o8"
+    ]
+  },
+  {
+    "yaml": "017",
+    "args": [
+      "17"
+    ]
+  },
+  {
+    "yaml": "0b101",
+    "args": [
+      "0b101"
+    ]
+  },
+  {
+    "yaml": "0B101",
+    "args": [
+      "0B101"
+    ]
+  },
+  {
+    "yaml": ".inf",
+    "args": [
+      "Infinity"
+    ]
+  },
+  {
+    "yaml": ".Inf",
+    "args": [
+      "Infinity"
+    ]
+  },
+  {
+    "yaml": ".INF",
+    "args": [
+      "Infinity"
+    ]
+  },
+  {
+    "yaml": "-.inf",
+    "args": [
+      "-Infinity"
+    ]
+  },
+  {
+    "yaml": "+.inf",
+    "args": [
+      "Infinity"
+    ]
+  },
+  {
+    "yaml": ".nan",
+    "args": [
+      "NaN"
+    ]
+  },
+  {
+    "yaml": ".NaN",
+    "args": [
+      "NaN"
+    ]
+  },
+  {
+    "yaml": ".NAN",
+    "args": [
+      "NaN"
+    ]
+  },
+  {
+    "yaml": "inf",
+    "args": [
+      "inf"
+    ]
+  },
+  {
+    "yaml": "-inf",
+    "args": [
+      "-inf"
+    ]
+  },
+  {
+    "yaml": "Infinity",
+    "args": [
+      "Infinity"
+    ]
+  },
+  {
+    "yaml": "-Infinity",
+    "args": [
+      "-Infinity"
+    ]
+  },
+  {
+    "yaml": "NaN",
+    "args": [
+      "NaN"
+    ]
+  },
+  {
+    "yaml": "nan",
+    "args": [
+      "nan"
+    ]
+  },
+  {
+    "yaml": "true",
+    "args": [
+      "true"
+    ]
+  },
+  {
+    "yaml": "True",
+    "args": [
+      "true"
+    ]
+  },
+  {
+    "yaml": "TRUE",
+    "args": [
+      "true"
+    ]
+  },
+  {
+    "yaml": "tRue",
+    "args": [
+      "tRue"
+    ]
+  },
+  {
+    "yaml": "false",
+    "args": [
+      "false"
+    ]
+  },
+  {
+    "yaml": "False",
+    "args": [
+      "false"
+    ]
+  },
+  {
+    "yaml": "FALSE",
+    "args": [
+      "false"
+    ]
+  },
+  {
+    "yaml": "yes",
+    "args": [
+      "yes"
+    ]
+  },
+  {
+    "yaml": "Yes",
+    "args": [
+      "Yes"
+    ]
+  },
+  {
+    "yaml": "YES",
+    "args": [
+      "YES"
+    ]
+  },
+  {
+    "yaml": "no",
+    "args": [
+      "no"
+    ]
+  },
+  {
+    "yaml": "No",
+    "args": [
+      "No"
+    ]
+  },
+  {
+    "yaml": "NO",
+    "args": [
+      "NO"
+    ]
+  },
+  {
+    "yaml": "on",
+    "args": [
+      "on"
+    ]
+  },
+  {
+    "yaml": "On",
+    "args": [
+      "On"
+    ]
+  },
+  {
+    "yaml": "ON",
+    "args": [
+      "ON"
+    ]
+  },
+  {
+    "yaml": "off",
+    "args": [
+      "off"
+    ]
+  },
+  {
+    "yaml": "Off",
+    "args": [
+      "Off"
+    ]
+  },
+  {
+    "yaml": "OFF",
+    "args": [
+      "OFF"
+    ]
+  },
+  {
+    "yaml": "y",
+    "args": [
+      "y"
+    ]
+  },
+  {
+    "yaml": "Y",
+    "args": [
+      "Y"
+    ]
+  },
+  {
+    "yaml": "n",
+    "args": [
+      "n"
+    ]
+  },
+  {
+    "yaml": "N",
+    "args": [
+      "N"
+    ]
+  },
+  {
+    "yaml": "null",
+    "args": []
+  },
+  {
+    "yaml": "Null",
+    "args": []
+  },
+  {
+    "yaml": "NULL",
+    "args": []
+  },
+  {
+    "yaml": "~",
+    "args": []
+  },
+  {
+    "yaml": "",
+    "args": []
+  },
+  {
+    "yaml": "\"1.10\"",
+    "args": [
+      "1.10"
+    ]
+  },
+  {
+    "yaml": "'1.10'",
+    "args": [
+      "1.10"
+    ]
+  },
+  {
+    "yaml": "\"yes\"",
+    "args": [
+      "yes"
+    ]
+  },
+  {
+    "yaml": "'true'",
+    "args": [
+      "true"
+    ]
+  },
+  {
+    "yaml": "\"null\"",
+    "args": [
+      "null"
+    ]
+  },
+  {
+    "yaml": "\"~\"",
+    "args": [
+      "~"
+    ]
+  },
+  {
+    "yaml": "\"\"",
+    "args": [
+      ""
+    ]
+  },
+  {
+    "yaml": "''",
+    "args": [
+      ""
+    ]
+  },
+  {
+    "yaml": "\"0x1F\"",
+    "args": [
+      "0x1F"
+    ]
+  },
+  {
+    "yaml": "\"1e3\"",
+    "args": [
+      "1e3"
+    ]
+  },
+  {
+    "yaml": "\"007\"",
+    "args": [
+      "007"
+    ]
+  },
+  {
+    "yaml": "\" padded \"",
+    "args": [
+      " padded "
+    ]
+  },
+  {
+    "yaml": "\"a\\tb\"",
+    "args": [
+      "a\tb"
+    ]
+  },
+  {
+    "yaml": "'it''s'",
+    "args": [
+      "it's"
+    ]
+  },
+  {
+    "yaml": "\"line1\\nline2\"",
+    "args": [
+      "line1\nline2"
+    ]
+  },
+  {
+    "yaml": "2026-01-01",
+    "args": [
+      "2026-01-01"
+    ]
+  },
+  {
+    "yaml": "2026-1-1",
+    "args": [
+      "2026-1-1"
+    ]
+  },
+  {
+    "yaml": "2026-01-01T00:00:00Z",
+    "args": [
+      "2026-01-01T00:00:00Z"
+    ]
+  },
+  {
+    "yaml": "2026-01-01 00:00:00",
+    "args": [
+      "2026-01-01 00:00:00"
+    ]
+  },
+  {
+    "yaml": "2001-12-14t21:59:43.10-05:00",
+    "args": [
+      "2001-12-14t21:59:43.10-05:00"
+    ]
+  },
+  {
+    "yaml": "2001-12-14 21:59:43.10 -5",
+    "args": [
+      "2001-12-14 21:59:43.10 -5"
+    ]
+  },
+  {
+    "yaml": "12:30:45",
+    "args": [
+      "12:30:45"
+    ]
+  },
+  {
+    "yaml": "1:30",
+    "args": [
+      "1:30"
+    ]
+  },
+  {
+    "yaml": "190:20:30",
+    "args": [
+      "190:20:30"
+    ]
+  },
+  {
+    "yaml": "foo",
+    "args": [
+      "foo"
+    ]
+  },
+  {
+    "yaml": "-",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "- a",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "?",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "!",
+    "args": [
+      ""
+    ]
+  },
+  {
+    "yaml": "foo bar",
+    "args": [
+      "foo bar"
+    ]
+  },
+  {
+    "yaml": "foo: bar",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "foo #comment",
+    "args": [
+      "foo"
+    ]
+  },
+  {
+    "yaml": "#only-a-comment",
+    "args": []
+  },
+  {
+    "yaml": "a#b",
+    "args": [
+      "a#b"
+    ]
+  },
+  {
+    "yaml": "1.2.3",
+    "args": [
+      "1.2.3"
+    ]
+  },
+  {
+    "yaml": "v1.2",
+    "args": [
+      "v1.2"
+    ]
+  },
+  {
+    "yaml": "1.10.0",
+    "args": [
+      "1.10.0"
+    ]
+  },
+  {
+    "yaml": "10-20",
+    "args": [
+      "10-20"
+    ]
+  },
+  {
+    "yaml": "1-2-3",
+    "args": [
+      "1-2-3"
+    ]
+  },
+  {
+    "yaml": "+",
+    "args": [
+      "+"
+    ]
+  },
+  {
+    "yaml": ".",
+    "args": [
+      "."
+    ]
+  },
+  {
+    "yaml": "..",
+    "args": [
+      ".."
+    ]
+  },
+  {
+    "yaml": "...",
+    "args": [
+      "..."
+    ]
+  },
+  {
+    "yaml": "---",
+    "args": [
+      "---"
+    ]
+  },
+  {
+    "yaml": "@at",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "`tick",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "%pct",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "&anchor",
+    "args": []
+  },
+  {
+    "yaml": "*alias",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unresolved alias"
+  },
+  {
+    "yaml": "|",
+    "args": [
+      ""
+    ]
+  },
+  {
+    "yaml": ">",
+    "args": [
+      ""
+    ]
+  },
+  {
+    "yaml": "{}",
+    "error": "profile.yml step 1: arguments must be a value or a list of values"
+  },
+  {
+    "yaml": "[a, b]",
+    "args": [
+      "a",
+      "b"
+    ]
+  },
+  {
+    "yaml": "[1.10, 0x1F, true]",
+    "args": [
+      "1.1",
+      "31",
+      "true"
+    ]
+  },
+  {
+    "yaml": "[~, yes, 1e3]",
+    "error": "profile.yml step 1: arguments must be a value or a list of values"
+  },
+  {
+    "yaml": "{a: 1}",
+    "error": "profile.yml step 1: arguments must be a value or a list of values"
+  },
+  {
+    "yaml": "[[a]]",
+    "error": "profile.yml step 1: arguments must be a value or a list of values"
+  },
+  {
+    "yaml": "[a, [b]]",
+    "error": "profile.yml step 1: arguments must be a value or a list of values"
+  },
+  {
+    "yaml": "[]",
+    "args": []
+  },
+  {
+    "yaml": "!!str 1.10",
+    "args": [
+      "1.10"
+    ]
+  },
+  {
+    "yaml": "!!str true",
+    "args": [
+      "true"
+    ]
+  },
+  {
+    "yaml": "!!int 3",
+    "args": [
+      "3"
+    ]
+  },
+  {
+    "yaml": "!!int \"3\"",
+    "args": [
+      "3"
+    ]
+  },
+  {
+    "yaml": "!!float 1",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "yaml": "!!bool yes",
+    "args": [
+      "yes"
+    ]
+  },
+  {
+    "yaml": "!!null ''",
+    "args": [
+      ""
+    ]
+  },
+  {
+    "yaml": "!!binary SGVsbG8=",
+    "args": [
+      "SGVsbG8="
+    ]
+  },
+  {
+    "yaml": "&a 1.10",
+    "args": [
+      "1.1"
+    ]
+  },
+  {
+    "yaml": "café",
+    "args": [
+      "café"
+    ]
+  },
+  {
+    "yaml": "日本語",
+    "args": [
+      "日本語"
+    ]
+  },
+  {
+    "yaml": "🚚",
+    "args": [
+      "🚚"
+    ]
+  },
+  {
+    "yaml": "\"\\u00e9\"",
+    "args": [
+      "é"
+    ]
+  },
+  {
+    "yaml": "\"\\U0001F69A\"",
+    "args": [
+      "🚚"
+    ]
+  },
+  {
+    "yaml": "|\n    line1\n    line2",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": ">\n    folded\n    text",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "|-\n    keep",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  },
+  {
+    "yaml": "|+\n    keep\n\n",
+    "error": "profile.yml: invalid YAML: YAML Parse error: Unexpected token"
+  }
+]

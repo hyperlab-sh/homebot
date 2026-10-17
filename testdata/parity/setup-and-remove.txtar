@@ -1,0 +1,107 @@
+[!linux] skip 'recorded on linux'
+
+# setup installs the commit guard and the helper (systemd stubbed); --remove takes the helper away.
+chmod 755 bin/systemctl
+# deliberate: the Go setup checks for gitleaks before anything else and stops without it; the TypeScript did not look
+chmod 755 bin/gitleaks
+exec git -C home/.home init -q
+# exit: 0
+exec homebot setup
+# deliberate: final review home I2: setup says the helper keeps the XDG_* folders it was set up with, after the helper line; the TypeScript's helper carried no XDG_* and said nothing
+# deliberate: the Go build loads the integration with eval "$(homebot shell zsh)", so the hint prints that line instead of the TypeScript's `source ~/.home/homebot/shell/homebot.zsh`
+# deliberate: guided setup: setup ends on the inbox, terminal or not, so what is left is listed with its commands; the TypeScript's setup printed only the zshrc hint
+cmpwork stdout setup.stdout
+cmpwork stderr setup.stderr
+exec git -C home/.home config core.hooksPath
+# deliberate: the Go build points core.hooksPath at the hooks shim under $XDG_DATA_HOME/homebot, not at the repo's homebot/hooks (wave C pin, guard.InstallHooks)
+cmpwork stdout hookspath.stdout
+exists home/.config/systemd/user/homebot-tidy.timer
+exists home/.config/systemd/user/homebot-tidy.service
+# exit: 0
+exec homebot setup
+# deliberate: final review home I2: setup says the helper keeps the XDG_* folders it was set up with, after the helper line; the TypeScript's helper carried no XDG_* and said nothing
+# deliberate: the Go build loads the integration with eval "$(homebot shell zsh)", so the hint prints that line instead of the TypeScript's `source ~/.home/homebot/shell/homebot.zsh`
+# deliberate: guided setup: setup ends on the inbox, terminal or not, so what is left is listed with its commands; the TypeScript's setup printed only the zshrc hint
+cmpwork stdout setup-again.stdout
+# exit: 0
+exec homebot setup --remove
+cmpwork stdout setup-remove.stdout
+! exists home/.config/systemd/user/homebot-tidy.timer
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- setup.stdout --
+installed commit guard (core.hooksPath)
+installed hourly systemd timer homebot-tidy.timer
+The helper keeps the XDG_* folders it was set up with. After changing XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_STATE_HOME or XDG_CACHE_HOME, run homebot setup again.
+
+Add this to your .zshrc so new terminals tell you when something needs you:
+  eval "$(homebot shell zsh)"
+
+homebot · testhost · 4 things need you
+
+  1  • 1 link to make or fix
+       → homebot link
+  2  • 3 new things to sort: track, ignore or snooze
+       autolink, homebot.yml, manifests
+       → homebot triage
+  3  • Not backed up: the repo has no remote
+       → homebot remote
+  4  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+
+  Do the first one now: homebot next
+-- setup.stderr --
+-- hookspath.stdout --
+$WORK/xdg/data/homebot/hooks
+-- setup-again.stdout --
+Commit guard already installed.
+installed hourly systemd timer homebot-tidy.timer
+The helper keeps the XDG_* folders it was set up with. After changing XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_STATE_HOME or XDG_CACHE_HOME, run homebot setup again.
+
+Add this to your .zshrc so new terminals tell you when something needs you:
+  eval "$(homebot shell zsh)"
+
+homebot · testhost · 4 things need you
+
+  1  • 1 link to make or fix
+       → homebot link
+  2  • 3 new things to sort: track, ignore or snooze
+       autolink, homebot.yml, manifests
+       → homebot triage
+  3  • Not backed up: the repo has no remote
+       → homebot remote
+  4  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+
+  Do the first one now: homebot next
+-- setup-remove.stdout --
+Background helper removed.

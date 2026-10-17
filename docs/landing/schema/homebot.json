@@ -1,0 +1,169 @@
+{
+  "$id": "https://homebot.sh/schema/homebot.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "ai": {},
+    "autosave": {
+      "additionalProperties": false,
+      "description": "Set the background save cadence and push behavior.",
+      "properties": {
+        "commit": {
+          "description": "Commit automatically: off, hourly or daily.",
+          "enum": [
+            "off",
+            "hourly",
+            "daily"
+          ],
+          "type": "string"
+        },
+        "push": {
+          "description": "Push background commits when enabled.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "exports": {
+      "description": "Programs that write files into the home repo.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Name used to select an export.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "linux",
+                    "macos"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "enum": [
+                  "linux",
+                  "macos"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Operating systems that run this export."
+          },
+          "out": {
+            "description": "Repo-relative output path for the export.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "profiles": {
+            "description": "Profiles allowed to run this export.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "run": {
+            "description": "Shell command that produces the export.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "out",
+          "run"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "limits": {
+      "additionalProperties": false,
+      "description": "Size limits enforced by the commit guard.",
+      "properties": {
+        "maxFileMB": {
+          "description": "Maximum file size in megabytes.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "name": {
+      "description": "Optional command name for this homebot.",
+      "minLength": 2,
+      "pattern": "^[a-z][a-z0-9-]{0,31}$",
+      "type": "string"
+    },
+    "persona": {
+      "description": "Optional persona id, or none for a neutral voice.",
+      "pattern": "^[a-z][a-z0-9-]{0,31}$",
+      "type": "string"
+    },
+    "profiles": {
+      "additionalProperties": false,
+      "description": "Choose which profile each machine unpacks.",
+      "properties": {
+        "default": {
+          "description": "Profile used when a host has no entry.",
+          "type": "string"
+        },
+        "hosts": {
+          "additionalProperties": false,
+          "description": "Map each host name to its profile.",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "triage": {
+      "additionalProperties": false,
+      "description": "Choose files the inbox offers to pack.",
+      "properties": {
+        "watch": {
+          "description": "Home-relative glob patterns to watch.",
+          "items": {
+            "pattern": "/\\.?\\*$",
+            "type": "string"
+          },
+          "pattern": "/\\.?\\*$",
+          "type": [
+            "array",
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "update": {
+      "description": "Release behavior: off, notify or auto. Automatic updates use a signed build after a soak period.",
+      "enum": [
+        "off",
+        "notify",
+        "auto"
+      ],
+      "type": "string"
+    }
+  },
+  "title": "homebot.yml",
+  "type": [
+    "object",
+    "null"
+  ]
+}

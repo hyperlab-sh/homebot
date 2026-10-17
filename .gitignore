@@ -1,0 +1,11 @@
+dist/
+docs/site/
+.DS_Store
+.superpowers/
+.worktrees/
+.remember/
+/homebot
+/dist-go/
+/dist-extra/
+
+/agent/

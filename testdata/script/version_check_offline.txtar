@@ -1,0 +1,12 @@
+# Only --check contacts releases. Plain version remains offline.
+env HOMEBOT_TEST_RELEASES_URL=http://127.0.0.1:1
+exec homebot version
+cmp stdout plain.golden
+! stderr .
+
+! exec homebot version --check
+! stdout .
+stderr 'Could not check the latest release:'
+
+-- plain.golden --
+dev

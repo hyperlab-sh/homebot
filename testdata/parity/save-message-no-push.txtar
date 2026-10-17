@@ -1,0 +1,78 @@
+[!linux] skip 'recorded on linux'
+
+# -m sets the subject; --no-push keeps the commit local.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+exec sh -c 'echo more >> home/.home/autolink/common/zshrc'
+# exit: 0
+exec homebot save -m 'tweak: zshrc'
+cmpwork stdout save-message.stdout
+exec sh -c 'echo again >> home/.home/autolink/common/zshrc'
+# exit: 0
+exec homebot save --no-push
+cmpwork stdout save-no-push.stdout
+exec git -C home/.home log --format=%s
+cmpwork stdout log.stdout
+# exit: 0
+exec homebot
+cmpwork stdout inbox-unpushed.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- save-message.stdout --
+committed 1 file
+pushed 1 commit
+-- save-no-push.stdout --
+committed 1 file
+-- log.stdout --
+chore(home): save changes from testhost
+tweak: zshrc
+init
+-- inbox-unpushed.stdout --
+homebot · testhost · 5 things need you (1 urgent)
+
+  1  ! The commit guard is not installed
+       → homebot setup
+  2  • 1 link to make or fix
+       → homebot link
+  3  • 1 commit not pushed
+       → homebot save
+  4  • Profile workstation was never unpacked here
+       It runs every step without asking; to see them first: homebot unpack
+       --dry-run
+       → homebot unpack
+  5  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+
+  Do the first one now: homebot next

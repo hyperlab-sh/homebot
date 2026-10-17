@@ -1,0 +1,63 @@
+[!linux] skip 'recorded on linux'
+
+# Real files in the way: link reports them and leaves them alone (exit 0).
+# exit: 0
+exec homebot link
+cmpwork stdout link-conflict.stdout
+cmpwork stderr link-conflict.stderr
+# exit: 0
+exec homebot
+cmpwork stdout link-conflict-inbox.stdout
+# exit: 0
+exec homebot link --dry-run
+cmpwork stdout link-conflict-dry.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export REPO=1
+-- home/.home/autolink/common/gitconfig --
+[user]
+-- home/.home/autolink/common/tmux --
+tmux
+-- home/.home/autolink/common/vim/vimrc --
+set nu
+-- home/.zshrc --
+export MINE=1
+-- home/.gitconfig --
+[user]
+-- home/.tmux/keep --
+a folder where the repo has a file
+-- home/.vim --
+a file where the repo has a folder
+-- link-conflict.stdout --
+  adopt   ~/.gitconfig
+  blocked ~/.tmux  is a folder, but the repo has a file here
+  blocked ~/.vim  is a file, but the repo has a folder here
+  blocked ~/.zshrc  already exists with different content
+1 change, 0 already linked, 3 blocked
+To move what is in the way aside (renamed *.homebot-backup-<time>, nothing is deleted):
+  homebot link --backup
+-- link-conflict.stderr --
+-- link-conflict-inbox.stdout --
+homebot · testhost · 6 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • 3 files are in the way of links
+       ~/.tmux, ~/.vim, ~/.zshrc
+       → homebot link
+  4  • 3 new things to sort: track, ignore or snooze
+       ~/.tmux, ~/.vim, ~/.zshrc
+       → homebot triage
+  5  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  ...and 1 more: homebot --all
+-- link-conflict-dry.stdout --
+  blocked ~/.tmux  is a folder, but the repo has a file here
+  blocked ~/.vim  is a file, but the repo has a folder here
+  blocked ~/.zshrc  already exists with different content
+1 already linked

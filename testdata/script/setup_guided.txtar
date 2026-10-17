@@ -1,0 +1,52 @@
+# homebot setup without a terminal, from nothing: what it refuses to do
+# there. The questions it asks on a terminal are tested in Go
+# (internal/cli/setup_guided_test.go): testscript's stdin is never one.
+chmod 755 bin/gitleaks
+
+# No repo and no terminal: setup creates and clones nothing, and says how.
+! exec homebot setup
+! stdout .
+cmp stderr no-terminal.stderr
+! exists home/.home
+! exists home/.config/systemd
+
+# Every command that needs the repo points at setup.
+! exec homebot link
+! stdout .
+cmp stderr no-repo.stderr
+
+# An old dotfiles folder at ~/.home is never touched.
+mkdir home/.home
+cp vimrc home/.home/vimrc
+! exec homebot setup
+! stdout .
+cmp stderr taken.stderr
+cmp home/.home/vimrc vimrc
+! exists home/.home/.git
+! exists home/.home/homebot.yml
+
+# A missing tool stops setup before anything else.
+rm bin/gitleaks
+! exec homebot setup
+! stdout .
+cmp stderr missing.stderr
+
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- vimrc --
+set number
+-- no-terminal.stderr --
+homebot: No home repo yet, and setup starts or clones one only in a terminal. Run it in one:
+  homebot setup
+Or clone yours by hand:
+  git clone <url> ~/.home
+-- no-repo.stderr --
+homebot: No homebot.yml found. Run homebot inside your home repo, or set HOMEBOT_ROOT.
+New here? This clones your home repo or starts one: homebot setup
+-- taken.stderr --
+homebot: ~/.home is there but holds no homebot.yml, so it isn't a home repo and setup won't touch it. Move it aside, or set HOMEBOT_ROOT to another folder, then run homebot setup again:
+  mv ~/.home ~/.home.old
+-- missing.stderr --
+homebot: Missing: gitleaks. The commit guard needs it to check every commit. Install it, then run homebot setup again:
+  brew install gitleaks

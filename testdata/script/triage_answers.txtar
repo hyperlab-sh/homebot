@@ -1,0 +1,133 @@
+[!linux] skip 'uses the linux layer'
+
+# Each answer is carried out right away. The home is a repo: pack stages
+# what it moves (D5), a repo file is staged or added to .gitignore, and
+# private/ is never asked about, since save stages it itself.
+exec git -C home/.home init -q
+exec sh -c 'printf /build > home/.home/.gitignore'
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+cp mine home/.home/notes.txt
+mkdir home/.home/scratch home/.home/private/common
+cp mine home/.home/scratch/x
+cp mine home/.home/private/common/token.age
+
+# x and o (this OS only, for a repo file) mean nothing and ask again;
+# letters are not case sensitive.
+stdin answers
+exec homebot triage
+cmp stdout answers.stdout
+! stderr .
+
+exec test -L home/.config/foo
+exec test -L home/.bashrc
+exists home/.home/autolink/linux/bashrc
+exec test -f home/.vimrc
+cmp home/.home/decisions.yml decisions.want
+cmp home/.home/.gitignore gitignore.want
+exec git -C home/.home diff --cached --name-only
+cmp stdout staged.want
+
+# What is left: decisions.yml, new in the repo. ~/.zshrc is snoozed and
+# ~/.vimrc ignored. q stops before deciding anything.
+stdin q
+exec homebot triage
+stdout '^1 things to decide\. Each answer is saved right away; q stops\.$'
+stdout '^\[1/1\] decisions\.yml  \(\d+ B\)$'
+! stdout zshrc
+! stdout vimrc
+exec homebot inventory
+stdout '^  Triage    1 to sort, 1 ignored$'
+
+# Eight days later the snooze is over.
+env HOMEBOT_TEST_NOW=1767916800000
+exec homebot inventory
+stdout '^  Triage    2 to sort, 1 ignored$'
+stdin q
+exec homebot triage
+stdout '^2 things to decide\.'
+stdout '^\[1/2\] ~/\.zshrc  \(5 B\)$'
+
+# Nothing left once everything has a decision.
+stdin ignore-both
+exec homebot triage
+exec homebot triage
+cmp stdout none.stdout
+grep '^  - ~/\.zshrc$' home/.home/decisions.yml
+grep '^/decisions\.yml$' home/.home/.gitignore
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.bashrc --
+mine
+-- home/.vimrc --
+mine
+-- home/.zshrc --
+mine
+-- home/.config/foo/conf --
+mine
+-- mine --
+mine
+-- answers --
+x
+t
+o
+i
+s
+o
+T
+i
+-- q --
+q
+-- ignore-both --
+i
+i
+-- answers.stdout --
+6 things to decide. Each answer is saved right away; q stops.
+
+[1/6] ~/.config/foo  (folder, 5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+>   pick one of the letters above
+>   packed ~/.config/foo into autolink/common/config/foo
+
+[2/6] ~/.bashrc  (5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+>   packed ~/.bashrc into autolink/linux/bashrc
+
+[3/6] ~/.vimrc  (5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+>   will never ask about ~/.vimrc again
+
+[4/6] ~/.zshrc  (5 B)
+  t track everywhere   o track on linux only   i ignore forever
+  s snooze 7 days      enter next              q quit
+>   snoozed ~/.zshrc for 7 days
+
+[5/6] notes.txt  (5 B)
+  t track (git add)    i ignore (.gitignore)   s snooze 7 days
+  enter next           q quit
+>   pick one of the letters above
+>   staged notes.txt
+
+[6/6] scratch  (folder, 5 B)
+  t track (git add)    i ignore (.gitignore)   s snooze 7 days
+  enter next           q quit
+>   added /scratch to .gitignore
+-- decisions.want --
+# Written by `homebot triage`; editing by hand is fine.
+# Paths (globs allowed) that homebot will never offer to track again.
+ignore:
+  - ~/.vimrc
+-- gitignore.want --
+/build
+/scratch
+-- staged.want --
+autolink/common/config/foo/conf
+autolink/linux/bashrc
+notes.txt
+-- none.stdout --
+Nothing to sort. Everything has a decision.

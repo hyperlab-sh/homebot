@@ -1,0 +1,26 @@
+[!linux] skip 'recorded on linux'
+
+# Inventory on a repo that is not even a git repository.
+# exit: 0
+exec homebot inventory
+cmpwork stdout inventory-fresh.stdout
+cmpwork stderr inventory-fresh.stderr
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.zshrc --
+mine
+-- home/.bashrc --
+mine
+-- inventory-fresh.stdout --
+homebot inventory · testhost (linux) · ~/.home
+  Profile   workstation · never unpacked here
+  Links     0 ok, 0 to fix, 1 blocked, 0 locked
+  Secrets   no keys yet (homebot keys init)
+  Triage    2 to sort, 0 ignored
+  Repo      not a git repository
+  Exports   none configured
+  Helper    not installed (homebot setup)
+-- inventory-fresh.stderr --

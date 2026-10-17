@@ -1,0 +1,146 @@
+[!linux] skip 'uses the linux layer'
+
+# pack moves things from $HOME into the repo and links them back. This script
+# covers the command end to end; the parity scripts pack-files and dashdash
+# hold the TypeScript's words for the same runs.
+
+# A folder becomes one link into autolink/common.
+exec homebot pack ~/.config/zed
+cmp stdout folder.stdout
+! stderr .
+exec readlink home/.config/zed
+stdout '^'$WORK'/home/.home/autolink/common/config/zed$'
+grep '"theme"' home/.config/zed/settings.json
+
+# --layer picks the layer.
+exec homebot pack --layer linux ~/.tmux.conf
+cmp stdout layer.stdout
+exists home/.home/autolink/linux/tmux.conf
+exec test -L home/.tmux.conf
+
+# Several paths, one line each, one hint at the end. A relative path starts
+# where the shell is, and so does one that goes up.
+exec homebot pack ~/.vimrc ~/.inputrc
+cmp stdout two.stdout
+cd home/.config
+exec homebot pack ../.bashrc
+cmp stdout $WORK/relative.stdout
+exists ../.home/autolink/common/bashrc
+exec homebot pack --layer linux ../.zprofile
+stdout '^packed ~/\.zprofile → autolink/linux/zprofile$'
+cd ../..
+
+# A single file in an app's folder gets a marked parent, so the app's other
+# files stay out of the repo.
+exec homebot pack ~/.claude/statusline.sh
+stdout '^packed ~/\.claude/statusline\.sh → autolink/common/\(claude\)/statusline\.sh$'
+exec test -d home/.claude
+! exec test -L home/.claude
+exec test -L home/.claude/statusline.sh
+exists home/.claude/sessions/x
+
+# One path that fails ends the command; the ones before it stay packed.
+! exec homebot pack ~/.gitconfig ~/.missing ~/.profile
+stdout '^packed ~/\.gitconfig → autolink/common/gitconfig$'
+! stdout 'profile'
+stderr '^homebot: ~/\.missing does not exist\.$'
+exec test -L home/.gitconfig
+! exec test -L home/.profile
+
+# Refusals leave everything where it was.
+! exec homebot pack
+! stdout .
+cmp stderr noargs.stderr
+! exec homebot pack --layer windows ~/.profile
+! stdout .
+cmp stderr badlayer.stderr
+# A layer this system does not link is refused, with nothing moved.
+! exec homebot pack --layer macos ~/.profile
+! stdout .
+cmp stderr notlinked.stderr
+exec test -f home/.profile
+! exists home/.home/autolink/macos
+! exec homebot pack ~/.vimrc
+! stdout .
+cmp stderr already.stderr
+! exec homebot pack ~/.config/zed/settings.json
+! stdout .
+stderr '^homebot: ~/\.config/zed/settings\.json is inside ~/\.config/zed, which is already managed\. It is in the repo already\.$'
+! exec homebot pack /etc/hostname
+stderr '^homebot: Only things inside your home folder can be packed \(got /etc/hostname\)\.$'
+! exec homebot pack ~/.home
+stderr '^homebot: ~/\.home is \(or contains\) the home repo itself\.$'
+! exec homebot pack ~/visible
+stderr 'Only dotfiles and Library can be tracked at the top of your home folder \(got ~/visible\)\.'
+symlink home/.link -> $WORK/home/visible/file
+! exec homebot pack ~/.link
+stderr '^homebot: ~/\.link is a symlink\. Pack the real file it points to instead\.$'
+! exec homebot pack --private ~/.profile
+! stdout .
+cmp stderr nokeys.stderr
+exec test -f home/.profile
+! exists home/.home/private/common/profile
+
+# Nothing after -- is an option.
+! exec homebot pack -- --help
+! stdout .
+stderr '^homebot: '$WORK'/--help does not exist\.$'
+
+# Everything packed is linked: a link run has nothing left to do.
+exec homebot link --dry-run
+stdout '^[0-9]+ already linked$'
+! stdout 'link   |relink|blocked'
+
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.config/zed/settings.json --
+{"theme": "one"}
+-- home/.tmux.conf --
+set -g mouse on
+-- home/.vimrc --
+set nu
+-- home/.inputrc --
+set bell-style none
+-- home/.bashrc --
+alias ll='ls -l'
+-- home/.zprofile --
+export Z=1
+-- home/.claude/statusline.sh --
+echo status
+-- home/.claude/sessions/x --
+session
+-- home/.gitconfig --
+[user]
+-- home/.profile --
+export P=1
+-- home/visible/file --
+x
+-- folder.stdout --
+packed ~/.config/zed → autolink/common/config/zed
+Commit it with:
+  homebot save
+-- layer.stdout --
+packed ~/.tmux.conf → autolink/linux/tmux.conf
+Commit it with:
+  homebot save
+-- two.stdout --
+packed ~/.vimrc → autolink/common/vimrc
+packed ~/.inputrc → autolink/common/inputrc
+Commit it with:
+  homebot save
+-- relative.stdout --
+packed ~/.bashrc → autolink/common/bashrc
+Commit it with:
+  homebot save
+-- noargs.stderr --
+homebot: What should be packed? e.g. homebot pack ~/.config/nvim
+-- badlayer.stderr --
+homebot: Unknown layer "windows" (use common, linux, macos).
+-- notlinked.stderr --
+homebot: The macos layer is not linked on linux, so a file packed there could not be linked back (use common, linux).
+-- already.stderr --
+homebot: ~/.vimrc is already managed.
+-- nokeys.stderr --
+homebot: Create keys before packing secrets:
+  homebot keys init

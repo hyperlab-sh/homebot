@@ -1,0 +1,48 @@
+[!linux] skip 'recorded on linux'
+
+# Bare homebot, and homebot with only options, run the inbox. -x is not an inbox option.
+# exit: 0
+exec homebot --all
+cmpwork stdout all.stdout
+cmpwork stderr all.stderr
+# exit: 1
+! exec homebot -x
+cmpwork stdout x.stdout
+cmpwork stderr x.stderr
+# exit: 0
+exec homebot inbox
+cmpwork stdout inbox-word.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- all.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup
+-- all.stderr --
+-- x.stdout --
+-- x.stderr --
+homebot: Unknown option '-x'. To specify a positional argument starting with a '-', place it at the end of the command after '--', as in '-- "-x"
+See: homebot --help
+-- inbox-word.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

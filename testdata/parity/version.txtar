@@ -1,0 +1,13 @@
+
+# exit: 0
+exec homebot --version
+# deliberate: Go reports the -ldflags version; a test binary is "dev" (the TypeScript printed package.json's 0.1.0)
+cmpwork stdout version-long.stdout
+# exit: 0
+exec homebot -v
+# deliberate: Go reports the -ldflags version; a test binary is "dev" (the TypeScript printed package.json's 0.1.0)
+cmpwork stdout version-short.stdout
+-- version-long.stdout --
+dev
+-- version-short.stdout --
+dev

@@ -1,0 +1,24 @@
+[!linux] skip 'recorded on linux'
+
+# profiles: limits an export to machines whose default profile is listed.
+# exit: 0
+exec homebot export
+cmpwork stdout export-profiles.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: server
+exports:
+  - name: for-server
+    profiles: [server]
+    out: manifests/server.txt
+    run: echo s
+  - name: for-desktop
+    profiles: [desktop]
+    out: manifests/desktop.txt
+    run: echo d
+  - name: for-everyone
+    out: manifests/all.txt
+    run: echo a
+-- export-profiles.stdout --
+updated   manifests/server.txt
+updated   manifests/all.txt

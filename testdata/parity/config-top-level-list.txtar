@@ -1,0 +1,14 @@
+[!linux] skip 'recorded on linux'
+
+# homebot.yml error: a list at the top level
+# exit: 1
+! exec homebot
+cmpwork stdout config-top-level-list.stdout
+# deliberate: PARITY.md "homebot.yml (Task 1)": every config error starts with homebot.yml:<line>:<col>: instead of homebot.yml:; the wording after it is unchanged
+cmpwork stderr config-top-level-list.stderr
+-- home/.home/homebot.yml --
+- profiles
+- triage
+-- config-top-level-list.stdout --
+-- config-top-level-list.stderr --
+homebot: $WORK/home/.home/homebot.yml:1:1: expected a mapping at the top level

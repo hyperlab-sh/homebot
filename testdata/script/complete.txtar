@@ -1,0 +1,32 @@
+# Completion runs without a repository and prints the Cobra directive.
+exec homebot __complete ''
+stdout '^action'
+stdout '^actions'
+stdout '^cleanup'
+stdout '^help'
+stdout '^save'
+stdout '^:([0-9]+)$'
+! stdout '^version'
+! stdout '^completion'
+! stdout '^refresh'
+! stdout '^hook'
+! exists xdg/state/homebot
+! exists xdg/cache/homebot
+! exists xdg/data/homebot
+
+# An option request reaches Cobra as given and offers save's flags.
+exec homebot __complete save -
+stdout '^--message'
+stdout '^--no-push'
+! exists xdg/state/homebot
+! exists xdg/cache/homebot
+! exists xdg/data/homebot
+
+# Cobra-hidden commands still have their existing dispatch and help paths.
+exec homebot version
+stdout '^dev$'
+exec homebot help version
+stdout '^Usage: homebot version$'
+exec homebot help completion
+stdout '^Usage: homebot completion bash\|zsh\|fish$'
+stdout 'source <\(homebot completion zsh\)'

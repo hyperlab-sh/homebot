@@ -1,0 +1,52 @@
+# The output of `homebot shell zsh` loads in zsh and reads the cache files.
+[!exec:zsh] skip 'zsh is not installed'
+
+mkdir $XDG_CACHE_HOME/homebot
+cp nudge $XDG_CACHE_HOME/homebot/nudge
+cp count $XDG_CACHE_HOME/homebot/count
+cp symbol $XDG_CACHE_HOME/homebot/symbol
+
+exec zsh -f check.zsh
+cmp stdout want.stdout
+
+# Without a symbol file the truck stays; without a count there is no HOMEBOT_COUNT.
+rm $XDG_CACHE_HOME/homebot/symbol
+rm $XDG_CACHE_HOME/homebot/count
+exec zsh -f check.zsh
+cmp stdout want-bare.stdout
+
+# A relative XDG_CACHE_HOME is ignored, as homebot ignores it: the shell
+# reads ~/.cache/homebot, where homebot writes, not ./rel/homebot.
+mkdir rel/homebot
+cp other rel/homebot/nudge
+mkdir home/.cache/homebot
+cp nudge home/.cache/homebot/nudge
+env XDG_CACHE_HOME=rel
+exec zsh -f check.zsh
+cmp stdout want-bare.stdout
+
+-- other --
+not this one
+-- check.zsh --
+eval "$(homebot shell zsh)"
+homebot_nudge
+print -r -- "count=[$(homebot_count)]"
+print -r -- "symbol=[$(homebot_symbol)]"
+_homebot_precmd
+print -r -- "env=[${HOMEBOT_COUNT-unset}]"
+-- nudge --
+3 things need you
+-- count --
+3!
+-- symbol --
+☔
+-- want.stdout --
+3 things need you
+count=[3!]
+symbol=[☔]
+env=[3!]
+-- want-bare.stdout --
+3 things need you
+count=[]
+symbol=[🚚]
+env=[unset]

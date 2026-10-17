@@ -1,0 +1,30 @@
+[!linux] skip 'the name link is exercised in the Linux sandbox'
+
+# A helper run cannot create ~/.local/bin for a synced name.
+mkdir home/.home
+cp zork.yml home/.home/homebot.yml
+exec homebot tidy --quiet
+! exists $HOME/.local/bin
+exec homebot inbox --all
+stdout 'The name zork needs a bin directory here'
+
+# An explicit name command creates the bin. Later config changes are synced
+# by tidy without another explicit name command.
+exec homebot name zork
+exists $HOME/.local/bin/zork
+cp zara.yml home/.home/homebot.yml
+exec homebot tidy --quiet
+exists $HOME/.local/bin/zara
+! exists $HOME/.local/bin/zork
+
+cp off.yml home/.home/homebot.yml
+exec homebot tidy --quiet
+! exists $HOME/.local/bin/zara
+
+-- zork.yml --
+name: zork
+-- zara.yml --
+name: zara
+-- off.yml --
+profiles:
+  default: workstation

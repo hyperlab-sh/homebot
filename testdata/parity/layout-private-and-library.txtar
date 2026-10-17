@@ -1,0 +1,36 @@
+[!linux] skip 'recorded on linux'
+
+# Layout rules in private/ and the NO_DOT name "Library": a sealed secret stays locked until unlocked.
+# exit: 0
+exec homebot link
+cmpwork stdout layout-private-link.stdout
+exists home/Library/note
+# exit: 0
+exec homebot
+cmpwork stdout layout-private-inbox.stdout
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/autolink/common/Library/note --
+n
+-- home/.home/private/common/token.age --
+not really age
+-- home/.home/private/common/readme.txt --
+plain
+-- layout-private-link.stdout --
+  link    ~/.readme.txt
+  link    ~/Library/note
+2 changes, 0 already linked, 1 locked (homebot unlock)
+-- layout-private-inbox.stdout --
+homebot · testhost · 4 things need you (1 urgent)
+
+  1  ! ~/.home is not a git repository
+       → git -C ~/.home init
+  2  • Secrets are not set up yet
+       → homebot keys init
+  3  • Profile workstation does not exist yet
+       Write the steps that set up this machine
+       → $EDITOR ~/.home/manifests/profiles/workstation.yml
+  4  • The background helper is not installed
+       It seals, exports, links and reminds you every hour
+       → homebot setup

@@ -1,0 +1,71 @@
+# homebot shell integration for zsh. In .zshrc:
+#
+#   (( $+commands[homebot] )) && eval "$(homebot shell zsh)"
+#
+# At startup it prints one line, only when something needs you. It reads cache
+# files (no subprocess) and refreshes the cache in the background when it is
+# older than 30 minutes. The cache holds three files: nudge (the start-up
+# line), count (inbox items) and symbol (the persona's emoji).
+
+# A relative XDG_CACHE_HOME is ignored, as homebot and its helper ignore it,
+# so the shell reads the cache they write.
+if [[ ${XDG_CACHE_HOME:-} == /* ]]; then
+  typeset -g HOMEBOT_CACHE="$XDG_CACHE_HOME/homebot"
+else
+  typeset -g HOMEBOT_CACHE="$HOME/.cache/homebot"
+fi
+
+homebot_nudge() {
+  local nudge="$HOMEBOT_CACHE/nudge"
+  [[ -s $nudge ]] && print -r -- "$(<$nudge)"
+}
+
+# Number of inbox items, with a trailing ! when one is urgent. Empty when none.
+homebot_count() {
+  local count="$HOMEBOT_CACHE/count"
+  [[ -s $count ]] && print -rn -- "${$(<$count)//[[:space:]]/}"
+}
+
+# The persona's emoji for prompts; a truck when the cache has none yet.
+homebot_symbol() {
+  local symbol="$HOMEBOT_CACHE/symbol"
+  if [[ -s $symbol ]]; then print -rn -- "$(<$symbol)"; else print -rn -- "🚚"; fi
+}
+
+_homebot_refresh_if_stale() {
+  (( $+commands[homebot] )) || return
+  zmodload -F zsh/stat b:zstat 2>/dev/null || return
+  zmodload zsh/datetime 2>/dev/null || return
+  local -a mtime
+  zstat -A mtime +mtime -- "$HOMEBOT_CACHE/nudge" 2>/dev/null || mtime=(0)
+  (( EPOCHSECONDS - mtime[1] > 1800 )) || return
+  ( homebot refresh >/dev/null 2>&1 & )
+}
+
+# Before each prompt: export HOMEBOT_COUNT for prompts that read the
+# environment (Starship's env_var module). `read` keeps it fork-free.
+_homebot_precmd() {
+  local count
+  [[ -r $HOMEBOT_CACHE/count ]] && read -r count <$HOMEBOT_CACHE/count
+  count=${count//[[:space:]]/}
+  if [[ -n $count ]]; then export HOMEBOT_COUNT=$count; else unset HOMEBOT_COUNT; fi
+}
+
+if [[ -o interactive ]]; then
+  homebot_nudge
+  _homebot_refresh_if_stale
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd _homebot_precmd
+fi
+
+# Spaceship prompt section. Enable it by adding "homebot" to SPACESHIP_PROMPT_ORDER.
+spaceship_homebot() {
+  local count="$(homebot_count)"
+  [[ -z $count ]] && return
+  spaceship::section \
+    --color "${SPACESHIP_HOMEBOT_COLOR:-yellow}" \
+    --prefix "${SPACESHIP_HOMEBOT_PREFIX:-}" \
+    --suffix "${SPACESHIP_HOMEBOT_SUFFIX:-${SPACESHIP_PROMPT_DEFAULT_SUFFIX- }}" \
+    --symbol "${SPACESHIP_HOMEBOT_SYMBOL:-$(homebot_symbol) }" \
+    "$count"
+}

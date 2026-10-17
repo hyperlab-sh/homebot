@@ -1,0 +1,67 @@
+[!linux] skip 'recorded on linux'
+
+# The helper's hourly chore, run by hand: seals, exports, commits nothing (autosave off), links.
+chmod 755 bin/gitleaks
+chmod 755 bin/systemctl
+exec git -C home/.home init -q
+exec git -C home/.home add -A
+exec git -C home/.home commit -q -m init
+exec git init -q --bare remote.git
+exec git -C home/.home remote add origin $WORK/remote.git
+exec git -C home/.home push -q -u origin main
+# exit: 0
+exec homebot setup
+exec sh -c 'echo "  - x" > /dev/null'
+# exit: 0
+exec homebot tidy
+cmpwork stdout tidy-first.stdout
+cmpwork stderr tidy-first.stderr
+# exit: 0
+exec homebot tidy --quiet
+cmpwork stdout tidy-quiet.stdout
+# exit: 0
+exec homebot refresh
+cmpwork stdout refresh.stdout
+exec cat xdg/cache/homebot/nudge
+cmpwork stdout nudge.stdout
+exec cat xdg/cache/homebot/count
+cmpwork stdout count.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- home/.home/autolink/common/gitconfig --
+[user]
+-- tidy-first.stdout --
+done fixed 2 links
+1 thing in the inbox.
+-- tidy-first.stderr --
+-- tidy-quiet.stdout --
+-- refresh.stdout --
+-- nudge.stdout --
+🚚 homebot: 1 thing needs you, run: homebot
+-- count.stdout --
+1

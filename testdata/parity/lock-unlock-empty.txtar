@@ -1,0 +1,42 @@
+[!linux] skip 'recorded on linux'
+
+# lock and unlock with nothing to do.
+# exit: 0
+exec homebot lock
+cmpwork stdout lock-nothing.stdout
+cmpwork stderr lock-nothing.stderr
+# exit: 0
+exec homebot lock --wipe
+cmpwork stdout lock-wipe-nothing.stdout
+-- bin/gitleaks --
+#!/bin/sh
+exit 0
+-- bin/systemctl --
+#!/bin/sh
+exit 0
+-- home/.home/homebot.yml --
+profiles:
+  default: workstation
+-- home/.home/manifests/profiles/workstation.yml --
+description: A workstation
+steps:
+  - link
+-- home/.home/private/.gitignore --
+*
+!*/
+!*.age
+!.gitignore
+!README.md
+!recipients.txt
+!.gitkeep
+-- home/.home/private/identity.age --
+placeholder: the scenarios never decrypt
+-- home/.home/private/recipients.txt --
+age1tujyac0368fyf35ffq75jjm8uu42endd5yx4c9ljlrt8yyhsuu2smhgq2m
+-- home/.home/autolink/common/zshrc --
+export A=1
+-- lock-nothing.stdout --
+Nothing to seal.
+-- lock-nothing.stderr --
+-- lock-wipe-nothing.stdout --
+Sealed 0, removed 0 plaintext files.

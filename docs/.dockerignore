@@ -1,0 +1,13 @@
+# Built inside the image, never copied in.
+node_modules
+site
+dist
+landing/assets/img
+
+# Not needed to build the site.
+Dockerfile
+.dockerignore
+README.md
+landing/IMAGE-PROMPTS.md
+**/.DS_Store
+**/*.log
