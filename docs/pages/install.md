@@ -102,7 +102,7 @@ sudo caller on macOS and Linux. A root shell with its own root-owned `HOME`
 
 The one-line method trusts GitHub and the network path to it to send the
 intended script. The front door script above is served by homebot.sh instead,
-so using it also trusts that server and Cloudflare. It checks the release
+so using it also trusts that server. It checks the release
 installer against the release's `checksums.txt`, but both come from the same
 place, and it does not check the signature or pass `--require-signature`. For
 high assurance, use the GitHub URL, not the front door: download the asset,

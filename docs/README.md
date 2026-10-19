@@ -40,7 +40,7 @@ bun run preview    # serve dist/ at http://localhost:4321, like production
   `/docs/assets/favicon.ico` (the docs link it), and stamps the homepage's
   `/assets/` URLs with a content hash (`?v=...`) so they can be cached for a
   year. The homepage links its favicon under `/assets/img/` for that stamp:
-  `/favicon.ico` is cached for a week, by Cloudflare too.
+  `/favicon.ico` is cached for a week by the browser.
 
 docmd 0.9.7 applies every `.gitignore` up the directory tree to the full path of
 `pages/`, so a checkout under a folder named like an ignored pattern (`site/`,

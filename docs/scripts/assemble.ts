@@ -64,7 +64,7 @@ for (const file of ["docs-choice.js", "reserved-names.json"]) {
 writeFileSync(join(DIST, "command-tokens.txt"), markSite(join(DIST, "docs")));
 
 // The homepage links the favicon under /assets/, so it gets a content hash like
-// every other asset: /favicon.ico is cached for a week (by Cloudflare too), and
+// every other asset: /favicon.ico is cached for a week by the browser, and
 // a new icon would wait that long. Browsers still ask for /favicon.ico at the
 // root no matter what the page says, so it is there as well. The docs link
 // theirs from docs/assets/ (docmd.config.json, which adds its own ?v=), where
